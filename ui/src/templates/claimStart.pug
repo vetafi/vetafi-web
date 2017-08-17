@@ -1,0 +1,36 @@
+#claim-start-view
+  vfi-breadcrumbs(page="0")
+  #claim-start-wrapper
+    h3 Select Claim
+
+    div.content.container(ng-show="isSignedIn")
+      div.row
+        div.col-sm-2
+          | Claim
+          hr
+        div.col-sm-4
+          | Description
+          hr
+        div.col-sm-2
+          | Number of Forms
+          hr
+
+
+      div.row(ng-repeat="claim in claimConfig.claims")
+        div.col-sm-2
+          | {{claim.name}}
+        div.col-sm-4
+          | {{claim.description}}
+        div.col-sm-2
+          | {{claim.forms.length}}
+        div.col-sm-2
+          button(ng-click="startClaim(claim)")
+            | Select
+
+    div.proceed-wrapper(ng-show="!isSignedIn")
+      div
+        h4.signup You must sign into an account to continue
+        a(href='/signup')
+          button.signup-btn
+            | Sign Up
+vfi-footer
