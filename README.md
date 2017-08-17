@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/vetafi/vetafi-web.svg?branch=master)](https://travis-ci.org/vetafi/vetafi-web)
+
 # Vetafi Web App
 
 This is the main vetafi app, built with Play-Framework 2.5.
