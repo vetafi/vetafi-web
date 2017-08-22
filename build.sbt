@@ -43,6 +43,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-core" % "1.2.3",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.log4s" %% "log4s" % "1.3.6",
+  "commons-io" % "commons-io" % "2.5",
   specs2 % Test,
   cache,
   filters

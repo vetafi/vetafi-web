@@ -1,6 +1,7 @@
-package gov.va.vetaffi;
+package services.documents.pdf;
 
 import com.google.common.collect.Lists;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -31,6 +32,6 @@ public class PDFMappingTest {
 
     @Test
     public void testReadLocators() throws Exception {
-        PDFMapping.getSpec(PDFMapping.class.getClassLoader().getResourceAsStream("forms/VBA-21-0781-ARE.locators.json"));
+        PDFMapping.getSpec(PDFMapping.class.getClassLoader().getResourceAsStream("forms/VBA-21-0966-ARE.locators.json"));
     }
 }
