@@ -10,9 +10,7 @@ class ITextDocumentService extends DocumentService {
    * @param form
    * @return
    */
-  override def render(form: ClaimForm) = {
-    PDFStamping.stampPdf()
-  }
+  override def render(form: ClaimForm) = ???
 
   /**
    * Get final signed PDF url for document from document service.

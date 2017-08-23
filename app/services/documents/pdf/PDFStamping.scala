@@ -1,180 +1,165 @@
-package services.documents.pdf;
+package services.documents.pdf
 
-import com.google.common.base.Throwables;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.ColumnText;
-import com.itextpdf.text.pdf.PdfAnnotation;
-import com.itextpdf.text.pdf.PdfBorderArray;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfDestination;
-import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfStamper;
-import com.itextpdf.text.pdf.PdfWriter;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.{InputStream, OutputStream}
+import java.util.Base64
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import com.itextpdf.text._
+import com.itextpdf.text.pdf._
+import org.apache.commons.io.IOUtils
+import org.log4s.getLogger
 
-public class PDFStamping {
-  private static final Logger logger = LoggerFactory.getLogger(PDFStamping.class);
+object PDFStamping {
+  private[this] val logger = getLogger
 
-  private static byte[] CHECK = null;
-  private static final String ACRO_FORM_CHECKED = "1";
+  val ACRO_FORM_CHECKED = "1"
 
-  static {
-    try {
-      CHECK = IOUtils.toByteArray(PDFStamping.class.getClassLoader().getResourceAsStream("forms/check.png"));
-    } catch (IOException e) {
-      Throwables.propagate(e);
-    }
+  lazy val CHECK: Array[Byte] =
+    IOUtils.toByteArray(getClass.getResourceAsStream("forms/check.png"))
+
+  def getRectangleForField(fields: AcroFields, key: String): Rectangle = {
+    val rectVals: Array[Double] = fields
+      .getFieldItem(key)
+      .getValue(0)
+      .getAsArray(PdfName.RECT)
+      .asDoubleArray()
+
+    new Rectangle(rectVals(0).toFloat,
+      rectVals(1).toFloat,
+      rectVals(2).toFloat,
+      rectVals(3).toFloat)
   }
 
-  private static Rectangle getRectangleForField(AcroFields fields, String key) {
-    double[] rectVals = fields.getFieldItem(key).getValue(0).getAsArray(PdfName.RECT).asDoubleArray();
-    return new Rectangle((float) rectVals[0],
-        (float) rectVals[1],
-        (float) rectVals[2],
-        (float) rectVals[3]);
+  def get2xRectangleForField(fields: AcroFields, key: String): Rectangle = {
+    val rectVals: Array[Double] = fields
+      .getFieldItem(key)
+      .getValue(0)
+      .getAsArray(PdfName.RECT)
+      .asDoubleArray()
+
+    new Rectangle(rectVals(0).toFloat,
+      (rectVals(1) - ((rectVals(3) - rectVals(1)) / 2)).toFloat,
+      rectVals(2).toFloat,
+      (rectVals(3) + ((rectVals(3) - rectVals(1)) / 2)).toFloat)
   }
 
-  private static Rectangle get2xRectangleForField(AcroFields fields, String key) {
-    double[] rectVals = fields.getFieldItem(key).getValue(0).getAsArray(PdfName.RECT).asDoubleArray();
-    return new Rectangle((float) rectVals[0],
-        (float) (rectVals[1] - ((rectVals[3] - rectVals[1]) / 2)),
-        (float) rectVals[2],
-        (float) (rectVals[3] + ((rectVals[3] - rectVals[1]) / 2)));
+  def placeImageInRectangle(image: Image, rectangle: Rectangle): Unit = {
+    val x = rectangle.getLeft()
+    val y = rectangle.getBottom()
+    image.setAbsolutePosition(x, y)
+    image.scaleToFit(rectangle)
   }
 
-  private static void placeImageInRectangle(Image image, Rectangle rectangle) {
-    float x = rectangle.getLeft();
-    float y = rectangle.getBottom();
-    image.setAbsolutePosition(x, y);
-    image.scaleToFit(rectangle);
+  def getPageForField(form: AcroFields, key: String): Integer = {
+    form.getFieldItem(key).getPage(0)
   }
 
-  private static Integer getPageForField(AcroFields form, String key) {
-    return form.getFieldItem(key).getPage(0);
-  }
-
-  private static void stampCheckbox(
-      String key,
-      Boolean value,
-      AcroFields form,
-      PdfStamper stamper,
-      PdfReader reader) throws DocumentException, IOException {
+  def stampCheckbox(
+                     key: String,
+                     value: Boolean,
+                     form: AcroFields,
+                     stamper: PdfStamper,
+                     reader: PdfReader): Unit = {
     if (value) {
-      form.setField(key, ACRO_FORM_CHECKED);
+      form.setField(key, ACRO_FORM_CHECKED)
 
       // Overlay with custom check image in addition to setting to "On"
-      Image img = Image.getInstance(CHECK);
-      Rectangle linkLocation = getRectangleForField(form, key);
-      placeImageInRectangle(img, linkLocation);
-      Integer pageIdx = getPageForField(form, key);
-      stamper.getOverContent(pageIdx).addImage(img);
-      PdfDestination destination = new PdfDestination(PdfDestination.FIT);
-      PdfAnnotation link = PdfAnnotation.createLink(stamper.getWriter(),
-          linkLocation,
-          PdfAnnotation.HIGHLIGHT_INVERT,
-          reader.getNumberOfPages(),
-          destination);
-      link.setBorder(new PdfBorderArray(0, 0, 0));
-      stamper.addAnnotation(link, pageIdx);
+      val img: Image = Image.getInstance(CHECK)
+      val linkLocation: Rectangle = getRectangleForField(form, key)
+      placeImageInRectangle(img, linkLocation)
+      val pageIdx: Integer = getPageForField(form, key)
+      stamper.getOverContent(pageIdx).addImage(img)
+      val destination: PdfDestination = new PdfDestination(PdfDestination.FIT)
+      val link: PdfAnnotation = PdfAnnotation.createLink(stamper.getWriter,
+        linkLocation,
+        PdfAnnotation.HIGHLIGHT_INVERT,
+        reader.getNumberOfPages,
+        destination)
+      link.setBorder(new PdfBorderArray(0, 0, 0))
+      stamper.addAnnotation(link, pageIdx)
     }
   }
 
-  private static final int MAX_FONT_SIZE = 32;
+  val MAX_FONT_SIZE = 32
 
-  private static void stampText(String key, String value, AcroFields form, PdfStamper pdfStamper) {
-    Rectangle rectangle = getRectangleForField(form, key);
-    Integer pageIdx = getPageForField(form, key);
-    PdfContentByte pdfContentByte = pdfStamper.getOverContent(pageIdx);
-    float fontSize = ColumnText.fitText(
-        new Font(Font.FontFamily.COURIER),
-        value,
-        rectangle,
-        MAX_FONT_SIZE,
-        PdfWriter.RUN_DIRECTION_DEFAULT);
+  def stampText(key: String, value: String, form: AcroFields, pdfStamper: PdfStamper): Unit = {
+    val rectangle = getRectangleForField(form, key)
+    val pageIdx = getPageForField(form, key)
+    val pdfContentByte = pdfStamper.getOverContent(pageIdx)
+    val fontSize = ColumnText.fitText(
+      new Font(Font.FontFamily.COURIER),
+      value,
+      rectangle,
+      MAX_FONT_SIZE,
+      PdfWriter.RUN_DIRECTION_DEFAULT)
 
     // A litte bit smaller than the exact height of the box is easier to read
-    Font font = new Font(Font.FontFamily.COURIER, fontSize * 0.90f);
-    logger.info("Stamping " + value + " to rectangle " + rectangle + " with size " + fontSize);
-    Chunk text = new Chunk(value, font);
-    text.setBackground(BaseColor.WHITE);
-    Paragraph paragraph = new Paragraph(text);
+    val font = new Font(Font.FontFamily.COURIER, fontSize * 0.90f)
+    logger.info("Stamping " + value + " to rectangle " + rectangle + " with size " + fontSize)
+    val text = new Chunk(value, font)
+    text.setBackground(BaseColor.WHITE)
+    val paragraph = new Paragraph(text)
     // How text is positioned is unclear, but 25% from bottom of box seems ideal
     ColumnText.showTextAligned(pdfContentByte, Element.ALIGN_LEFT,
-        paragraph, rectangle.getLeft(),
-        (rectangle.getBottom() + ((rectangle.getTop() - rectangle.getBottom()) / 4)),
-        0);
-    pdfContentByte.saveState();
+      paragraph, rectangle.getLeft(),
+      rectangle.getBottom() + ((rectangle.getTop() - rectangle.getBottom()) / 4),
+      0)
+    pdfContentByte.saveState()
   }
 
 
-  private static void stampSignature(PdfStamper stamper,
-                                     AcroFields acroFields,
-                                     String key,
-                                     String base64Image) throws DocumentException, IOException {
-    Image image = Image.getInstance(Base64.getDecoder().decode(base64Image.split(",")[1]));
-    Rectangle rectangle = get2xRectangleForField(acroFields, key);
-    placeImageInRectangle(image, rectangle);
-    stamper.getOverContent(getPageForField(acroFields, key)).addImage(image);
+  def stampSignature(stamper: PdfStamper,
+                     acroFields: AcroFields,
+                     key: String,
+                     base64Image: String): Unit = {
+
+    val imageBytes: Array[Byte] = Base64.getDecoder.decode(base64Image.split(",")(1))
+    val image = Image.getInstance(imageBytes)
+    val rectangle = get2xRectangleForField(acroFields, key)
+    placeImageInRectangle(image, rectangle)
+    stamper.getOverContent(getPageForField(acroFields, key)).addImage(image)
   }
 
-  public static void stampPdf(InputStream pdfTemplate,
-                              List<PDFField> fields,
-                              List<PDFFieldLocator> pdfFieldLocators,
-                              OutputStream outputStream) throws IOException {
-    PdfReader reader = new PdfReader(pdfTemplate);
-    PdfStamper stamper;
+  def stampPdf(pdfTemplate: InputStream,
+               fields: Map[String, String],
+               pdfFieldLocators: Seq[PDFFieldLocator],
+               outputStream: OutputStream): Unit = {
+    val reader = new PdfReader(pdfTemplate)
+    val stamper = new PdfStamper(reader, outputStream)
+
     try {
-      stamper = new PdfStamper(reader, outputStream);
-    } catch (DocumentException e) {
-      throw Throwables.propagate(e);
+      val form = stamper.getAcroFields
+
+      val stringStringMap = PDFMapping.mapStringValues(fields, pdfFieldLocators)
+
+      stringStringMap.foreach {
+        case (k, v) =>
+          logger.info("Stamping text: " + k + " with " + v)
+          stampText(k, v, form, stamper);
+      }
+
+      val stringBoolMap = PDFMapping.mapCheckboxValues(fields, pdfFieldLocators)
+
+      stringBoolMap.foreach {
+        case (k, v) =>
+          logger.info("Stamping checkbox: " + k + " with " + v)
+          stampCheckbox(k, v, form, stamper, reader);
+      }
+
+      val imageMap = PDFMapping.mapBase64ImageBlogValues(fields, pdfFieldLocators)
+
+      imageMap.foreach {
+        case (k, v) =>
+          logger.info("Stamping image: " + k + " with " + v)
+          stampSignature(stamper, form, k, v);
+      }
+
+      (1 to reader.getNumberOfPages).foreach(
+        i => form.removeFieldsFromPage(i))
+      form.removeXfa()
+      stamper.setFormFlattening(false)
+    } finally {
+      stamper.close()
+      reader.close()
     }
-    AcroFields form = stamper.getAcroFields();
-    try {
-      Map<String, String> stringStringMap = PDFMapping.mapStringValues(fields, pdfFieldLocators);
-      for (Map.Entry<String, String> entry : stringStringMap.entrySet()) {
-        logger.info("Stamping text: " + entry.getKey() + " with " + entry.getValue());
-        stampText(entry.getKey(), entry.getValue(), form, stamper);
-      }
-      Map<String, Boolean> stringBoolMap = PDFMapping.mapCheckboxValues(fields, pdfFieldLocators);
-      for (Map.Entry<String, Boolean> entry : stringBoolMap.entrySet()) {
-        logger.info("Stamping checkbox: " + entry.getKey() + " with " + entry.getValue());
-        stampCheckbox(entry.getKey(), entry.getValue(), form, stamper, reader);
-      }
-      Map<String, String> imageMap = PDFMapping.mapBase64ImageBlogValues(fields, pdfFieldLocators);
-      for (Map.Entry<String, String> entry : imageMap.entrySet()) {
-        stampSignature(stamper, form, entry.getKey(), entry.getValue());
-      }
-      for (int i = 0; i < reader.getNumberOfPages(); i++) {
-        form.removeFieldsFromPage(i + 1); // Pages are always 1 indexed
-      }
-      form.removeXfa();
-    } catch (DocumentException e) {
-      throw Throwables.propagate(e);
-    }
-    stamper.setFormFlattening(false);
-    try {
-      stamper.close();
-    } catch (DocumentException e) {
-      throw Throwables.propagate(e);
-    }
-    reader.close();
   }
 }

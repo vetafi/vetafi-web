@@ -1,5 +1,7 @@
 package services.documents.pdf
 
+import play.api.libs.json.{Json, OFormat}
+
 
 /**
  * JSON Schema for locating the PDF field for a form field
@@ -15,4 +17,8 @@ case class PDFFieldLocator(pdfId: String,
                            // Is the value a base64 encoded image to be overlayed?
                            isBase64ImageBlog: Boolean = false
                           ) {
+}
+
+object PDFFieldLocator {
+  implicit val jsonFormat: OFormat[PDFFieldLocator] = Json.format[PDFFieldLocator]
 }

@@ -44,6 +44,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.log4s" %% "log4s" % "1.3.6",
   "commons-io" % "commons-io" % "2.5",
+  "com.google.guava" % "guava" % "23.0",
   specs2 % Test,
   cache,
   filters

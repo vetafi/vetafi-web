@@ -13,135 +13,76 @@ object ConcatOrdering extends Ordering[PDFFieldLocator] {
   }
 }
 
-class PDFMapping {
+object PDFMapping {
   private[this] val logger = getLogger
 
   def mapBase64ImageBlogValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, String] = {
-    val imageLocators = spec.filter(_.isBase64ImageBlog)
-    val formElementSet = imageLocators.map(_.elementId).toSet
-    val values = input.filter { case (k, _) => formElementSet.contains(k) }.toMap
+    val imageLocators: Seq[PDFFieldLocator] = spec.filter(_.isBase64ImageBlog)
+    val formElementSet: Set[String] = imageLocators.map(_.elementId).toSet
+    val values: Map[String, String] = input.filter { case (k, _) => formElementSet.contains(k) }
 
-    imageLocators.filter { locator => values.contains(locator.elementId) }.map(locator => (locator.pdfId, values(locator.elementId)))
+    imageLocators.filter {
+      locator => values.contains(locator.elementId)
+    }.map(locator => (locator.pdfId, values(locator.elementId))).toMap
   }
 
   /**
    * Map all checkbox values to their PDF fields and checkbox state
    */
-  public static Map < String
-  , Boolean > mapCheckboxValues(input: Seq[PDFField] ,
-  final List < PDFFieldLocator > spec
-  )
-  {
-    HashMap < String
-    , Boolean > output = Maps.newHashMap();
+  def mapCheckboxValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
 
-    List < PDFFieldLocator > checkboxLocators =
-      Lists.newArrayList(spec.stream().filter(locator -> (locator.hasIdMap())).iterator());
+    val checkboxLocators: Map[String, PDFFieldLocator] = spec.filter(_.idMap.nonEmpty).map(
+      locator =>
+        (locator.elementId, locator)).toMap
 
-    Set < String > formElementSet = Sets.newHashSet(
-      checkboxLocators.stream().map(locator -> (locator.elementId)).iterator());
-
-    Stream < PDFField > filtered = input.stream().filter(pdfField -> (formElementSet.contains(pdfField.fieldName)));
-
-    HashMap < String
-    , String > formValueMap = Maps.newHashMap();
-
-    filtered.forEach(pdfField -> {
-      formValueMap.put(pdfField.getFieldName(), pdfField.getFieldValue());
-    });
-
-    for (PDFFieldLocator locator
-    : checkboxLocators
-    )
-    {
-      String pdfFieldId = null;
-      for (Map.Entry < String
-      , String > entry: locator.idMap.entrySet
-      ()
-      )
-      {
-        if (formValueMap.containsKey(locator.elementId) &&
-          formValueMap.get(locator.elementId).equals(entry.getKey())) {
-          pdfFieldId = entry.getValue();
-        }
-      }
-      if (pdfFieldId == null) {
-        logger.warn("Invalid checkbox value for " + locator + " : " + formValueMap.get(locator.elementId));
-        continue;
-      }
-      output.put(pdfFieldId, true);
+    val filtered: Map[String, String] = input.filter {
+      case (k, _) => checkboxLocators.contains(k)
     }
 
-    return output;
+    filtered.map {
+      case (k, v) if checkboxLocators.contains(k) && checkboxLocators(k).idMap.get.contains(v) =>
+        (checkboxLocators(k).idMap.get(v), true)
+      case (k, v) =>
+        logger.error("Invalid checkbox value for " + k + " : " + v)
+        throw new RuntimeException("Invalid checkbox value for " + k + " : " + v)
+    }
   }
 
-  /**
-   * Map all string (non checkbox values) from input to their PDF fields
-   *
-   * Perform all concatenation and substring operations.
-   */
-  public static Map < String
-  , String > mapStringValues(List < PDFField > input,
-  final List < PDFFieldLocator > spec
-  )
-  {
-    HashMap < String
-    , String > output = Maps.newHashMap();
+  def mapStringValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, String] = {
+    val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlog).map(
+      locator =>
+        (locator.elementId, locator)).toMap
 
-    List < PDFFieldLocator > nonCheckboxLocators =
-      Lists.newArrayList(spec.stream().filter(locator -> (!locator.hasIdMap() && !locator.isBase64ImageBlob)).iterator());
-
-    Set < String > formElementSet = Sets.newHashSet(
-      nonCheckboxLocators.stream().map(locator -> (locator.elementId)).iterator());
-
-    Stream < PDFField > filtered = input.stream().filter(pdfField -> (formElementSet.contains(pdfField.fieldName)));
-
-    HashMap < String
-    , String > formValueMap = Maps.newHashMap();
-
-    filtered.forEach(pdfField -> {
-      formValueMap.put(pdfField.getFieldName(), pdfField.getFieldValue());
-    });
-
-    ImmutableListMultimap < String
-    , PDFFieldLocator > grouped = Multimaps.index(nonCheckboxLocators,
-    new Function < PDFFieldLocator, String > () {
-      @Nullable
-      @Override
-      public String apply(PDFFieldLocator locator) {
-        return locator.pdfId;
-      }
-    });
-
-    for (String key
-    : grouped.keys()
-    )
-    {
-      ImmutableList < PDFFieldLocator > pdfFieldLocators = grouped.get(key);
-      List < PDFFieldLocator > pdfFieldLocatorsSorted = CONCAT_ORDERING.sortedCopy(pdfFieldLocators);
-
-      String valueString = Joiner.on(" ").join(
-        pdfFieldLocatorsSorted.stream().map(
-          pdfFieldLocator -> {
-            if (formValueMap.containsKey(pdfFieldLocator.elementId)) {
-              return formValueMap.get(pdfFieldLocator.elementId);
-            } else {
-              return "";
-            }
-          }).iterator());
-
-      if (pdfFieldLocators.size() == 1) {
-        PDFFieldLocator pdfFieldLocator = Iterables.getOnlyElement(pdfFieldLocators);
-        if (pdfFieldLocator.substringStart != null && pdfFieldLocator.substringEnd != null) {
-          valueString = valueString.substring(
-            pdfFieldLocator.substringStart > valueString.length() ? valueString.length(): pdfFieldLocator.substringStart,
-            pdfFieldLocator.substringEnd > valueString.length() ? valueString.length(): pdfFieldLocator.substringEnd);
-        }
-      }
-
-      output.put(key, valueString);
+    val filtered: Map[String, String] = input.filter {
+      case (k, _) => stringLocators.contains(k)
     }
 
-    return output;
+    val grouped: Map[String, Iterable[PDFFieldLocator]] = stringLocators.values.groupBy(_.pdfId)
+
+    val concatenatedValues: Map[String, String] = grouped.map {
+      case (k, v) =>
+        (k, v.toList.sorted(ConcatOrdering))
+    }.map {
+      case (k, v) =>
+        (k, v.map(locator => filtered.getOrElse(locator.elementId, "")).reduce(_ + " " + _))
+    }
+
+    val substringAppliedValues = grouped.filter {
+      case (_, v) => v.size == 1
+    }.map {
+      case (k, v) => (k, v.head)
+    }.filter {
+      case (k, pdfFieldLocator) =>
+        pdfFieldLocator.substringStart.nonEmpty && pdfFieldLocator.substringEnd.nonEmpty
+    }.map {
+      case (k, pdfFieldLocator) =>
+        (k, concatenatedValues(k).substring(
+          if (pdfFieldLocator.substringStart.get > concatenatedValues(k).length()) concatenatedValues(k).length() else pdfFieldLocator.substringStart.get,
+          if (pdfFieldLocator.substringEnd.get > concatenatedValues(k).length()) concatenatedValues(k).length() else pdfFieldLocator.substringEnd.get
+        ))
+    }
+
+    concatenatedValues ++ substringAppliedValues
   }
+
 }
