@@ -15,10 +15,10 @@ class PDFMappingTest extends PlaySpecification {
           ("field4", JsString("abc"))
         ),
         Seq(
-          PDFFieldLocator("pdfField", "field1", 0, None, None, None, false),
-          PDFFieldLocator("pdfField", "field2", 1, None, None, None, false),
-          PDFFieldLocator("pdfField", "field3", 2, None, None, None, false),
-          PDFFieldLocator("pdfSubSField", "field4", 0, None, Some(0), Some(1), false)
+          PDFFieldLocator("pdfField", "field1", Some(0), None, None, None, None),
+          PDFFieldLocator("pdfField", "field2", Some(1), None, None, None, None),
+          PDFFieldLocator("pdfField", "field3", Some(2), None, None, None, None),
+          PDFFieldLocator("pdfSubSField", "field4", Some(0), None, Some(0), Some(1), None)
         )
       )
 

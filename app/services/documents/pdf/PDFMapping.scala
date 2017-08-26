@@ -1,16 +1,14 @@
 package services.documents.pdf
 
-import java.util.stream.Stream
-import javax.annotation.Nullable
-
-import com.google.common.base.{ Function, Joiner }
 import org.log4s.getLogger
 import play.api.libs.json.{ JsBoolean, JsString, JsValue }
 
 object ConcatOrdering extends Ordering[PDFFieldLocator] {
 
   override def compare(left: PDFFieldLocator, right: PDFFieldLocator): Int = {
-    left.concatOrder.compareTo(right.concatOrder)
+    val rightOrder: Int = right.concatOrder.getOrElse(0)
+    val leftOrder: Int = left.concatOrder.getOrElse(0)
+    leftOrder.compareTo(rightOrder)
   }
 }
 
@@ -25,13 +23,18 @@ object PDFMapping {
       case (k, v: JsString) => (k, v.value)
     }
 
-    val imageLocators: Seq[PDFFieldLocator] = spec.filter(_.isBase64ImageBlob)
+    val imageLocators: Seq[PDFFieldLocator] = spec.filter {
+      _.isBase64ImageBlob match {
+        case None => false
+        case Some(bool) => bool
+      }
+    }
     val formElementSet: Set[String] = imageLocators.map(_.elementId).toSet
     val values: Map[String, String] = stringInputs.filter { case (k, _) => formElementSet.contains(k) }
 
     imageLocators.filter {
       locator => values.contains(locator.elementId)
-    }.map(locator => (locator.pdfId, values(locator.elementId))).toMap
+    }.map(locator => (locator.pdfId.get, values(locator.elementId))).toMap
   }
 
   def mapCheckBoxValues(input: Map[String, JsValue], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
@@ -47,7 +50,7 @@ object PDFMapping {
         checkboxResponses.contains(locator.elementId)
     ).map(
         locator =>
-          (locator.pdfId, checkboxResponses(locator.elementId))
+          (locator.pdfId.get, checkboxResponses(locator.elementId))
       ).toMap
   }
 
@@ -88,7 +91,7 @@ object PDFMapping {
       case (k, v: JsString) => (k, v.value)
     }
 
-    val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob).map(
+    val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob.getOrElse(false)).map(
       locator =>
         (locator.elementId, locator)
     ).toMap
@@ -97,7 +100,7 @@ object PDFMapping {
       case (k, _) => stringLocators.contains(k)
     }
 
-    val grouped: Map[String, Iterable[PDFFieldLocator]] = stringLocators.values.groupBy(_.pdfId)
+    val grouped: Map[String, Iterable[PDFFieldLocator]] = stringLocators.values.groupBy(_.pdfId.get)
 
     val concatenatedValues: Map[String, String] = grouped.map {
       case (k, v) =>

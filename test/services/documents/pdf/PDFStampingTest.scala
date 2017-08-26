@@ -76,7 +76,7 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
         pdfTemplate,
         Map("veteran_previous_claim_with_va_y_n" -> JsBoolean(true)),
         Seq(
-          PDFFieldLocator("F[0].Page_1[0].Compensation[1]", "veteran_previous_claim_with_va_y_n", 0, None, None, None, false)
+          PDFFieldLocator("F[0].Page_1[0].Compensation[1]", "veteran_previous_claim_with_va_y_n", None, None, None, None, None)
         ),
         new FileOutputStream(tmpFile)
       )
@@ -97,7 +97,7 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
           Seq(
             PDFFieldLocator(
               "F[0].Page_1[0].SignatureField1[0]",
-              "signature", 0, None, None, None, true
+              "signature", None, None, None, None, None
             )
           ),
           new FileOutputStream(tmpFile)
