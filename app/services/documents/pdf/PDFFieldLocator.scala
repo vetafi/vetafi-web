@@ -15,7 +15,7 @@ case class PDFFieldLocator(pdfId: String,
                            substringStart: Option[Int] = None,
                            substringEnd: Option[Int] = None,
                            // Is the value a base64 encoded image to be overlayed?
-                           isBase64ImageBlog: Boolean = false
+                           isBase64ImageBlob: Boolean = false
                           ) {
 }
 

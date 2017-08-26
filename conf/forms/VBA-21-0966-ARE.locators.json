@@ -27,18 +27,12 @@
     }
   },
   {
-    "pdfId": null,
-    "elementId": "veteran_intent_to_file_compensation_y_n",
-    "idMap": {
-      "Yes": "F[0].Page_1[0].Compensation[1]"
-    }
+    "pdfId": "F[0].Page_1[0].Compensation[1]",
+    "elementId": "veteran_intent_to_file_compensation_y_n"
   },
   {
-    "pdfId": null,
-    "elementId": "veteran_intent_to_file_pension_y_n",
-    "idMap": {
-      "Yes": "F[0].Page_1[0].Pension[1]"
-    }
+    "pdfId": "F[0].Page_1[0].Pension[1]",
+    "elementId": "veteran_intent_to_file_pension_y_n"
   },
   {
     "pdfId": null,

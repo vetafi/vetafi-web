@@ -17,7 +17,7 @@ object PDFMapping {
   private[this] val logger = getLogger
 
   def mapBase64ImageBlogValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, String] = {
-    val imageLocators: Seq[PDFFieldLocator] = spec.filter(_.isBase64ImageBlog)
+    val imageLocators: Seq[PDFFieldLocator] = spec.filter(_.isBase64ImageBlob)
     val formElementSet: Set[String] = imageLocators.map(_.elementId).toSet
     val values: Map[String, String] = input.filter { case (k, _) => formElementSet.contains(k) }
 
@@ -29,7 +29,7 @@ object PDFMapping {
   /**
    * Map all checkbox values to their PDF fields and checkbox state
    */
-  def mapCheckboxValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
+  def mapRadioValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
 
     val checkboxLocators: Map[String, PDFFieldLocator] = spec.filter(_.idMap.nonEmpty).map(
       locator =>
@@ -49,7 +49,7 @@ object PDFMapping {
   }
 
   def mapStringValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, String] = {
-    val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlog).map(
+    val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob).map(
       locator =>
         (locator.elementId, locator)).toMap
 
@@ -72,7 +72,7 @@ object PDFMapping {
     }.map {
       case (k, v) => (k, v.head)
     }.filter {
-      case (k, pdfFieldLocator) =>
+      case (_, pdfFieldLocator) =>
         pdfFieldLocator.substringStart.nonEmpty && pdfFieldLocator.substringEnd.nonEmpty
     }.map {
       case (k, pdfFieldLocator) =>

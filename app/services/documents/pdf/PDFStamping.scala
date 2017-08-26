@@ -7,16 +7,18 @@ import com.itextpdf.text._
 import com.itextpdf.text.pdf._
 import org.apache.commons.io.IOUtils
 import org.log4s.getLogger
+import play.api.libs.json.{JsBoolean, JsValue}
 
 object PDFStamping {
   private[this] val logger = getLogger
 
   val ACRO_FORM_CHECKED = "1"
 
-  lazy val CHECK: Array[Byte] =
-    IOUtils.toByteArray(getClass.getResourceAsStream("forms/check.png"))
+  lazy val CHECK: Array[Byte] = {
+    IOUtils.toByteArray(getClass.getClassLoader.getResourceAsStream("forms/check.png"))
+  }
 
-  def getRectangleForField(fields: AcroFields, key: String): Rectangle = {
+  private [this] def getRectangleForField(fields: AcroFields, key: String): Rectangle = {
     val rectVals: Array[Double] = fields
       .getFieldItem(key)
       .getValue(0)
@@ -29,7 +31,7 @@ object PDFStamping {
       rectVals(3).toFloat)
   }
 
-  def get2xRectangleForField(fields: AcroFields, key: String): Rectangle = {
+  private [this] def get2xRectangleForField(fields: AcroFields, key: String): Rectangle = {
     val rectVals: Array[Double] = fields
       .getFieldItem(key)
       .getValue(0)
@@ -42,18 +44,18 @@ object PDFStamping {
       (rectVals(3) + ((rectVals(3) - rectVals(1)) / 2)).toFloat)
   }
 
-  def placeImageInRectangle(image: Image, rectangle: Rectangle): Unit = {
+  private [this] def placeImageInRectangle(image: Image, rectangle: Rectangle): Unit = {
     val x = rectangle.getLeft()
     val y = rectangle.getBottom()
     image.setAbsolutePosition(x, y)
     image.scaleToFit(rectangle)
   }
 
-  def getPageForField(form: AcroFields, key: String): Integer = {
+  private [this] def getPageForField(form: AcroFields, key: String): Integer = {
     form.getFieldItem(key).getPage(0)
   }
 
-  def stampCheckbox(
+  private [this] def stampCheckbox(
                      key: String,
                      value: Boolean,
                      form: AcroFields,
@@ -81,7 +83,7 @@ object PDFStamping {
 
   val MAX_FONT_SIZE = 32
 
-  def stampText(key: String, value: String, form: AcroFields, pdfStamper: PdfStamper): Unit = {
+  private [this] def stampText(key: String, value: String, form: AcroFields, pdfStamper: PdfStamper): Unit = {
     val rectangle = getRectangleForField(form, key)
     val pageIdx = getPageForField(form, key)
     val pdfContentByte = pdfStamper.getOverContent(pageIdx)
@@ -107,7 +109,7 @@ object PDFStamping {
   }
 
 
-  def stampSignature(stamper: PdfStamper,
+  private [this] def stampSignature(stamper: PdfStamper,
                      acroFields: AcroFields,
                      key: String,
                      base64Image: String): Unit = {
@@ -120,7 +122,7 @@ object PDFStamping {
   }
 
   def stampPdf(pdfTemplate: InputStream,
-               fields: Map[String, String],
+               fields: Map[String, JsValue],
                pdfFieldLocators: Seq[PDFFieldLocator],
                outputStream: OutputStream): Unit = {
     val reader = new PdfReader(pdfTemplate)
@@ -129,7 +131,27 @@ object PDFStamping {
     try {
       val form = stamper.getAcroFields
 
-      val stringStringMap = PDFMapping.mapStringValues(fields, pdfFieldLocators)
+      val stringResponses: Map[String, String] = fields.filter {
+        case (_, _: JsBoolean) => false
+        case _ => true
+      }.map {
+        case (k, v) => (k, v.toString())
+      }
+
+      val checkboxResponses: Map[String, Boolean] = fields.filter {
+        case (_, _: JsBoolean) => true
+        case _ => false
+      }.map {
+        case (k, v) => (k, v.as[JsBoolean].value)
+      }
+
+      checkboxResponses.foreach {
+        case (k, v) =>
+          logger.info("Stamping checkbox: " + k + " with " + v)
+          stampCheckbox(k, v, form, stamper, reader);
+      }
+
+      val stringStringMap = PDFMapping.mapStringValues(stringResponses, pdfFieldLocators)
 
       stringStringMap.foreach {
         case (k, v) =>
@@ -137,15 +159,15 @@ object PDFStamping {
           stampText(k, v, form, stamper);
       }
 
-      val stringBoolMap = PDFMapping.mapCheckboxValues(fields, pdfFieldLocators)
+      val mappedRadioResponses = PDFMapping.mapRadioValues(stringResponses, pdfFieldLocators)
 
-      stringBoolMap.foreach {
+      mappedRadioResponses.foreach {
         case (k, v) =>
-          logger.info("Stamping checkbox: " + k + " with " + v)
+          logger.info("Stamping radio: " + k + " with " + v)
           stampCheckbox(k, v, form, stamper, reader);
       }
 
-      val imageMap = PDFMapping.mapBase64ImageBlogValues(fields, pdfFieldLocators)
+      val imageMap = PDFMapping.mapBase64ImageBlogValues(stringResponses, pdfFieldLocators)
 
       imageMap.foreach {
         case (k, v) =>
