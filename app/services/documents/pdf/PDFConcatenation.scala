@@ -1,11 +1,9 @@
-package services.documents.pdf
+package services.documents.pdf;
 
-;
-
-import java.io.{InputStream, OutputStream}
+import java.io.{ InputStream, OutputStream }
 
 import com.itextpdf.text.Document
-import com.itextpdf.text.pdf.{PdfCopy, PdfReader};
+import com.itextpdf.text.pdf.{ PdfCopy, PdfReader };
 
 /**
  * Concatenation of multiple pdf documents
@@ -29,7 +27,8 @@ object PDFConcatenation {
           val reader = new PdfReader(inputStream)
 
           (1 to reader.getNumberOfPages).foreach(
-            i => pdfCopy.addPage(pdfCopy.getImportedPage(reader, i)))
+            i => pdfCopy.addPage(pdfCopy.getImportedPage(reader, i))
+          )
         }
       )
     } finally {

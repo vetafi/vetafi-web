@@ -3,8 +3,9 @@ package services.documents.pdf
 import java.util.stream.Stream
 import javax.annotation.Nullable
 
-import com.google.common.base.{Function, Joiner}
+import com.google.common.base.{ Function, Joiner }
 import org.log4s.getLogger
+import play.api.libs.json.{ JsBoolean, JsString, JsValue }
 
 object ConcatOrdering extends Ordering[PDFFieldLocator] {
 
@@ -16,26 +17,57 @@ object ConcatOrdering extends Ordering[PDFFieldLocator] {
 object PDFMapping {
   private[this] val logger = getLogger
 
-  def mapBase64ImageBlogValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, String] = {
+  def mapBase64ImageBlogValues(input: Map[String, JsValue], spec: Seq[PDFFieldLocator]): Map[String, String] = {
+    val stringInputs = input.filter {
+      case (_, _: JsString) => true
+      case _ => false
+    }.map {
+      case (k, v: JsString) => (k, v.value)
+    }
+
     val imageLocators: Seq[PDFFieldLocator] = spec.filter(_.isBase64ImageBlob)
     val formElementSet: Set[String] = imageLocators.map(_.elementId).toSet
-    val values: Map[String, String] = input.filter { case (k, _) => formElementSet.contains(k) }
+    val values: Map[String, String] = stringInputs.filter { case (k, _) => formElementSet.contains(k) }
 
     imageLocators.filter {
       locator => values.contains(locator.elementId)
     }.map(locator => (locator.pdfId, values(locator.elementId))).toMap
   }
 
+  def mapCheckBoxValues(input: Map[String, JsValue], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
+    val checkboxResponses: Map[String, Boolean] = input.filter {
+      case (_, _: JsBoolean) => true
+      case _ => false
+    }.map {
+      case (k, v) => (k, v.as[JsBoolean].value)
+    }
+
+    spec.filter(
+      locator =>
+        checkboxResponses.contains(locator.elementId)
+    ).map(
+        locator =>
+          (locator.pdfId, checkboxResponses(locator.elementId))
+      ).toMap
+  }
+
   /**
    * Map all checkbox values to their PDF fields and checkbox state
    */
-  def mapRadioValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
+  def mapRadioValues(input: Map[String, JsValue], spec: Seq[PDFFieldLocator]): Map[String, Boolean] = {
+    val stringInputs = input.filter {
+      case (_, _: JsString) => true
+      case _ => false
+    }.map {
+      case (k, v: JsString) => (k, v.value)
+    }
 
     val checkboxLocators: Map[String, PDFFieldLocator] = spec.filter(_.idMap.nonEmpty).map(
       locator =>
-        (locator.elementId, locator)).toMap
+        (locator.elementId, locator)
+    ).toMap
 
-    val filtered: Map[String, String] = input.filter {
+    val filtered: Map[String, String] = stringInputs.filter {
       case (k, _) => checkboxLocators.contains(k)
     }
 
@@ -48,12 +80,20 @@ object PDFMapping {
     }
   }
 
-  def mapStringValues(input: Map[String, String], spec: Seq[PDFFieldLocator]): Map[String, String] = {
+  def mapStringValues(input: Map[String, JsValue], spec: Seq[PDFFieldLocator]): Map[String, String] = {
+    val stringInputs = input.filter {
+      case (_, _: JsString) => true
+      case _ => false
+    }.map {
+      case (k, v: JsString) => (k, v.value)
+    }
+
     val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob).map(
       locator =>
-        (locator.elementId, locator)).toMap
+        (locator.elementId, locator)
+    ).toMap
 
-    val filtered: Map[String, String] = input.filter {
+    val filtered: Map[String, String] = stringInputs.filter {
       case (k, _) => stringLocators.contains(k)
     }
 

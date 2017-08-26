@@ -1,10 +1,9 @@
 package services.documents.pdf
 
-
 import java.io.File
 
 import com.google.common.collect.ComparisonChain
-import com.itextpdf.text.pdf.{AcroFields, PdfName, PdfReader, PdfStamper}
+import com.itextpdf.text.pdf.{ AcroFields, PdfName, PdfReader, PdfStamper }
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.output.NullOutputStream
 

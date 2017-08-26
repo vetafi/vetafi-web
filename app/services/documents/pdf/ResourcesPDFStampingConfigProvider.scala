@@ -6,7 +6,7 @@ import org.log4s.getLogger
 import play.api.Configuration
 import play.api.libs.json.Json
 
-class ResourcesPDFStampingConfigProvider @Inject()(configuration: Configuration) extends PDFStampingConfigProvider {
+class ResourcesPDFStampingConfigProvider @Inject() (configuration: Configuration) extends PDFStampingConfigProvider {
 
   private[this] val logger = getLogger
 
@@ -14,7 +14,8 @@ class ResourcesPDFStampingConfigProvider @Inject()(configuration: Configuration)
     configuration.getStringSeq("forms.enabled").get.map(
       formKey =>
         Json.parse(
-          getClass.getClassLoader.getResourceAsStream(s"forms/$formKey.locators.pdf")).validate[Seq[PDFFieldLocator]]
+          getClass.getClassLoader.getResourceAsStream(s"forms/$formKey.locators.pdf")
+        ).validate[Seq[PDFFieldLocator]]
           .fold(
             errors => {
               val msg = s"Errors while parsing form config JSON from" +

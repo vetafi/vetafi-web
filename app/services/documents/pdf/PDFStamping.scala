@@ -1,13 +1,13 @@
 package services.documents.pdf
 
-import java.io.{InputStream, OutputStream}
+import java.io.{ InputStream, OutputStream }
 import java.util.Base64
 
 import com.itextpdf.text._
 import com.itextpdf.text.pdf._
 import org.apache.commons.io.IOUtils
 import org.log4s.getLogger
-import play.api.libs.json.{JsBoolean, JsValue}
+import play.api.libs.json.JsValue
 
 object PDFStamping {
   private[this] val logger = getLogger
@@ -18,49 +18,54 @@ object PDFStamping {
     IOUtils.toByteArray(getClass.getClassLoader.getResourceAsStream("forms/check.png"))
   }
 
-  private [this] def getRectangleForField(fields: AcroFields, key: String): Rectangle = {
+  private[this] def getRectangleForField(fields: AcroFields, key: String): Rectangle = {
     val rectVals: Array[Double] = fields
       .getFieldItem(key)
       .getValue(0)
       .getAsArray(PdfName.RECT)
       .asDoubleArray()
 
-    new Rectangle(rectVals(0).toFloat,
+    new Rectangle(
+      rectVals(0).toFloat,
       rectVals(1).toFloat,
       rectVals(2).toFloat,
-      rectVals(3).toFloat)
+      rectVals(3).toFloat
+    )
   }
 
-  private [this] def get2xRectangleForField(fields: AcroFields, key: String): Rectangle = {
+  private[this] def get2xRectangleForField(fields: AcroFields, key: String): Rectangle = {
     val rectVals: Array[Double] = fields
       .getFieldItem(key)
       .getValue(0)
       .getAsArray(PdfName.RECT)
       .asDoubleArray()
 
-    new Rectangle(rectVals(0).toFloat,
+    new Rectangle(
+      rectVals(0).toFloat,
       (rectVals(1) - ((rectVals(3) - rectVals(1)) / 2)).toFloat,
       rectVals(2).toFloat,
-      (rectVals(3) + ((rectVals(3) - rectVals(1)) / 2)).toFloat)
+      (rectVals(3) + ((rectVals(3) - rectVals(1)) / 2)).toFloat
+    )
   }
 
-  private [this] def placeImageInRectangle(image: Image, rectangle: Rectangle): Unit = {
+  private[this] def placeImageInRectangle(image: Image, rectangle: Rectangle): Unit = {
     val x = rectangle.getLeft()
     val y = rectangle.getBottom()
     image.setAbsolutePosition(x, y)
     image.scaleToFit(rectangle)
   }
 
-  private [this] def getPageForField(form: AcroFields, key: String): Integer = {
+  private[this] def getPageForField(form: AcroFields, key: String): Integer = {
     form.getFieldItem(key).getPage(0)
   }
 
-  private [this] def stampCheckbox(
-                     key: String,
-                     value: Boolean,
-                     form: AcroFields,
-                     stamper: PdfStamper,
-                     reader: PdfReader): Unit = {
+  private[this] def stampCheckbox(
+    key: String,
+    value: Boolean,
+    form: AcroFields,
+    stamper: PdfStamper,
+    reader: PdfReader
+  ): Unit = {
     if (value) {
       form.setField(key, ACRO_FORM_CHECKED)
 
@@ -71,11 +76,13 @@ object PDFStamping {
       val pageIdx: Integer = getPageForField(form, key)
       stamper.getOverContent(pageIdx).addImage(img)
       val destination: PdfDestination = new PdfDestination(PdfDestination.FIT)
-      val link: PdfAnnotation = PdfAnnotation.createLink(stamper.getWriter,
+      val link: PdfAnnotation = PdfAnnotation.createLink(
+        stamper.getWriter,
         linkLocation,
         PdfAnnotation.HIGHLIGHT_INVERT,
         reader.getNumberOfPages,
-        destination)
+        destination
+      )
       link.setBorder(new PdfBorderArray(0, 0, 0))
       stamper.addAnnotation(link, pageIdx)
     }
@@ -83,7 +90,7 @@ object PDFStamping {
 
   val MAX_FONT_SIZE = 32
 
-  private [this] def stampText(key: String, value: String, form: AcroFields, pdfStamper: PdfStamper): Unit = {
+  private[this] def stampText(key: String, value: String, form: AcroFields, pdfStamper: PdfStamper): Unit = {
     val rectangle = getRectangleForField(form, key)
     val pageIdx = getPageForField(form, key)
     val pdfContentByte = pdfStamper.getOverContent(pageIdx)
@@ -92,7 +99,8 @@ object PDFStamping {
       value,
       rectangle,
       MAX_FONT_SIZE,
-      PdfWriter.RUN_DIRECTION_DEFAULT)
+      PdfWriter.RUN_DIRECTION_DEFAULT
+    )
 
     // A litte bit smaller than the exact height of the box is easier to read
     val font = new Font(Font.FontFamily.COURIER, fontSize * 0.90f)
@@ -108,11 +116,12 @@ object PDFStamping {
     pdfContentByte.saveState()
   }
 
-
-  private [this] def stampSignature(stamper: PdfStamper,
-                     acroFields: AcroFields,
-                     key: String,
-                     base64Image: String): Unit = {
+  private[this] def stampSignature(
+    stamper: PdfStamper,
+    acroFields: AcroFields,
+    key: String,
+    base64Image: String
+  ): Unit = {
 
     val imageBytes: Array[Byte] = Base64.getDecoder.decode(base64Image.split(",")(1))
     val image = Image.getInstance(imageBytes)
@@ -121,37 +130,27 @@ object PDFStamping {
     stamper.getOverContent(getPageForField(acroFields, key)).addImage(image)
   }
 
-  def stampPdf(pdfTemplate: InputStream,
-               fields: Map[String, JsValue],
-               pdfFieldLocators: Seq[PDFFieldLocator],
-               outputStream: OutputStream): Unit = {
+  def stampPdf(
+    pdfTemplate: InputStream,
+    responses: Map[String, JsValue],
+    pdfFieldLocators: Seq[PDFFieldLocator],
+    outputStream: OutputStream
+  ): Unit = {
     val reader = new PdfReader(pdfTemplate)
     val stamper = new PdfStamper(reader, outputStream)
 
     try {
       val form = stamper.getAcroFields
 
-      val stringResponses: Map[String, String] = fields.filter {
-        case (_, _: JsBoolean) => false
-        case _ => true
-      }.map {
-        case (k, v) => (k, v.toString())
-      }
+      val checkBoxResponses: Map[String, Boolean] = PDFMapping.mapCheckBoxValues(responses, pdfFieldLocators)
 
-      val checkboxResponses: Map[String, Boolean] = fields.filter {
-        case (_, _: JsBoolean) => true
-        case _ => false
-      }.map {
-        case (k, v) => (k, v.as[JsBoolean].value)
-      }
-
-      checkboxResponses.foreach {
+      checkBoxResponses.foreach {
         case (k, v) =>
           logger.info("Stamping checkbox: " + k + " with " + v)
           stampCheckbox(k, v, form, stamper, reader);
       }
 
-      val stringStringMap = PDFMapping.mapStringValues(stringResponses, pdfFieldLocators)
+      val stringStringMap = PDFMapping.mapStringValues(responses, pdfFieldLocators)
 
       stringStringMap.foreach {
         case (k, v) =>
@@ -159,7 +158,7 @@ object PDFStamping {
           stampText(k, v, form, stamper);
       }
 
-      val mappedRadioResponses = PDFMapping.mapRadioValues(stringResponses, pdfFieldLocators)
+      val mappedRadioResponses = PDFMapping.mapRadioValues(responses, pdfFieldLocators)
 
       mappedRadioResponses.foreach {
         case (k, v) =>
@@ -167,7 +166,7 @@ object PDFStamping {
           stampCheckbox(k, v, form, stamper, reader);
       }
 
-      val imageMap = PDFMapping.mapBase64ImageBlogValues(stringResponses, pdfFieldLocators)
+      val imageMap = PDFMapping.mapBase64ImageBlogValues(responses, pdfFieldLocators)
 
       imageMap.foreach {
         case (k, v) =>
@@ -176,7 +175,8 @@ object PDFStamping {
       }
 
       (1 to reader.getNumberOfPages).foreach(
-        i => form.removeFieldsFromPage(i))
+        i => form.removeFieldsFromPage(i)
+      )
       form.removeXfa()
       stamper.setFormFlattening(false)
     } finally {

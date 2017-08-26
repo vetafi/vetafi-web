@@ -1,12 +1,13 @@
 package services.documents
 
-import java.io.{ByteArrayOutputStream, InputStream}
+import java.io.{ ByteArrayOutputStream, InputStream }
 import javax.inject.Inject
 
 import models.ClaimForm
-import services.documents.pdf.{PDFFieldLocator, PDFStamping, PDFStampingConfigProvider, PDFTemplateProvider}
+import services.documents.pdf.{ PDFFieldLocator, PDFStamping, PDFStampingConfigProvider, PDFTemplateProvider }
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ITextDocumentService @Inject() (pDFStampingConfigProvider: PDFStampingConfigProvider, pDFTemplateProvider: PDFTemplateProvider) extends DocumentService {
 
@@ -19,14 +20,9 @@ class ITextDocumentService @Inject() (pDFStampingConfigProvider: PDFStampingConf
   override def render(form: ClaimForm) = Future {
     val locators: Seq[PDFFieldLocator] = pDFStampingConfigProvider.getPDFFieldLocators(form.key)
     val template: InputStream = pDFTemplateProvider.getTemplate(form.key)
-
     val out = new ByteArrayOutputStream()
 
-    val responsesAsString: Map[String, String] = form.responses.map {
-      case (k, v) => (k, v.toString())
-    }
-
-    PDFStamping.stampPdf(template, responsesAsString, locators, out)
+    PDFStamping.stampPdf(template, form.responses, locators, out)
 
     out.toByteArray
   }
