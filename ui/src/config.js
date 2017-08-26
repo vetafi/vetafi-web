@@ -1,5 +1,5 @@
 var bulk = require('bulk-require');
-var forms = bulk('../conf/forms/', ['*']);
+var forms = bulk('../conf/forms/formly_configs', ['*']);
 var claimsConfig = require('../../conf/claims.json');
 
 var app = angular.module('vetafiApp');

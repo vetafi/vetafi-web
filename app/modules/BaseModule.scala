@@ -6,8 +6,9 @@ import com.google.inject.AbstractModule
 import models.daos._
 import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
-import services.documents.{ DocumentService, SeamlessDocsDocumentService }
+import services.documents.{ DocumentService, ITextDocumentService, SeamlessDocsDocumentService }
 import services._
+import services.documents.pdf.{ PDFStampingConfigProvider, PDFTemplateProvider, ResourcesPDFStampingConfigProvider, ResourcesPDFTemplateProvider }
 import services.forms._
 import services.submission.{ FaxSubmissionService, SubmissionService }
 import utils.seamlessdocs.{ RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl }
@@ -36,7 +37,9 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[ContactInfoService].to[ContactInfoServiceImpl]
     bind[ClaimService].to[ClaimServiceImpl]
     bind[SubmissionService].to[FaxSubmissionService]
-    bind[DocumentService].to[SeamlessDocsDocumentService]
+    bind[DocumentService].to[ITextDocumentService]
+    bind[PDFStampingConfigProvider].to[ResourcesPDFStampingConfigProvider]
+    bind[PDFTemplateProvider].to[ResourcesPDFTemplateProvider]
     bind[SeamlessDocsService].to[SeamlessDocsServiceImpl]
     bind[ReactiveMongoApi].to[BiscuitPasswordMongoApi]
     bind[UserValuesService].to[UserValuesServiceImpl]
