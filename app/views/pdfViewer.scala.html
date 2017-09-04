@@ -4,54 +4,11 @@
     <head>
         <meta charset="utf-8">
         <title>Vetafi</title>
-        <link rel="stylesheet" href="libs/pdf.js">
-        <script type="application/javascript">
-                var url = '@pdfUrl';
-
-                // Disable workers to avoid yet another cross-origin issue (workers need
-                // the URL of the script to be loaded, and dynamically loading a cross-origin
-                // script does not work).
-                // PDFJS.disableWorker = true;
-
-                // The workerSrc property shall be specified.
-                PDFJS.workerSrc = 'libs/pdf.worker.js';
-
-                // Asynchronous download of PDF
-                var loadingTask = PDFJS.getDocument(url);
-                loadingTask.promise.then(function (pdf) {
-                    console.log('PDF loaded');
-
-                    // Fetch the first page
-                    var pageNumber = 1;
-                    pdf.getPage(pageNumber).then(function (page) {
-                        console.log('Page loaded');
-
-                        var scale = 1;
-                        var viewport = page.getViewport(scale);
-
-                        // Prepare canvas using PDF page dimensions
-                        var canvas = document.getElementById('pdf-canvas');
-                        var context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-
-                        // Render PDF page into canvas context
-                        var renderContext = {
-                            canvasContext: context,
-                            viewport: viewport
-                        };
-                        var renderTask = page.render(renderContext);
-                        renderTask.then(function () {
-                            console.log('Page rendered');
-                        });
-                    });
-                }, function (reason) {
-                    // PDF loading error
-                    console.error(reason);
-                });
-        </script>
+        <script type="text/javascript" src="/libs/pdf.js"></script>
+        <script type="text/javascript" src="/libs/pdf.worker.js"></script>
+        <script type="text/javascript" src="/js/pdfViewer.js"></script>
     </head>
     <body>
-        <canvas id="pdf-canvas" height="100%" width="100%"></canvas>
+        <canvas id="pdf-canvas" height="1200px" width="800px"></canvas>
     </body>
 </html>
