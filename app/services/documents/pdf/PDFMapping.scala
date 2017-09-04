@@ -45,6 +45,8 @@ object PDFMapping {
       case (k, v) => (k, v.as[JsBoolean].value)
     }
 
+    logger.info("Got checkbox responses:" + checkboxResponses.toString())
+
     spec.filter(
       locator =>
         checkboxResponses.contains(locator.elementId)
@@ -91,16 +93,15 @@ object PDFMapping {
       case (k, v: JsString) => (k, v.value)
     }
 
-    val stringLocators: Map[String, PDFFieldLocator] = spec.filter(locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob.getOrElse(false)).map(
-      locator =>
-        (locator.elementId, locator)
-    ).toMap
+    val stringLocators: Map[String, Seq[PDFFieldLocator]] = spec.filter(
+      locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob.getOrElse(false)
+    ).groupBy(_.elementId)
 
     val filtered: Map[String, String] = stringInputs.filter {
       case (k, _) => stringLocators.contains(k)
     }
 
-    val grouped: Map[String, Iterable[PDFFieldLocator]] = stringLocators.values.groupBy(_.pdfId.get)
+    val grouped: Map[String, Iterable[PDFFieldLocator]] = stringLocators.values.flatten.groupBy(_.pdfId.get)
 
     val concatenatedValues: Map[String, String] = grouped.map {
       case (k, v) =>

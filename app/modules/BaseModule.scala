@@ -40,7 +40,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[DocumentService].to[ITextDocumentService]
     bind[PDFStampingConfigProvider].to[ResourcesPDFStampingConfigProvider]
     bind[PDFTemplateProvider].to[ResourcesPDFTemplateProvider]
-    bind[SeamlessDocsService].to[SeamlessDocsServiceImpl]
     bind[ReactiveMongoApi].to[BiscuitPasswordMongoApi]
     bind[UserValuesService].to[UserValuesServiceImpl]
     bind[RequestUtils].toInstance(new RequestUtils(Clock.systemUTC()))

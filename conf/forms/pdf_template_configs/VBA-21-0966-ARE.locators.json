@@ -20,11 +20,8 @@
     "elementId": "veteran_date_signed_0966"
   },
   {
-    "pdfId": null,
-    "elementId": "dependency_indemnity_compensation_y_n",
-    "idMap": {
-      "Yes": "F[0].Page_1[0].SurvivorsPensionOrDependencyAndIndemnityCompensationDIC[0]"
-    }
+    "pdfId": "F[0].Page_1[0].SurvivorsPensionOrDependencyAndIndemnityCompensationDIC[0]",
+    "elementId": "dependency_indemnity_compensation_y_n"
   },
   {
     "pdfId": "F[0].Page_1[0].Compensation[1]",
@@ -131,22 +128,8 @@
     "elementId": "veteran_home_country"
   },
   {
-    "pdfId": "F[0].Page_1[0].PreferredTelephoneNumber_AreaCode[0]",
-    "elementId": "contact_phone_number",
-    "substringStart": 0,
-    "substringEnd": 3
-  },
-  {
-    "pdfId": "F[0].Page_1[0].PreferredTelephoneNumber_FirstThreeNumbers[0]",
-    "elementId": "contact_phone_number",
-    "substringStart": 4,
-    "substringEnd": 7
-  },
-  {
-    "pdfId": "F[0].Page_1[0].PreferredTelephoneNumber_LastFourNumbers[0]",
-    "elementId": "contact_phone_number",
-    "substringStart": 8,
-    "substringEnd": 12
+    "pdfId": "F[0].Page_1[0].PhoneNumber[0]",
+    "elementId": "contact_phone_number"
   },
   {
     "pdfId": "F[0].Page_1[0].VAFileNumber[0]",
