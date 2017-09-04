@@ -45,6 +45,7 @@ libraryDependencies ++= Seq(
   "com.github.emstlk" %% "nacl4s" % "1.0.0",
   "com.itextpdf" % "itextpdf" % "5.5.12",
   "commons-io" % "commons-io" % "2.5",
+  "org.ghost4j" % "ghost4j" % "1.0.1",
   specs2 % Test,
   cache,
   filters

@@ -119,6 +119,20 @@ class FormController @Inject() (
       }
   }
 
+  def viewPage(claimID: UUID, formKey: String, page: Int): Action[AnyContent] = silhouette.SecuredAction.async {
+    request =>
+      formDAO.find(request.identity.userID, claimID, formKey).flatMap {
+        case Some(claimForm) =>
+          documentService.renderPage(claimForm, page).map {
+            content =>
+              logger.info(s"PDF page rendered for user ${request.identity.userID}")
+              Ok(content).as("image/png")
+          }
+        case None =>
+          Future.successful(NotFound)
+      }
+  }
+
   def pdfLoadingScreen(): Action[AnyContent] = Action {
     request =>
       Ok("Please wait while your document is being generated...")

@@ -70,6 +70,8 @@ gulp.task('libs', function () {
       "src/libs/signature-pad-angular.js",
       "src/libs/api-check.js",
       "src/libs/formly.js",
+      "src/libs/pdf.js",
+      "src/libs/pdf.worker.js",
       "src/libs/angular-formly-templates-bootstrap.js",
       "src/libs/angular-momentjs-service.js",
       "src/libs/*.js"
@@ -85,6 +87,13 @@ gulp.task('other-js', function () {
     .pipe(gulp.dest('build/js'))
     .pipe(browserSync.stream())
     .pipe(sourcemaps.write());
+});
+
+gulp.task('pdf-js', function () {
+    return gulp.src('src/libs/pdf*.js')
+      .pipe(gulp.dest('build/libs'))
+      .pipe(browserSync.stream())
+      .pipe(sourcemaps.write());
 });
 
 gulp.task('xhrEnv', function () {
@@ -146,6 +155,6 @@ gulp.task('watch', ['build', 'initBrowserSync'], function () {
   gulp.watch('src/**/*.pug', ['pug']);
 });
 
-gulp.task('build', ['clean', 'fonts', 'icons', 'libs', 'xhrEnv', 'js', 'other-js', 'css-libs', 'stylus', 'pug', 'browserify', 'lint']);
+gulp.task('build', ['clean', 'fonts', 'icons', 'libs', 'xhrEnv', 'js', 'other-js', 'pdf-js', 'css-libs', 'stylus', 'pug', 'browserify', 'lint']);
 
 gulp.task('default', ['clean', 'build', 'initBrowserSync', 'watch']);
