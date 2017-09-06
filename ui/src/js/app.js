@@ -278,6 +278,21 @@ app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $u
         name: 'root.signpreview',
         url: '/sign/{claimId}/{formId}',
         templateUrl: 'templates/signDocumentPreview.html',
-        controller: 'signDocumentPreviewCtrl'
+        controller: 'signDocumentPreviewCtrl',
+        resolve: {
+            userValues: ['net', '$q', function (net, $q) {
+                var deferred = $q.defer();
+
+                net.getUserValues().then(
+                  function success(res) {
+                      deferred.resolve(res.data);
+                  }, function failure() {
+                      deferred.reject();
+                  }
+                );
+
+                return deferred.promise;
+            }]
+        }
     });
 }]);

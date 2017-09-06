@@ -124,18 +124,6 @@ class ClaimController @Inject() (
     }
   }
 
-  def sign(claimID: UUID): Action[AnyContent] = silhouette.SecuredAction.async {
-    request =>
-      {
-        formDAO.find(request.identity.userID, claimID).flatMap {
-          forms =>
-            Future.sequence(forms.map(documentService.submitForSignature))
-        }.map {
-          _ => Ok
-        }
-      }
-  }
-
   def submit(claimID: UUID): Action[JsValue] = silhouette.SecuredAction.async(BodyParsers.parse.json) {
     request =>
       {
