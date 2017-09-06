@@ -1,0 +1,10 @@
+div#vfi-sign-document-view
+  vfi-breadcrumbs(page="2")
+
+  div#sign-document-wrapper
+    h2.header Sign Document
+
+    div.section
+      div.container-fluid.nopadding
+        div.row(ng-repeat="page in pages")
+          img.pdf-page(src="/pdfpreview/{{claimID}}/{{formKey}}/{{page}}")
