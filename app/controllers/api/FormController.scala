@@ -70,8 +70,11 @@ class FormController @Inject() (
                   val formWithProgress: ClaimForm =
                     claimService.calculateProgress(claimForm.copy(responses = data))
 
+                  val formWithSignatureStatus: ClaimForm =
+                    formWithProgress.copy(isSigned = formWithProgress.responses.contains("signature"))
+
                   (for {
-                    formSaveFuture <- formDAO.save(request.identity.userID, claimID, formKey, formWithProgress)
+                    formSaveFuture <- formDAO.save(request.identity.userID, claimID, formKey, formWithSignatureStatus)
                     updateUserValuesFuture <- updateUserValues(request.identity, data)
                   } yield {
                     logger.info(s"Form saved and user values updated for ${request.identity.userID}")
@@ -90,16 +93,11 @@ class FormController @Inject() (
 
   def getFormSignatureStatus(claimID: UUID, formKey: String): Action[AnyContent] = silhouette.SecuredAction.async {
     request =>
-      formDAO.find(request.identity.userID, claimID, formKey).flatMap {
+      formDAO.find(request.identity.userID, claimID, formKey).map {
         case Some(claimForm) =>
-          documentService.isSigned(claimForm).flatMap {
-            isSigned =>
-              formDAO.save(request.identity.userID, claimID, formKey, claimForm.copy(isSigned = isSigned)).map {
-                _ => Ok(JsBoolean(isSigned))
-              }
-          }
+          Ok(JsBoolean(claimForm.responses.contains("signature")))
         case None =>
-          Future.successful(NotFound)
+          NotFound
       }
   }
 

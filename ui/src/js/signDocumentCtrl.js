@@ -17,23 +17,6 @@ app.controller('signDocumentCtrl', ['$scope', '$filter', '$stateParams', '$state
             return result;
         }
 
-        function handleVisibilityChange() {
-            if (!document.hidden) {
-                for (var i = 0; i < $scope.forms.length; i++) {
-                    var form = $scope.forms[i];
-                    net.getFormSignatureStatus(form.claimID, form.key).then(
-                        function success(res) {
-                            form.isSigned = res.data;
-                            $scope.allFormsSigned = testAllFormsSigned();
-                        })
-                }
-            }
-        }
-
-        $window.addEventListener("visibilitychange",
-            handleVisibilityChange,
-            false);
-
         $scope.markCurrentlySigningForm = function (form) {
             $scope.currentlySigningForm = form
         };

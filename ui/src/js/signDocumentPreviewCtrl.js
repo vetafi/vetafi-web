@@ -11,15 +11,14 @@ app.controller('signDocumentPreviewCtrl', ['$scope', '$filter', '$stateParams', 
         }
 
         $scope.onSubmit = function () {
-            userValues.date_signed = currentDate();
-            userValues.signature = $scope.signature;
+            userValues.values.date_signed = currentDate();
+            userValues.values.signature = $scope.signature;
 
             net.saveForm(
               $scope.claimId,
               $scope.formId,
-              userValues
+              userValues.values
             ).then(function (res) {
-                claimService.createNewClaim();
                 $state.transitionTo('root.sign', {claimId: $scope.claimId});
             });
         }
