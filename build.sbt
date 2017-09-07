@@ -43,6 +43,8 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.log4s" %% "log4s" % "1.3.6",
   "com.github.emstlk" %% "nacl4s" % "1.0.0",
+  "com.itextpdf" % "itextpdf" % "5.5.12",
+  "commons-io" % "commons-io" % "2.5",
   specs2 % Test,
   cache,
   filters

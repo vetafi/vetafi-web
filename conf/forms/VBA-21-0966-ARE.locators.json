@@ -1,0 +1,178 @@
+[
+  {
+    "pdfId": "F[0].Page_1[0].Email[0]",
+    "elementId": "contact_email"
+  },
+  {
+    "pdfId": null,
+    "elementId": "veteran_sex",
+    "idMap": {
+      "Male": "F[0].Page_1[0].Male[0]",
+      "Female": "F[0].Page_1[0].Female[0]"
+    }
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransServiceNumber[0]",
+    "elementId": "veterans_service_number"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].DateSigned[0]",
+    "elementId": "veteran_date_signed_0966"
+  },
+  {
+    "pdfId": null,
+    "elementId": "dependency_indemnity_compensation_y_n",
+    "idMap": {
+      "Yes": "F[0].Page_1[0].SurvivorsPensionOrDependencyAndIndemnityCompensationDIC[0]"
+    }
+  },
+  {
+    "pdfId": "F[0].Page_1[0].Compensation[1]",
+    "elementId": "veteran_intent_to_file_compensation_y_n"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].Pension[1]",
+    "elementId": "veteran_intent_to_file_pension_y_n"
+  },
+  {
+    "pdfId": null,
+    "elementId": "veteran_previous_claim_with_va_y_n",
+    "idMap": {
+      "Yes": "F[0].Page_1[0].Compensation[3]",
+      "No": "F[0].Page_1[0].Compensation[2]"
+    }
+  },
+  {
+    "pdfId": "F[0].Page_1[0].NameOfAttorney_Agent_VeteransServiceOrganization[0]",
+    "elementId": "veteran_attorney_or_vso"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].ClaimantsSocialSecurityNumber_FirstThreeNumbers[0]",
+    "elementId": "claimant_ssn",
+    "substringStart": 0,
+    "substringEnd": 3
+  },
+  {
+    "pdfId": "F[0].Page_1[0].ClaimantsSocialSecurityNumber_SecondTwoNumbers[0]",
+    "elementId": "claimant_ssn",
+    "substringStart": 4,
+    "substringEnd": 6
+  },
+  {
+    "pdfId": "F[0].Page_1[0].ClaimantsSocialSecurityNumber_LastFourNumbers[0]",
+    "elementId": "claimant_ssn",
+    "substringStart": 7,
+    "substringEnd": 11
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransSocialSecurityNumber_FirstThreeNumbers[0]",
+    "elementId": "veteran_ssn",
+    "substringStart": 0,
+    "substringEnd": 3
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransSocialSecurityNumber_SecondTwoNumbers[0]",
+    "elementId": "veteran_ssn",
+    "substringStart": 4,
+    "substringEnd": 6
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransSocialSecurityNumber_LastFourNumbers[0]",
+    "elementId": "veteran_ssn",
+    "substringStart": 7,
+    "substringEnd": 11
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransFirstName[0]",
+    "elementId": "veteran_first_name"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransMiddleInitial[0]",
+    "elementId": "veteran_middle_initial"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VeteransLastName[0]",
+    "elementId": "veteran_last_name"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].ClaimantsFirstName[0]",
+    "elementId": "claimant_first_name"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].ClaimantsMiddleInitial1[0]",
+    "elementId": "claimant_middle_initial"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].ClaimantsLastName[0]",
+    "elementId": "claimant_last_name"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].CurrentMailingAddress_NumberAndStreet[0]",
+    "elementId": "veteran_home_address_line1"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].CurrentMailingAddress_ApartmentOrUnitNumber[0]",
+    "elementId": "veteran_home_apartment_number"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].CurrentMailingAddress_City[0]",
+    "elementId": "veteran_home_city"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].CurrentMailingAddress_StateOrProvince[0]",
+    "elementId": "veteran_home_state"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].CurrentMailingAddress_ZIPOrPostalCode_FirstFiveNumbers[0]",
+    "elementId": "veteran_home_zip_code"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].CurrentMailingAddress_Country[0]",
+    "elementId": "veteran_home_country"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].PreferredTelephoneNumber_AreaCode[0]",
+    "elementId": "contact_phone_number",
+    "substringStart": 0,
+    "substringEnd": 3
+  },
+  {
+    "pdfId": "F[0].Page_1[0].PreferredTelephoneNumber_FirstThreeNumbers[0]",
+    "elementId": "contact_phone_number",
+    "substringStart": 4,
+    "substringEnd": 7
+  },
+  {
+    "pdfId": "F[0].Page_1[0].PreferredTelephoneNumber_LastFourNumbers[0]",
+    "elementId": "contact_phone_number",
+    "substringStart": 8,
+    "substringEnd": 12
+  },
+  {
+    "pdfId": "F[0].Page_1[0].VAFileNumber[0]",
+    "elementId": "va_file_number"
+  },
+  {
+    "pdfId": "F[0].Page_1[0].DOByear[0]",
+    "elementId": "veteran_dob",
+    "substringStart": 6,
+    "substringEnd": 10
+  },
+  {
+    "pdfId": "F[0].Page_1[0].DOBmonth[0]",
+    "elementId": "veteran_dob",
+    "substringStart": 0,
+    "substringEnd": 2
+  },
+  {
+    "pdfId": "F[0].Page_1[0].DOBday[0]",
+    "elementId": "veteran_dob",
+    "substringStart": 3,
+    "substringEnd": 5
+  },
+  {
+    "pdfId": "F[0].Page_1[0].SignatureField1[0]",
+    "elementId": "signature",
+    "isBase64ImageBlob": true
+  }
+]
