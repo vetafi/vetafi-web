@@ -64,7 +64,7 @@ class FormController @Inject() (
                 BadRequest(Json.obj("status" -> "error", "message" -> JsError.toJson(errors)))
               )
             },
-            data => {
+            (data: Map[String, JsValue]) => {
               formDAO.find(request.identity.userID, claimID, formKey).flatMap {
                 case Some(claimForm) =>
                   val formWithProgress: ClaimForm =
