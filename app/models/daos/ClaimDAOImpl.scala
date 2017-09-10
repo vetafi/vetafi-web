@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
-import models.{ Address, Claim, Recipients }
+import models.{Address, Claim, ClaimSubmission, Recipient}
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json._
@@ -64,19 +64,20 @@ class ClaimDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Cl
       key = key,
       Claim.State.INCOMPLETE,
       java.util.Date.from(Instant.now()),
-      Recipients(None, None, Seq.empty[String], Seq.empty[Address])
+      Seq.empty[Recipient]
     )
 
     collection.flatMap(_.insert(claim))
   }
 
-  override def submit(userID: UUID, claimID: UUID): Future[WriteResult] = {
+  override def submit(userID: UUID, claimID: UUID, submissions: Seq[ClaimSubmission]): Future[WriteResult] = {
     collection.flatMap(
       _.update(
         Json.obj("userID" -> userID, "claimID" -> claimID),
         Json.obj("$set" -> Json.obj(
           "state" -> Claim.State.SUBMITTED,
-          "stateUpdatedAt" -> java.util.Date.from(Instant.now())
+          "stateUpdatedAt" -> java.util.Date.from(Instant.now()),
+          "submissions" -> Json.toJson(submissions)
         ))
       )
     )

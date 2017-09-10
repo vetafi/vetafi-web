@@ -10,7 +10,7 @@ import services.documents.{ DocumentService, ITextDocumentService, SeamlessDocsD
 import services._
 import services.documents.pdf.{ PDFStampingConfigProvider, PDFTemplateProvider, ResourcesPDFStampingConfigProvider, ResourcesPDFTemplateProvider }
 import services.forms._
-import services.submission.{ FaxSubmissionService, SubmissionService }
+import services.submission.{ TwilioFaxSubmissionService, FaxSubmissionService }
 import utils.seamlessdocs.{ RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl }
 import utils.secrets.{ BiscuitSecretsManager, SecretsManager, StaticSecrets }
 
@@ -36,7 +36,7 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[FormConfigManager].to[JsonResourceFormConfigManager]
     bind[ContactInfoService].to[ContactInfoServiceImpl]
     bind[ClaimService].to[ClaimServiceImpl]
-    bind[SubmissionService].to[FaxSubmissionService]
+    bind[FaxSubmissionService].to[TwilioFaxSubmissionService]
     bind[DocumentService].to[ITextDocumentService]
     bind[PDFStampingConfigProvider].to[ResourcesPDFStampingConfigProvider]
     bind[PDFTemplateProvider].to[ResourcesPDFTemplateProvider]
