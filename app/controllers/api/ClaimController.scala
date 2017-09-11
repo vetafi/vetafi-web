@@ -121,15 +121,18 @@ class ClaimController @Inject() (
         submissions =>
           claimDAO.submit(claim.userID, claim.claimID, submissions).flatMap {
             case submitted if submitted.ok =>
-              submissions match {
-                case allSuccess if allSuccess.reduce(_.success && _.success) =>
-                  Future.successful(Ok(Json.obj("status" -> "ok")))
-                case failure =>
-                  Future.successful(InternalServerError(Json.obj("status" -> "error")))
+              val allSuccess: Boolean = submissions.map(_.success).reduce(_ && _)
+              if (allSuccess) {
+                Future.successful(Ok(Json.obj("status" -> "ok", "errors" -> Json.arr())))
+              } else {
+                val failures: Seq[ClaimSubmission] = submissions.filter(!_.success)
+                Future.successful(InternalServerError(
+                  Json.obj(
+                    "status" -> "error",
+                    "errors" -> Json.toJson(failures))))
               }
             case _ => Future.successful(InternalServerError)
           }
-
 
       }
       case _ => Future.successful(InternalServerError)

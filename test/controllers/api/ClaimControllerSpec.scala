@@ -161,6 +161,9 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
 
   "The `submit` action" should {
     "return 200" in new ClaimControllerTestContext {
+      val testRecipients = Seq(
+        Recipient(Recipient.Type.FAX, "18005555555"),
+        Recipient(Recipient.Type.EMAIL, "test@x.com"))
 
       Mockito.when(mockClaimDao.findClaim(identity.userID, testIncompleteClaim.claimID))
         .thenReturn(Future.successful(Some(testIncompleteClaim)))
@@ -168,16 +171,15 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
       Mockito.when(mockClaimDao.save(Matchers.eq(identity.userID), Matchers.eq(testIncompleteClaim.claimID), Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
-      Mockito.when(mockClaimDao.submit(identity.userID, testIncompleteClaim.claimID, Seq()))
+      Mockito.when(mockClaimDao.submit(
+        Matchers.eq(identity.userID),
+        Matchers.eq(testIncompleteClaim.claimID),
+        Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
       new WithApplication(application) {
         val req = FakeRequest(POST, controllers.api.routes.ClaimController.submit(testIncompleteClaim.claimID).url)
-          .withJsonBody(Json.toJson(
-            Seq(Recipient(Recipient.Type.FAX, "18005555555"),
-              Recipient(Recipient.Type.EMAIL, "test@x.com")
-            )
-          ))
+          .withJsonBody(Json.toJson(testRecipients))
           .withAuthenticator[DefaultEnv](identity.loginInfo)
         val csrfReq = addToken(req)
         val result: Future[Result] = route(app, csrfReq).get
