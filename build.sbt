@@ -46,6 +46,7 @@ libraryDependencies ++= Seq(
   "com.itextpdf" % "itextpdf" % "5.5.12",
   "commons-io" % "commons-io" % "2.5",
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
+  "com.twilio.sdk" % "twilio" % "7.14.5",
   specs2 % Test,
   cache,
   filters
