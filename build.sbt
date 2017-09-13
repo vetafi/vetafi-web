@@ -45,6 +45,8 @@ libraryDependencies ++= Seq(
   "com.github.emstlk" %% "nacl4s" % "1.0.0",
   "com.itextpdf" % "itextpdf" % "5.5.12",
   "commons-io" % "commons-io" % "2.5",
+  "commons-codec" % "commons-codec" % "1.10",
+  "org.apache.commons" % "commons-lang3" % "3.6",
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
   "com.twilio.sdk" % "twilio" % "7.14.5",
   specs2 % Test,
