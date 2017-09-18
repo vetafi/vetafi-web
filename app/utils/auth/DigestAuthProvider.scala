@@ -7,16 +7,21 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{Credentials, PasswordHasherRegistry}
 import com.mohiva.play.silhouette.api.{Logger, LoginInfo, RequestProvider}
 import com.mohiva.play.silhouette.impl.providers.PasswordProvider
+import models.{TwilioUser, User}
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
 import play.api.http.HeaderNames
 import play.api.mvc.{Request, RequestHeader}
 import play.mvc.Http
-import com.mohiva.play.silhouette.api.util.Credentials
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DigestParameters(username: String, realm: String, uri: String, nonce: String, response: String) {
+case class DigestParameters(username: String,
+                            realm: String,
+                            uri: String,
+                            nonce: String,
+                            response: String,
+                            method: String) {
 
 }
 
@@ -34,9 +39,6 @@ class DigestAuthProvider(
                           protected val authInfoRepository: AuthInfoRepository,
                           protected val passwordHasherRegistry: PasswordHasherRegistry)(implicit val executionContext: ExecutionContext)
   extends RequestProvider with PasswordProvider with Logger {
-
-  private val params = new util.HashMap[String, String]
-
 
   def getCredentials(request: RequestHeader): Option[DigestParameters] = {
     if (!request.headers.toMap.contains("authorization")) return None
@@ -69,27 +71,31 @@ class DigestAuthProvider(
         params("realm"),
         params("uri"),
         params("nonce"),
-        params("response")))
+        params("response"),
+        request.method))
     } else {
       None
     }
   }
 
 
-    def isAuthorized(digestParameters: DigestParameters): Boolean = {
-      val user: Future[Option[Nothing]] = authInfoRepository.find(LoginInfo(id, digestParameters.username))
-      if (user == null) throw new Nothing(params.get("realm"))
-      val digest = createDigest(user.apiPassword)
-      digest == params.get("response")
+  def isAuthorized(digestParameters: DigestParameters): Future[Boolean] = {
+    authInfoRepository.find(LoginInfo(id, digestParameters.username)).flatMap {
+      case None =>
+        false
+      case Some(authInfo: TwilioUser) =>
+        val digest = createDigest(digestParameters, authInfo.apiPassword)
     }
+  }
 
-    private def createDigest(pass: String) = {
-      val username = params.get("username")
-      val realm = params.get("realm")
-      val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
-      val digest2 = DigestUtils.md5Hex(request.method + ":" + params.get("uri"))
-      DigestUtils.md5Hex(digest1 + ":" + params.get("nonce") + ":" + digest2)
-    }*/
+  private def createDigest(digestParameters: DigestParameters, pass: String) = {
+    val username = digestParameters.username
+    val realm = digestParameters.realm
+    val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
+    val digest2 = DigestUtils.md5Hex(digestParameters.method + ":" + digestParameters.uri)
+    DigestUtils.md5Hex(digest1 + ":" + digestParameters.nonce + ":" + digest2)
+  }
+
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
 
   }
@@ -103,14 +109,6 @@ class DigestAuthProvider(
         }
       case _ => None
     }
-  }
-
-  private def createDigest(request: RequestHeader, pass: String) = {
-    val username = params.get("username")
-    val realm = params.get("realm")
-    val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
-    val digest2 = DigestUtils.md5Hex(request.method + ":" + params.get("uri"))
-    DigestUtils.md5Hex(digest1 + ":" + params.get("nonce") + ":" + digest2)
   }
 
   override def id = DigestAuthProvider.ID

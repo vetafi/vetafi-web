@@ -1,25 +1,25 @@
 package modules
 
 import com.google.inject.name.Named
-import com.google.inject.{ AbstractModule, Provides }
+import com.google.inject.{AbstractModule, Provides}
 import com.mohiva.play.silhouette.api.crypto._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.services._
 import com.mohiva.play.silhouette.api.util._
-import com.mohiva.play.silhouette.api.{ Environment, EventBus, Silhouette, SilhouetteProvider }
-import com.mohiva.play.silhouette.crypto.{ JcaCookieSigner, JcaCookieSignerSettings, JcaCrypter, JcaCrypterSettings }
+import com.mohiva.play.silhouette.api.{Environment, EventBus, Silhouette, SilhouetteProvider}
+import com.mohiva.play.silhouette.crypto.{JcaCookieSigner, JcaCookieSignerSettings, JcaCrypter, JcaCrypterSettings}
 import com.mohiva.play.silhouette.impl.authenticators._
 import com.mohiva.play.silhouette.impl.providers._
 import com.mohiva.play.silhouette.impl.providers.oauth1._
-import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{ CookieSecretProvider, CookieSecretSettings }
+import com.mohiva.play.silhouette.impl.providers.oauth1.secrets.{CookieSecretProvider, CookieSecretSettings}
 import com.mohiva.play.silhouette.impl.providers.oauth2._
-import com.mohiva.play.silhouette.impl.providers.oauth2.state.{ CookieStateProvider, CookieStateSettings, DummyStateProvider }
+import com.mohiva.play.silhouette.impl.providers.oauth2.state.{CookieStateProvider, CookieStateSettings, DummyStateProvider}
 import com.mohiva.play.silhouette.impl.providers.openid.YahooProvider
 import com.mohiva.play.silhouette.impl.providers.openid.services.PlayOpenIDService
 import com.mohiva.play.silhouette.impl.services._
 import com.mohiva.play.silhouette.impl.util._
 import com.mohiva.play.silhouette.password.BCryptPasswordHasher
-import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, MongoAuthInfoDAO }
+import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import models.daos._
 import net.ceedubs.ficus.Ficus._
@@ -29,12 +29,13 @@ import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
-import utils.auth.{ CustomUnsecuredErrorHandler, DefaultEnv, IdMeProvider, RedirectSecuredErrorHandler }
+import utils.auth.{CustomUnsecuredErrorHandler, DefaultEnv, IdMeProvider, RedirectSecuredErrorHandler}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.api.libs.json._
 import _root_.services.UserService
 import _root_.services.UserServiceImpl
 import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
+import models.TwilioUser
 
 /**
  * The Guice module which wires all Silhouette dependencies.
@@ -241,6 +242,12 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     new MongoAuthInfoDAO[PasswordInfo](reactiveMongoApi, config)
   }
 
+  @Provides
+  def provideTwilioUserDAO(reactiveMongoApi: ReactiveMongoApi, config: Configuration): DelegableAuthInfoDAO[TwilioUser] = {
+    implicit lazy val format = Json.format[TwilioUser]
+    new MongoAuthInfoDAO[TwilioUser](reactiveMongoApi, config)
+  }
+
   /**
    * Provides the auth info repository.
    *
@@ -255,10 +262,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     passwordInfoDAO: DelegableAuthInfoDAO[PasswordInfo],
     oauth1InfoDAO: DelegableAuthInfoDAO[OAuth1Info],
     oauth2InfoDAO: DelegableAuthInfoDAO[OAuth2Info],
-    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo]
+    openIDInfoDAO: DelegableAuthInfoDAO[OpenIDInfo],
+    twilioUserDAO: DelegableAuthInfoDAO[TwilioUser]
   ): AuthInfoRepository = {
 
-    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO)
+    new DelegableAuthInfoRepository(passwordInfoDAO, oauth1InfoDAO, oauth2InfoDAO, openIDInfoDAO, twilioUserDAO)
   }
 
   /**

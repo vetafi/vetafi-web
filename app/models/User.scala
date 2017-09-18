@@ -55,3 +55,11 @@ case class User(
 object User {
   implicit val jsonFormat: OFormat[User] = Json.format[User]
 }
+
+case class TwilioUser(userID: UUID, apiPassword: String) {
+
+}
+
+object TwilioUser {
+  implicit val jsonFormat: OFormat[TwilioUser] = Json.format[TwilioUser]
+}
