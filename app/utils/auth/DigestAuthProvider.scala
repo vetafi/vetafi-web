@@ -1,18 +1,15 @@
 package utils.auth
 
-import java.util
-
-import com.mohiva.play.silhouette.api.crypto.Base64
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.{Credentials, PasswordHasherRegistry}
+import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
 import com.mohiva.play.silhouette.api.{Logger, LoginInfo, RequestProvider}
 import com.mohiva.play.silhouette.impl.providers.PasswordProvider
-import models.{TwilioUser, User}
+import models.TwilioUser
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
+import org.log4s.getLogger
 import play.api.http.HeaderNames
 import play.api.mvc.{Request, RequestHeader}
-import play.mvc.Http
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,24 +22,22 @@ case class DigestParameters(username: String,
 
 }
 
-
-object DigestAuthProvider {
-  def isAuthorized(request: Http.Request): Boolean = {
-    val req = new DigestAuthProvider(request)
-    req.isValid && req.isAuthorized
-  }
-
-  val ID = "digest-auth"
-}
-
 class DigestAuthProvider(
                           protected val authInfoRepository: AuthInfoRepository,
                           protected val passwordHasherRegistry: PasswordHasherRegistry)(implicit val executionContext: ExecutionContext)
   extends RequestProvider with PasswordProvider with Logger {
 
-  def getCredentials(request: RequestHeader): Option[DigestParameters] = {
-    if (!request.headers.toMap.contains("authorization")) return None
-    val authStringOpt = request.headers.get("authorization")
+  private[this] val logger = getLogger
+
+  override def id = "digest-auth"
+
+  private val expectedHeaders: Set[String] = Set(
+    "username", "realm", "uri", "nonce", "response"
+  )
+
+  def getDigestParameters(request: RequestHeader): Option[DigestParameters] = {
+    if (!request.headers.toMap.contains(HeaderNames.AUTHORIZATION)) return None
+    val authStringOpt = request.headers.get(HeaderNames.AUTHORIZATION)
 
     val authString: String = authStringOpt match {
       case Some(value) if value.startsWith("Digest ") => value
@@ -62,11 +57,7 @@ class DigestAuthProvider(
         StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)
     }.toMap
 
-    if (params.contains("username") &&
-      params.contains("realm") &&
-      params.contains("uri") &&
-      params.contains("nonce") &&
-      params.contains("response")) {
+    if (expectedHeaders.subsetOf(params.keys.toSet)) {
       Some(DigestParameters(params("username"),
         params("realm"),
         params("uri"),
@@ -74,17 +65,25 @@ class DigestAuthProvider(
         params("response"),
         request.method))
     } else {
+      val missingHeaders = expectedHeaders -- params.keys.toSet
+      logger.warn(s"Digest auth request missing required headers: ${missingHeaders.toString()}")
       None
     }
   }
 
 
-  def isAuthorized(digestParameters: DigestParameters): Future[Boolean] = {
-    authInfoRepository.find(LoginInfo(id, digestParameters.username)).flatMap {
-      case None =>
-        false
+  def getAuthorizedUser(digestParameters: DigestParameters): Future[Option[LoginInfo]] = {
+    authInfoRepository.find(LoginInfo(id, digestParameters.username)).map {
       case Some(authInfo: TwilioUser) =>
         val digest = createDigest(digestParameters, authInfo.apiPassword)
+        if (digest == digestParameters.response) {
+          Some(LoginInfo(id, digestParameters.username))
+        } else {
+          logger.warn(s"Digest $digest did not match expected value ${digestParameters.response}")
+          None
+        }
+      case None =>
+        None
     }
   }
 
@@ -97,19 +96,12 @@ class DigestAuthProvider(
   }
 
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
-
-  }
-
-  def getCredentials(request: RequestHeader): Option[Credentials] = {
-    request.headers.get(HeaderNames.AUTHORIZATION) match {
-      case Some(header) if header.startsWith("Basic ") =>
-        Base64.decode(header.replace("Basic ", "")).split(":", 2) match {
-          case credentials if credentials.length == 2 => Some(Credentials(credentials(0), credentials(1)))
-          case _ => None
-        }
-      case _ => None
+    getDigestParameters(request) match {
+      case Some(params: DigestParameters) =>
+        getAuthorizedUser(params)
+      case None =>
+        logger.warn("Failed to parse digest request.")
+        Future.successful(None)
     }
   }
-
-  override def id = DigestAuthProvider.ID
 }

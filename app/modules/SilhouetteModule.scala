@@ -29,7 +29,7 @@ import play.api.Configuration
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.openid.OpenIdClient
 import play.api.libs.ws.WSClient
-import utils.auth.{CustomUnsecuredErrorHandler, DefaultEnv, IdMeProvider, RedirectSecuredErrorHandler}
+import utils.auth._
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.api.libs.json._
 import _root_.services.UserService
@@ -47,6 +47,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
    */
   def configure() {
     bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
+    bind[Silhouette[TwilioAuthEnv]].to[SilhouetteProvider[TwilioAuthEnv]]
     bind[UserService].to[UserServiceImpl]
     bind[UserDAO].to[UserDAOImpl]
     bind[CacheLayer].to[PlayCacheLayer]
@@ -88,6 +89,9 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
       eventBus
     )
   }
+
+  @Provides
+  def provideEnvironment()
 
   /**
    * Provides the social provider registry.
@@ -371,6 +375,14 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   ): CredentialsProvider = {
 
     new CredentialsProvider(authInfoRepository, passwordHasherRegistry)
+  }
+
+  @Provides
+  def provideDigestAuthProvider(
+                                 authInfoRepository: AuthInfoRepository,
+                                 passwordHasherRegistry: PasswordHasherRegistry
+                               ): DigestAuthProvider = {
+    new DigestAuthProvider(authInfoRepository, passwordHasherRegistry)
   }
 
   /**
