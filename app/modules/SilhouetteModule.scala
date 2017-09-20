@@ -34,7 +34,9 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import play.api.libs.json._
 import _root_.services.UserService
 import _root_.services.UserServiceImpl
-import com.mohiva.play.silhouette.impl.providers.oauth1.services.PlayOAuth1Service
+import _root_.services.TwilioUserService
+import _root_.services.TwilioUserServiceImpl
+import services.PlayOAuth1Service
 import models.TwilioUser
 
 /**
@@ -49,6 +51,7 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     bind[Silhouette[DefaultEnv]].to[SilhouetteProvider[DefaultEnv]]
     bind[Silhouette[TwilioAuthEnv]].to[SilhouetteProvider[TwilioAuthEnv]]
     bind[UserService].to[UserServiceImpl]
+    bind[TwilioUserService].to[TwilioUserServiceImpl]
     bind[UserDAO].to[UserDAOImpl]
     bind[CacheLayer].to[PlayCacheLayer]
     bind[IDGenerator].toInstance(new SecureRandomIDGenerator())
@@ -91,7 +94,18 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   @Provides
-  def provideEnvironment()
+  def provideEnvironment(userService: TwilioUserService,
+                         authenticatorService: DummyAuthenticatorService,
+                         eventBus: EventBus,
+                         authInfoRepository: AuthInfoRepository,
+                         passwordHasherRegistry: PasswordHasherRegistry): Environment[TwilioAuthEnv] = {
+    Environment[TwilioAuthEnv](
+      userService,
+      authenticatorService,
+      Seq(new DigestAuthProvider(authInfoRepository, passwordHasherRegistry)),
+      eventBus
+    )
+  }
 
   /**
    * Provides the social provider registry.
