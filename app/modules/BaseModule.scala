@@ -8,7 +8,7 @@ import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
 import services.documents.{DocumentService, ITextDocumentService, SeamlessDocsDocumentService}
 import services._
-import services.documents.pdf.{PDFStampingConfigProvider, PDFTemplateProvider, ResourcesPDFStampingConfigProvider, ResourcesPDFTemplateProvider}
+import services.documents.pdf._
 import services.forms._
 import services.submission._
 import utils.seamlessdocs.{RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl}
@@ -45,5 +45,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[RequestUtils].toInstance(new RequestUtils(Clock.systemUTC()))
     bind[EmailSubmissionService].to[SESEmailSubmissionService]
     bind[RecipientService].to[RecipientServiceImpl]
+    bind[PDFConcatenator].to[ITextPDFConcatenator]
   }
 }

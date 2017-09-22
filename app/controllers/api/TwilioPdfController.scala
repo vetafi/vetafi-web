@@ -1,42 +1,59 @@
 package controllers.api
 
+import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
 import models.daos.{FormDAO, UserValuesDAO}
-import org.log4s.getLogger
-import play.api.mvc.{Action, AnyContent, Controller, Cookie}
+import org.log4s.{MDC, getLogger}
+import play.api.mvc.{Action, AnyContent, Controller}
 import services.documents.DocumentService
+import services.documents.pdf.PDFConcatenator
 import services.forms.{ClaimService, ContactInfoService}
-import utils.auth.{DefaultEnv, DigestAuthErrorHandler, TwilioAuthEnv}
+import utils.auth.{DigestAuthErrorHandler, TwilioAuthEnv}
 
+import scala.collection.parallel.ParSeq
 import scala.concurrent.Future
 
-class TwilioPdfController @Inject() (
-                                      val formDAO: FormDAO,
-                                      val userValuesDAO: UserValuesDAO,
-                                      val claimService: ClaimService,
-                                      val contactInfoService: ContactInfoService,
-                                      val documentService: DocumentService,
-                                      silhouette: Silhouette[TwilioAuthEnv],
-                                      val digestAuthErrorHandler: DigestAuthErrorHandler
-                                    ) extends Controller {
+class TwilioPdfController @Inject()(
+                                     val formDAO: FormDAO,
+                                     val userValuesDAO: UserValuesDAO,
+                                     val claimService: ClaimService,
+                                     val contactInfoService: ContactInfoService,
+                                     val documentService: DocumentService,
+                                     silhouette: Silhouette[TwilioAuthEnv],
+                                     val digestAuthErrorHandler: DigestAuthErrorHandler,
+                                     val pdfConcatenator: PDFConcatenator
+                                   ) extends Controller {
 
   private[this] val logger = getLogger
 
-  def getPdf: Action[AnyContent] = silhouette.SecuredAction(digestAuthErrorHandler).async {
+  def getPdf(userID: UUID, claimID: UUID): Action[AnyContent] = silhouette.SecuredAction(digestAuthErrorHandler).async {
     implicit request =>
-      formDAO.find(request.identity.userID, claimID, formKey).flatMap {
-        case Some(claimForm) =>
-          documentService.render(claimForm).map {
-            content =>
-              logger.info(s"PDF rendered for user ${request.identity.userID}")
-              Ok(content).as("application/pdf").withCookies(
-                Cookie("fileDownloadToken", "1", secure = false, httpOnly = false)
-              )
+      MDC.withCtx(
+        "userID" -> userID.toString,
+        "claimID" -> claimID.toString
+      ) {
+        logger.info("Received request from twilio for claim PDF.")
+
+        val formsFuture = formDAO.find(request.identity.userID, claimID)
+
+        formsFuture.flatMap(
+          forms => {
+            logger.info(s"Will concatenate ${forms.length} forms.")
+            Future.sequence(forms.par.map(documentService.render))
           }
-        case None =>
-          Future.successful(NotFound)
+        ).map(
+          (pdfs: ParSeq[Array[Byte]]) => {
+            pdfConcatenator.concat(pdfs.seq)
+          }
+        ).map {
+          (concatedPdf: Array[Byte]) =>
+            logger.info("Serving concatenated pdf.")
+            Ok(concatedPdf).as("application/pdf")
+        }
       }
   }
+
+
 }
