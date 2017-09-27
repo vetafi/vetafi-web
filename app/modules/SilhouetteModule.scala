@@ -99,12 +99,13 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     authenticatorService: DummyAuthenticatorService,
     eventBus: EventBus,
     authInfoRepository: AuthInfoRepository,
-    passwordHasherRegistry: PasswordHasherRegistry
+    passwordHasherRegistry: PasswordHasherRegistry,
+    digestAuthProvider: DigestAuthProvider
   ): Environment[TwilioAuthEnv] = {
     Environment[TwilioAuthEnv](
       userService,
       authenticatorService,
-      Seq(new DigestAuthProvider(authInfoRepository, passwordHasherRegistry)),
+      Seq(digestAuthProvider),
       eventBus
     )
   }
@@ -314,6 +315,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     val encoder = new CrypterAuthenticatorEncoder(crypter)
 
     new CookieAuthenticatorService(config, None, cookieSigner, encoder, fingerprintGenerator, idGenerator, clock)
+  }
+
+  @Provides
+  def provideAuthenticatorService(): DummyAuthenticatorService = {
+    new DummyAuthenticatorService()
   }
 
   /**

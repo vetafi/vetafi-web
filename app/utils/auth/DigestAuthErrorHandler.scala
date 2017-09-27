@@ -12,10 +12,10 @@ import scala.concurrent.Future
 class DigestAuthErrorHandler extends SecuredErrorHandler {
 
   override def onNotAuthorized(implicit request: RequestHeader): Future[Result] = {
-    Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> "Digest realm=twilio"))
+    Future.successful(Forbidden)
   }
 
   override def onNotAuthenticated(implicit request: RequestHeader): Future[Result] = {
-    Future.successful(Forbidden)
+    Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> "Digest realm=twilio"))
   }
 }

@@ -12,7 +12,6 @@ import play.api.http.HeaderNames
 import play.api.mvc.{ Request, RequestHeader }
 
 import scala.concurrent.{ ExecutionContext, Future }
-import scala.reflect.ClassTag
 
 case class DigestParameters(
   username: String,
