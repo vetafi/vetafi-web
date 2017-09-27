@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
-import models.{Address, Claim, ClaimSubmission, Recipient}
+import models.{ Address, Claim, ClaimSubmission, Recipient }
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json._

@@ -1,8 +1,9 @@
 package models
 
 import java.util.UUID
+
 import play.api.libs.json._
-import com.mohiva.play.silhouette.api.{ Identity, LoginInfo }
+import com.mohiva.play.silhouette.api.{ AuthInfo, Identity, LoginInfo }
 
 case class Contact(
   phoneNumber: Option[String],
@@ -56,7 +57,7 @@ object User {
   implicit val jsonFormat: OFormat[User] = Json.format[User]
 }
 
-case class TwilioUser(userID: UUID, apiPassword: String) {
+case class TwilioUser(userID: UUID, apiPassword: String) extends AuthInfo with Identity {
 
 }
 

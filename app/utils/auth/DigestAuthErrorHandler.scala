@@ -1,8 +1,8 @@
 package utils.auth
 
 import com.mohiva.play.silhouette.api.actions.SecuredErrorHandler
-import play.api.mvc.{RequestHeader, Result}
-import play.api.mvc.Results.{Unauthorized, Forbidden}
+import play.api.mvc.{ RequestHeader, Result }
+import play.api.mvc.Results.{ Unauthorized, Forbidden }
 import scala.concurrent.Future
 
 /**

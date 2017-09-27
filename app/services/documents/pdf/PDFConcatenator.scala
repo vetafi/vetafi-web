@@ -1,6 +1,6 @@
 package services.documents.pdf
 
-import java.io.{InputStream, OutputStream}
+import java.io.{ InputStream, OutputStream }
 
 trait PDFConcatenator {
 

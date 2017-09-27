@@ -1,6 +1,6 @@
 package services.submission
 
-import models.{Claim, Recipient}
+import models.{ Claim, Recipient }
 
 /**
  * Service used to discover default recipients for a given Claim.

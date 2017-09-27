@@ -1,9 +1,9 @@
 package services.documents.pdf;
 
-import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
+import java.io.{ ByteArrayOutputStream, InputStream, OutputStream }
 
 import com.itextpdf.text.Document
-import com.itextpdf.text.pdf.{PdfCopy, PdfReader};
+import com.itextpdf.text.pdf.{ PdfCopy, PdfReader };
 
 /**
  * Concatenation of multiple pdf documents

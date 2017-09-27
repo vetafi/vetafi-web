@@ -2,8 +2,8 @@ package models.daos
 
 import java.util.UUID
 
-import models.{Claim, ClaimSubmission}
-import reactivemongo.api.commands.{MultiBulkWriteResult, WriteResult}
+import models.{ Claim, ClaimSubmission }
+import reactivemongo.api.commands.{ MultiBulkWriteResult, WriteResult }
 
 import scala.concurrent.Future
 

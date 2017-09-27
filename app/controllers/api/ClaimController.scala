@@ -4,13 +4,13 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
-import models.daos.{ClaimDAO, FormDAO}
+import models.daos.{ ClaimDAO, FormDAO }
 import models._
-import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, _}
+import play.api.libs.json.{ JsError, JsValue, Json }
+import play.api.mvc.{ Action, _ }
 import services.documents.DocumentService
-import services.forms.{ClaimService, FormConfigManager}
-import services.submission.{EmailSubmissionService, FaxSubmissionService, RecipientService}
+import services.forms.{ ClaimService, FormConfigManager }
+import services.submission.{ EmailSubmissionService, FaxSubmissionService, RecipientService }
 import utils.auth.DefaultEnv
 import org.log4s._
 
@@ -129,7 +129,9 @@ class ClaimController @Inject() (
                 Future.successful(InternalServerError(
                   Json.obj(
                     "status" -> "error",
-                    "errors" -> Json.toJson(failures))))
+                    "errors" -> Json.toJson(failures)
+                  )
+                ))
               }
             case _ => Future.successful(InternalServerError)
           }

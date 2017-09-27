@@ -1,6 +1,6 @@
 package services.submission
 
-import models.{Claim, ClaimSubmission}
+import models.{ Claim, ClaimSubmission }
 
 import scala.concurrent.Future
 

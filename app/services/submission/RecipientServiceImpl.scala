@@ -1,7 +1,7 @@
 package services.submission
 import javax.inject.Inject
 
-import models.{Claim, Recipient}
+import models.{ Claim, Recipient }
 import play.api.Configuration
 
 class RecipientServiceImpl @Inject() (configuration: Configuration) extends RecipientService {

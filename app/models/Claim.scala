@@ -5,8 +5,10 @@ import java.util.UUID
 import play.api.libs.json.{ Format, Json, OFormat }
 import utils.EnumUtils
 
-case class Recipient (recipientType: Recipient.Type.Value,
-                      value: String) {
+case class Recipient(
+  recipientType: Recipient.Type.Value,
+  value: String
+) {
 
 }
 
@@ -39,13 +41,13 @@ object StartClaimRequest {
  * A claim represents 1 or more Forms grouped together for submission.
  */
 case class Claim(
-                  userID: UUID,
-                  claimID: UUID,
-                  key: String,
-                  state: Claim.State.Value,
-                  stateUpdatedAt: java.util.Date,
-                  recipients: Seq[Recipient],
-                  submissions: Seq[ClaimSubmission] = Seq.empty[ClaimSubmission]
+  userID: UUID,
+  claimID: UUID,
+  key: String,
+  state: Claim.State.Value,
+  stateUpdatedAt: java.util.Date,
+  recipients: Seq[Recipient],
+  submissions: Seq[ClaimSubmission] = Seq.empty[ClaimSubmission]
 ) {
 
 }
