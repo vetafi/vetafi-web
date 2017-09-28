@@ -16,6 +16,6 @@ class DigestAuthErrorHandler extends SecuredErrorHandler {
   }
 
   override def onNotAuthenticated(implicit request: RequestHeader): Future[Result] = {
-    Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> "Digest realm=twilio"))
+    Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> "Digest realm=\"twilio\",qop=auth,nonce="))
   }
 }

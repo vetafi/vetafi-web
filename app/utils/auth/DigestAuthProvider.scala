@@ -2,32 +2,38 @@ package utils.auth
 
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
-import com.mohiva.play.silhouette.api.{ AuthInfo, Logger, LoginInfo, RequestProvider }
+import com.mohiva.play.silhouette.api.{Logger, LoginInfo, RequestProvider}
 import com.mohiva.play.silhouette.impl.providers.PasswordProvider
 import models.TwilioUser
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
+import org.apache.http.HttpRequest
+import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.impl.DefaultHttpRequestFactory
+import org.apache.http.impl.auth.DigestScheme
+import org.apache.http.message.BasicHeader
+import org.apache.http.protocol.BasicHttpContext
 import org.log4s.getLogger
 import play.api.http.HeaderNames
-import play.api.mvc.{ Request, RequestHeader }
+import play.api.mvc.{Request, RequestHeader}
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 case class DigestParameters(
-  username: String,
-  realm: String,
-  uri: String,
-  nonce: String,
-  response: String,
-  method: String
-) {
+                             username: String,
+                             realm: String,
+                             uri: String,
+                             nonce: String,
+                             response: String,
+                             method: String
+                           ) {
 
 }
 
 class DigestAuthProvider(
-  protected val authInfoRepository: AuthInfoRepository,
-  protected val passwordHasherRegistry: PasswordHasherRegistry
-)(implicit val executionContext: ExecutionContext)
+                          protected val authInfoRepository: AuthInfoRepository,
+                          protected val passwordHasherRegistry: PasswordHasherRegistry
+                        )(implicit val executionContext: ExecutionContext)
   extends RequestProvider with PasswordProvider with Logger {
 
   private[this] val logger = getLogger
@@ -38,7 +44,18 @@ class DigestAuthProvider(
     "username", "realm", "uri", "nonce", "response"
   )
 
+  def convertPlayToApacheHttpRequest(request: RequestHeader): HttpRequest = {
+    val apacheRequest = DefaultHttpRequestFactory.INSTANCE.newHttpRequest(request.method, request.uri)
+    request.headers.toSimpleMap.map {
+      case (key, value) => new BasicHeader(key, value)
+    }.foreach(header => apacheRequest.setHeader(header))
+    apacheRequest
+  }
+
   def getDigestParameters(request: RequestHeader): Option[DigestParameters] = {
+
+
+
     if (!request.headers.toMap.contains(HeaderNames.AUTHORIZATION)) return None
     val authStringOpt = request.headers.get(HeaderNames.AUTHORIZATION)
 
@@ -56,9 +73,9 @@ class DigestAuthProvider(
         (key, value)
       }
     ).filter {
-        case (key, value) =>
-          StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)
-      }.toMap
+      case (key, value) =>
+        StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)
+    }.toMap
 
     if (expectedHeaders.subsetOf(params.keys.toSet)) {
       Some(DigestParameters(
@@ -90,12 +107,16 @@ class DigestAuthProvider(
     }
   }
 
-  private def createDigest(digestParameters: DigestParameters, pass: String): String = {
-    val username = digestParameters.username
-    val realm = digestParameters.realm
-    val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
-    val digest2 = DigestUtils.md5Hex(digestParameters.method + ":" + digestParameters.uri)
-    DigestUtils.md5Hex(digest1 + ":" + digestParameters.nonce + ":" + digest2)
+  private def createDigest(request: RequestHeader, username: String, pass: String): String = {
+
+
+    val digestScheme = new DigestScheme()
+
+    digestScheme.authenticate(
+      new UsernamePasswordCredentials(username, pass),
+      convertPlayToApacheHttpRequest(request),
+      new BasicHttpContext()
+    )
   }
 
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
