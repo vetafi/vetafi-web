@@ -44,18 +44,16 @@ class DigestAuthProvider(
     "username", "realm", "uri", "nonce", "response"
   )
 
-  def convertPlayToApacheHttpRequest(request: RequestHeader): HttpRequest = {
-    val apacheRequest = DefaultHttpRequestFactory.INSTANCE.newHttpRequest(request.method, request.uri)
-    request.headers.toSimpleMap.map {
-      case (key, value) => new BasicHeader(key, value)
-    }.foreach(header => apacheRequest.setHeader(header))
+  def convertPlayToApacheHttpRequest(params: DigestParameters): HttpRequest = {
+    val apacheRequest = DefaultHttpRequestFactory.INSTANCE.newHttpRequest(params.method, params.uri)
+    apacheRequest.addHeader(new BasicHeader("realm", params.realm))
+    apacheRequest.addHeader(new BasicHeader("nonce", params.realm))
+    apacheRequest.addHeader(new BasicHeader("response", params.realm))
+    apacheRequest.addHeader(new BasicHeader("username", params.realm))
     apacheRequest
   }
 
   def getDigestParameters(request: RequestHeader): Option[DigestParameters] = {
-
-
-
     if (!request.headers.toMap.contains(HeaderNames.AUTHORIZATION)) return None
     val authStringOpt = request.headers.get(HeaderNames.AUTHORIZATION)
 
@@ -107,16 +105,13 @@ class DigestAuthProvider(
     }
   }
 
-  private def createDigest(request: RequestHeader, username: String, pass: String): String = {
-
-
+  private def createDigest(params: DigestParameters, pass: String): String = {
     val digestScheme = new DigestScheme()
-
     digestScheme.authenticate(
-      new UsernamePasswordCredentials(username, pass),
-      convertPlayToApacheHttpRequest(request),
+      new UsernamePasswordCredentials(params.username, pass),
+      convertPlayToApacheHttpRequest(params),
       new BasicHttpContext()
-    )
+    ).getValue
   }
 
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
