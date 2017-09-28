@@ -53,10 +53,9 @@ trait SeamplessDocsServiceTestContext extends SilhouetteTestContext {
     key = "fakeKey",
     state = Claim.State.INCOMPLETE,
     stateUpdatedAt = java.util.Date.from(Instant.now()),
-    sentTo = Recipients(
-      None, None,
-      Seq("test@website.com"),
-      Seq(Address(name = Some("name")))
+    recipients = Seq(
+      Recipient(Recipient.Type.FAX, "18005555555"),
+      Recipient(Recipient.Type.EMAIL, "test@x.com")
     )
   )
 

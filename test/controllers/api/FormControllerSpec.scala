@@ -15,6 +15,13 @@ import reactivemongo.api.commands.UpdateWriteResult
 
 import scala.concurrent.Future
 
+import org.mockito.ArgumentMatcher
+
+class IsSignedClaimForm extends ArgumentMatcher[ClaimForm] {
+
+  override def matches(argument: scala.Any): Boolean = argument.asInstanceOf[ClaimForm].isSigned
+}
+
 class FormControllerSpec extends PlaySpecification with CSRFTest {
   sequential
 
@@ -127,6 +134,50 @@ class FormControllerSpec extends PlaySpecification with CSRFTest {
 
       new WithApplication(application) {
         val values = Map("key" -> JsString("value"))
+
+        val req = FakeRequest(
+          POST,
+          controllers.api.routes.FormController.saveForm(testClaim.claimID, "VBA-21-0966-ARE").url
+        )
+          .withJsonBody(Json.toJson(values))
+          .withAuthenticator[DefaultEnv](identity.loginInfo)
+
+        val csrfReq = addToken(req)
+
+        val result: Future[Result] = route(app, csrfReq).get
+
+        status(result) must be equalTo CREATED
+      }
+    }
+
+    "update signature status" in new FormControllerTestContext {
+
+      Mockito.when(mockFormDao.find(identity.userID, testClaim.claimID, "VBA-21-0966-ARE"))
+        .thenReturn(Future.successful(Some(testForm)))
+
+      Mockito.when(mockClaimService.calculateProgress(Matchers.any()))
+        .thenReturn(testForm.copy(responses = Map("signature" -> JsString("value"))))
+
+      Mockito.when(mockFormDao.save(
+        Matchers.eq(identity.userID),
+        Matchers.eq(testClaim.claimID),
+        Matchers.eq("VBA-21-0966-ARE"),
+        Matchers.argThat(new IsSignedClaimForm)
+      ))
+        .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
+
+      Mockito.when(mockContactInfoService.updateContactInfo(identity.userID))
+        .thenReturn(Future.successful(
+          Some(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None))
+        ))
+
+      Mockito.when(mockUserValuesDao.update(Matchers.eq(identity.userID), Matchers.any()))
+        .thenReturn(Future.successful(
+          UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)
+        ))
+
+      new WithApplication(application) {
+        val values = Map("signature" -> JsString("value"))
 
         val req = FakeRequest(
           POST,

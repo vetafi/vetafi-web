@@ -6,10 +6,11 @@ import com.google.inject.AbstractModule
 import models.daos._
 import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
-import services.documents.{ DocumentService, SeamlessDocsDocumentService }
+import services.documents.{ DocumentService, ITextDocumentService, SeamlessDocsDocumentService }
 import services._
+import services.documents.pdf._
 import services.forms._
-import services.submission.{ FaxSubmissionService, SubmissionService }
+import services.submission._
 import utils.seamlessdocs.{ RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl }
 import utils.secrets.{ BiscuitSecretsManager, SecretsManager, StaticSecrets }
 
@@ -35,11 +36,15 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[FormConfigManager].to[JsonResourceFormConfigManager]
     bind[ContactInfoService].to[ContactInfoServiceImpl]
     bind[ClaimService].to[ClaimServiceImpl]
-    bind[SubmissionService].to[FaxSubmissionService]
-    bind[DocumentService].to[SeamlessDocsDocumentService]
-    bind[SeamlessDocsService].to[SeamlessDocsServiceImpl]
+    bind[FaxSubmissionService].to[TwilioFaxSubmissionService]
+    bind[DocumentService].to[ITextDocumentService]
+    bind[PDFStampingConfigProvider].to[ResourcesPDFStampingConfigProvider]
+    bind[PDFTemplateProvider].to[ResourcesPDFTemplateProvider]
     bind[ReactiveMongoApi].to[BiscuitPasswordMongoApi]
     bind[UserValuesService].to[UserValuesServiceImpl]
     bind[RequestUtils].toInstance(new RequestUtils(Clock.systemUTC()))
+    bind[EmailSubmissionService].to[SESEmailSubmissionService]
+    bind[RecipientService].to[RecipientServiceImpl]
+    bind[PDFConcatenator].to[ITextPDFConcatenator]
   }
 }

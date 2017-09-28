@@ -1,9 +1,8 @@
 var app = angular.module('vetafiApp');
 app.controller('claimConfirmCtrl', ['$scope', '$state', '$stateParams', 'net', '$uibModal', 'userValues', 'forms', 'formConfig',
-  'user', 'vaService', 'claimService', '$filter',
+  'user', 'claimService', '$filter',
   function($scope, $state, $stateParams, net, $uibModal, userValues, forms, formConfig, user, vaService, claimService, $filter) {
     $scope.claimId = $stateParams.claimId;
-    $scope.vaAddress = vaService.getAddress();
     $scope.user = user || {};
     $scope.userEmail = $scope.user.email;
     $scope.userAddress = $scope.user.contact.address;
@@ -66,6 +65,7 @@ app.controller('claimConfirmCtrl', ['$scope', '$state', '$stateParams', 'net', '
     }
 
     $scope.onClickConfirm = function () {
+      //TODO fix this so address is not trusted to client side.
       var data = {
         toAddress: $scope.vaAddress,
         fromAddress: $scope.userAddress,

@@ -5,6 +5,7 @@ import javax.script.{ ScriptEngine, ScriptEngineManager, SimpleBindings }
 
 import com.google.inject.Inject
 import models.{ ClaimForm, Field, FormConfig }
+import org.log4s.getLogger
 import play.api.libs.json.JsValue
 import utils.JsonUnbox
 
@@ -14,6 +15,8 @@ import utils.JsonUnbox
 class ClaimServiceImpl @Inject() (formConfigManager: FormConfigManager) extends ClaimService {
 
   val engine: ScriptEngine = new ScriptEngineManager().getEngineByMimeType("text/javascript")
+
+  private[this] val logger = getLogger
 
   override def calculateProgress(claimForm: ClaimForm): ClaimForm = {
     if (!formConfigManager.getFormConfigs.contains(claimForm.key)) {
@@ -45,7 +48,9 @@ class ClaimServiceImpl @Inject() (formConfigManager: FormConfigManager) extends 
     } else {
       // SimpleBindings seems to require a real java HashMap.
       val model = new util.HashMap[String, Object]
-      data.foreach { x => model.put(x._1, JsonUnbox.unbox(x._2)) }
+      data.foreach { x =>
+        model.put(x._1, JsonUnbox.unbox(x._2))
+      }
 
       val bindings = new util.HashMap[String, Object]
       bindings.put("model", model)

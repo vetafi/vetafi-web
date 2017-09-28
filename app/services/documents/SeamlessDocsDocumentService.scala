@@ -214,4 +214,6 @@ class SeamlessDocsDocumentService @Inject() (
         status.total_signers == status.signatures && status.status == "Complete"
     }
   }
+
+  override def renderPage(form: ClaimForm, page: Int) = ???
 }

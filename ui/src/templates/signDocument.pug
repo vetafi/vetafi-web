@@ -35,6 +35,6 @@ div#vfi-sign-document-view
               img(src="/icons/checkmark-green.svg")
             p(ng-show="!form.isSigned") Not Signed
           div.col-xs-4
-            a.btn(ng-class="{'disabled': form.isSigned}" href="{{form.externalSignatureLink | trusted}}" target="_blank" ng-click="markCurrentlySigningForm(form)") Sign
+            a.btn(ng-class="{'disabled': form.isSigned}" ui-sref="root.signpreview({claimId: claimId, formId: form.key})" ng-click="markCurrentlySigningForm(form)") Sign
 
 vfi-footer
