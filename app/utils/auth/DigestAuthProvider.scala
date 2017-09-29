@@ -2,32 +2,32 @@ package utils.auth
 
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
-import com.mohiva.play.silhouette.api.{Logger, LoginInfo, RequestProvider}
+import com.mohiva.play.silhouette.api.{ Logger, LoginInfo, RequestProvider }
 import com.mohiva.play.silhouette.impl.providers.PasswordProvider
 import models.TwilioUser
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
 import org.log4s.getLogger
 import play.api.http.HeaderNames
-import play.api.mvc.{Request, RequestHeader}
+import play.api.mvc.{ Request, RequestHeader }
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class DigestParameters(
-                             username: String,
-                             realm: String,
-                             uri: String,
-                             nonce: String,
-                             response: String,
-                             method: String
-                           ) {
+  username: String,
+  realm: String,
+  uri: String,
+  nonce: String,
+  response: String,
+  method: String
+) {
 
 }
 
 class DigestAuthProvider(
-                          protected val authInfoRepository: AuthInfoRepository,
-                          protected val passwordHasherRegistry: PasswordHasherRegistry
-                        )(implicit val executionContext: ExecutionContext)
+  protected val authInfoRepository: AuthInfoRepository,
+  protected val passwordHasherRegistry: PasswordHasherRegistry
+)(implicit val executionContext: ExecutionContext)
   extends RequestProvider with PasswordProvider with Logger {
 
   private[this] val logger = getLogger
@@ -56,9 +56,9 @@ class DigestAuthProvider(
         (key, value)
       }
     ).filter {
-      case (key, value) =>
-        StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)
-    }.toMap
+        case (key, value) =>
+          StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)
+      }.toMap
 
     if (expectedHeaders.subsetOf(params.keys.toSet)) {
       Some(DigestParameters(

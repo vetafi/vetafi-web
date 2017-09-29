@@ -8,5 +8,5 @@ import scala.concurrent.Future
 
 trait TwilioUserService extends IdentityService[TwilioUser] {
 
-  def save(loginInfo: LoginInfo, twilioUser: TwilioUser): Future[Option[TwilioUser]]
+  def save(loginInfo: LoginInfo, twilioUser: TwilioUser): Future[TwilioUser]
 }

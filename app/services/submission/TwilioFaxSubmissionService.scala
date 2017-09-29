@@ -2,22 +2,22 @@ package services.submission
 
 import java.net.URL
 import java.time.Instant
-import java.util.{Date, UUID}
+import java.util.{ Date, UUID }
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import models.{Claim, ClaimSubmission, TwilioFax, TwilioUser}
-import play.api.Configuration
-import utils.secrets.SecretsManager
 import com.twilio.Twilio
-import com.twilio.rest.fax.v1.Fax
-import com.twilio.rest.fax.v1.FaxCreator
-import models.daos.{ClaimDAO, TwilioFaxDAO}
+import com.twilio.rest.fax.v1.{ Fax, FaxCreator }
+import models.daos.{ ClaimDAO, TwilioFaxDAO }
+import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
+import play.api.Configuration
 import reactivemongo.api.commands.WriteResult
 import services.TwilioUserService
 import utils.auth.DigestAuthProvider
+import utils.secrets.SecretsManager
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -43,12 +43,13 @@ class TwilioFaxSubmissionService @Inject() (
   val fromNumber: String = configuration.getString("twilio.number").get
   val toNumber: String = configuration.getString("submission.va.fax").get
 
-  def createNewTwilioUser(claim: Claim): Future[Option[TwilioUser]] = {
+  def createNewTwilioUser(claim: Claim): Future[TwilioUser] = {
     secureRandomIDGenerator.generate.flatMap {
       password =>
         twilioUserService.save(
           LoginInfo(DigestAuthProvider.ID, claim.claimID.toString),
-          TwilioUser(claim.claimID, password))
+          TwilioUser(claim.claimID, password)
+        )
     }
   }
 
@@ -66,7 +67,9 @@ class TwilioFaxSubmissionService @Inject() (
         to = fax.getTo,
         from = fax.getFrom,
         twilioFaxId = fax.getSid,
-        status = fax.getStatus.toString))
+        status = fax.getStatus.toString
+      )
+    )
   }
 
   def sendFax(claim: Claim, twilioUser: TwilioUser): Fax = {
@@ -93,18 +96,19 @@ class TwilioFaxSubmissionService @Inject() (
 
   override def submit(claim: Claim): Future[ClaimSubmission] = {
     createNewTwilioUser(claim).flatMap {
-      case Some(twilioUser) =>
+      twilioUser =>
         val fax: Fax = sendFax(claim, twilioUser)
-        val claimSubmission: ClaimSubmission = ClaimSubmission(UUID.randomUUID(),
+        val claimSubmission: ClaimSubmission = ClaimSubmission(
+          UUID.randomUUID(),
           fax.getTo,
           getClass.getSimpleName,
-          Date.from(Instant.now()))
+          Date.from(Instant.now()),
+          success = true
+        )
         saveResults(claimSubmission, claim, fax).map {
           claimSubmission =>
             claimSubmission
         }
-      case None =>
-        throw new RuntimeException("Could not create twilioUser.")
     }
   }
 }
