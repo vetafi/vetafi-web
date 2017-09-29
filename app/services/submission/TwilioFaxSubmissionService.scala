@@ -29,16 +29,9 @@ class TwilioFaxSubmissionService @Inject() (
   twilioUserService: TwilioUserService,
   twilioFaxDAO: TwilioFaxDAO,
   secureRandomIDGenerator: SecureRandomIDGenerator,
-  claimDAO: ClaimDAO
+  claimDAO: ClaimDAO,
+  faxApi: FaxApi
 ) extends FaxSubmissionService {
-
-  lazy val accountSid: String = secretsManager.getSecretUtf8(
-    configuration.getString("twilio.accountSidSecretName").get
-  )
-
-  lazy val authTokenSecretName: String = secretsManager.getSecretUtf8(
-    configuration.getString("twilio.authTokenSecretName").get
-  )
 
   val fromNumber: String = configuration.getString("twilio.number").get
   val toNumber: String = configuration.getString("submission.va.fax").get
@@ -57,31 +50,15 @@ class TwilioFaxSubmissionService @Inject() (
     claimDAO.save(claim.userID, claim.claimID, claim.copy(submissions = Seq(claimSubmission)))
   }
 
-  def saveTwilioFax(claimSubmission: ClaimSubmission, claim: Claim, fax: Fax): Future[WriteResult] = {
+  def saveTwilioFax(twilioFax: TwilioFax): Future[WriteResult] = {
     twilioFaxDAO.save(
-      TwilioFax(
-        claimID = claim.claimID,
-        claimSubmissionID = claimSubmission.claimSubmissionID,
-        dateCreated = fax.getDateCreated.toDate,
-        dateUpdated = fax.getDateUpdated.toDate,
-        to = fax.getTo,
-        from = fax.getFrom,
-        twilioFaxId = fax.getSid,
-        status = fax.getStatus.toString
-      )
+      twilioFax
     )
   }
 
-  def sendFax(claim: Claim, twilioUser: TwilioUser): Fax = {
-    Twilio.init(accountSid, authTokenSecretName)
-    val mediaUrl: URL = new URL("https://www.twilio.com/docs/documents/25/justthefaxmaam.pdf")
-    val faxCreator: FaxCreator = Fax.creator(toNumber, mediaUrl.toURI)
-    faxCreator.setFrom(fromNumber)
-    faxCreator.create()
-  }
 
-  def saveResults(claimSubmission: ClaimSubmission, claim: Claim, fax: Fax): Future[ClaimSubmission] = {
-    saveTwilioFax(claimSubmission, claim, fax).flatMap {
+  def saveResults(claimSubmission: ClaimSubmission, claim: Claim, fax: TwilioFax): Future[ClaimSubmission] = {
+    saveTwilioFax(fax).flatMap {
       case faxWrite if faxWrite.ok =>
         updateClaim(claim, claimSubmission).map {
           case claimWrite if claimWrite.ok =>
@@ -97,17 +74,16 @@ class TwilioFaxSubmissionService @Inject() (
   override def submit(claim: Claim): Future[ClaimSubmission] = {
     createNewTwilioUser(claim).flatMap {
       twilioUser =>
-        val fax: Fax = sendFax(claim, twilioUser)
         val claimSubmission: ClaimSubmission = ClaimSubmission(
           UUID.randomUUID(),
-          fax.getTo,
+          toNumber,
+          fromNumber,
           getClass.getSimpleName,
           Date.from(Instant.now()),
-          success = true
-        )
-        saveResults(claimSubmission, claim, fax).map {
-          claimSubmission =>
-            claimSubmission
+          success = true)
+        val twilioFax = faxApi.sendFax(claim, claimSubmission, twilioUser)
+        saveResults(claimSubmission, claim, twilioFax).map {
+          claimSubmission => claimSubmission
         }
     }
   }
