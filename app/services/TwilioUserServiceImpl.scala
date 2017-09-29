@@ -12,4 +12,11 @@ class TwilioUserServiceImpl @Inject() (twilioUserDAO: DelegableAuthInfoDAO[Twili
   override def retrieve(loginInfo: LoginInfo): Future[Option[TwilioUser]] = {
     twilioUserDAO.find(loginInfo)
   }
+
+  /**
+   * Save new TwilioUser or update the existing TwilioUser info.
+   */
+  override def save(loginInfo: LoginInfo, twilioUser: TwilioUser): Future[TwilioUser] = {
+    twilioUserDAO.save(loginInfo, twilioUser)
+  }
 }

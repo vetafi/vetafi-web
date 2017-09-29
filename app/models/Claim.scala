@@ -65,9 +65,9 @@ object Claim {
 }
 
 case class ClaimSubmission(
-  externalId: String,
-  success: Boolean,
-  message: Option[String],
+  claimSubmissionID: UUID,
+  to: String,
+  method: String,
   dateSubmitted: java.util.Date
 ) {
 

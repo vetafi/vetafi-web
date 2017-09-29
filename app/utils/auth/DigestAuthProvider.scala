@@ -32,7 +32,7 @@ class DigestAuthProvider(
 
   private[this] val logger = getLogger
 
-  override def id = "digest-auth"
+  override def id: String = DigestAuthProvider.ID
 
   private val expectedHeaders: Set[String] = Set(
     "username", "realm", "uri", "nonce", "response"
@@ -102,6 +102,9 @@ class DigestAuthProvider(
 }
 
 object DigestAuthProvider {
+
+  val ID = "digest-auth"
+
   def createDigest(digestParameters: DigestParameters, pass: String): String = {
     val username = digestParameters.username
     val realm = digestParameters.realm
