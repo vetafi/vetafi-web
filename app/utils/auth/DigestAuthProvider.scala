@@ -8,11 +8,8 @@ import models.TwilioUser
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.http.HttpRequest
-import org.apache.http.auth.UsernamePasswordCredentials
 import org.apache.http.impl.DefaultHttpRequestFactory
-import org.apache.http.impl.auth.DigestScheme
 import org.apache.http.message.BasicHeader
-import org.apache.http.protocol.BasicHttpContext
 import org.log4s.getLogger
 import play.api.http.HeaderNames
 import play.api.mvc.{Request, RequestHeader}
@@ -53,7 +50,6 @@ class DigestAuthProvider(
   }
 
   def getDigestParameters(request: RequestHeader): Option[DigestParameters] = {
-
 
 
     if (!request.headers.toMap.contains(HeaderNames.AUTHORIZATION)) return None
@@ -107,16 +103,12 @@ class DigestAuthProvider(
     }
   }
 
-  private def createDigest(request: RequestHeader, username: String, pass: String): String = {
-
-
-    val digestScheme = new DigestScheme()
-
-    digestScheme.authenticate(
-      new UsernamePasswordCredentials(username, pass),
-      convertPlayToApacheHttpRequest(request),
-      new BasicHttpContext()
-    )
+  private def createDigest(digestParameters: DigestParameters, pass: String): String = {
+    val username = digestParameters.username
+    val realm = digestParameters.realm
+    val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
+    val digest2 = DigestUtils.md5Hex(digestParameters.method + ":" + digestParameters.uri)
+    DigestUtils.md5Hex(digest1 + ":" + digestParameters.nonce + ":" + digest2)
   }
 
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {

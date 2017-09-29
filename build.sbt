@@ -49,7 +49,6 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.6",
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
   "com.twilio.sdk" % "twilio" % "7.14.5",
-  "org.apache.httpcomponents" % "httpclient" % "4.5.3",
   specs2 % Test,
   cache,
   filters
