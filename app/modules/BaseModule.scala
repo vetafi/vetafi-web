@@ -47,6 +47,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[EmailSubmissionService].to[SESEmailSubmissionService]
     bind[RecipientService].to[RecipientServiceImpl]
     bind[PDFConcatenator].to[ITextPDFConcatenator]
-    bind[Fax].to[Fax]
+    bind[FaxApi].to[TwilioFaxApi]
   }
 }

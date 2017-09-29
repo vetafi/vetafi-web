@@ -3,7 +3,7 @@ package services.submission
 import java.time.Instant
 import java.util.{Date, UUID}
 
-import models.{ClaimSubmission, TwilioUser}
+import models.{ClaimSubmission, TwilioFax, TwilioUser}
 import org.mockito.{Matchers, Mockito}
 import play.api.test.{PlaySpecification, WithApplication}
 import reactivemongo.api.commands.UpdateWriteResult
@@ -19,9 +19,21 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       val claimSubmission = ClaimSubmission(
         claimSubmissionID = UUID.randomUUID(),
         to = "xxx",
+        from = "xxx",
         method = "xxx",
         dateSubmitted = Date.from(Instant.now()),
         success = true
+      )
+
+      val fakeTwilioFax = TwilioFax(
+        claimID = UUID.randomUUID(),
+        claimSubmissionID = UUID.randomUUID(),
+        dateCreated = Date.from(Instant.now()),
+        dateUpdated = Date.from(Instant.now()),
+        to = "toNumber",
+        from = "fromNumber",
+        twilioFaxId = "twilioFaxId",
+        status = "status"
       )
 
       Mockito.when(mockSecretsManager.getSecretUtf8(Matchers.any()))
@@ -39,7 +51,8 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       Mockito.when(mockClaimDAO.save(Matchers.any(), Matchers.any(), Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
-      Mockito.when(mockFax)
+      Mockito.when(mockFaxApi.sendFax(Matchers.any(), Matchers.any(), Matchers.any()))
+        .thenReturn(fakeTwilioFax)
 
       new WithApplication(application) {
         val twilioFaxSubmissionService: TwilioFaxSubmissionService =

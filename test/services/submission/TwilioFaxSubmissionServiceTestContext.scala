@@ -27,7 +27,7 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
   val mockTwilioFaxDAO: TwilioFaxDAO = Mockito.mock(classOf[TwilioFaxDAO])
   val mockSecureRandomIDGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
   val mockClaimDAO: ClaimDAO = Mockito.mock(classOf[ClaimDAO])
-  val mockFax: Fax = Mockito.mock(classOf[Fax])
+  val mockFaxApi: FaxApi = Mockito.mock(classOf[FaxApi])
   val userID: UUID = UUID.randomUUID()
 
   /**
@@ -66,7 +66,7 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
       bind[TwilioFaxDAO].toInstance(mockTwilioFaxDAO)
       bind[SecureRandomIDGenerator].toInstance(mockSecureRandomIDGenerator)
       bind[ClaimDAO].toInstance(mockClaimDAO)
-      bind[Fax].toInstance(mockFax)
+      bind[FaxApi].toInstance(mockFaxApi)
     }
   }
 
