@@ -21,6 +21,9 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
       Mockito.when(mockDigestAuthProvider.authenticate(Matchers.any()))
         .thenReturn(Future.successful(None))
 
+      Mockito.when(mockSecureRandomIdGenerator.generate)
+        .thenReturn(Future.successful("nonce"))
+
       new WithApplication(application) {
         val getRequest: FakeRequest[AnyContentAsEmpty.type] =
           FakeRequest(controllers.api.routes.TwilioPdfController.getPdf(UUID.randomUUID(), UUID.randomUUID()))
@@ -28,12 +31,11 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
         val getResult: Future[Result] = route(app, csrfReq).get
 
         status(getResult) must be equalTo UNAUTHORIZED
-        headers(getResult).get("WWW-Authenticate").get must be equalTo "Digest realm=twilio"
+        headers(getResult).get("WWW-Authenticate").get must be equalTo "Digest realm=twilio,qop=auth,nonce=nonce"
       }
     }
 
     "return 200 with pdf if digest credentials are authenticated" in new TwilioPdfControllerTestContext {
-
       val userUUID: UUID = UUID.randomUUID()
       val claimUUID: UUID = UUID.randomUUID()
       Mockito.when(mockDigestAuthProvider.authenticate(Matchers.any()))
@@ -61,7 +63,5 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
         contentAsBytes(getResult).toArray must be equalTo Array.empty[Byte]
       }
     }
-
-
   }
 }

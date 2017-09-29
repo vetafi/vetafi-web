@@ -7,9 +7,6 @@ import com.mohiva.play.silhouette.impl.providers.PasswordProvider
 import models.TwilioUser
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.lang3.StringUtils
-import org.apache.http.HttpRequest
-import org.apache.http.impl.DefaultHttpRequestFactory
-import org.apache.http.message.BasicHeader
 import org.log4s.getLogger
 import play.api.http.HeaderNames
 import play.api.mvc.{Request, RequestHeader}
@@ -41,17 +38,7 @@ class DigestAuthProvider(
     "username", "realm", "uri", "nonce", "response"
   )
 
-  def convertPlayToApacheHttpRequest(request: RequestHeader): HttpRequest = {
-    val apacheRequest = DefaultHttpRequestFactory.INSTANCE.newHttpRequest(request.method, request.uri)
-    request.headers.toSimpleMap.map {
-      case (key, value) => new BasicHeader(key, value)
-    }.foreach(header => apacheRequest.setHeader(header))
-    apacheRequest
-  }
-
   def getDigestParameters(request: RequestHeader): Option[DigestParameters] = {
-
-
     if (!request.headers.toMap.contains(HeaderNames.AUTHORIZATION)) return None
     val authStringOpt = request.headers.get(HeaderNames.AUTHORIZATION)
 
@@ -92,7 +79,7 @@ class DigestAuthProvider(
   def getAuthorizedUser(digestParameters: DigestParameters): Future[Option[LoginInfo]] = {
     authInfoRepository.find[TwilioUser](LoginInfo(id, digestParameters.username)).map {
       case Some(authInfo: TwilioUser) =>
-        val digest: String = createDigest(digestParameters, authInfo.apiPassword)
+        val digest: String = DigestAuthProvider.createDigest(digestParameters, authInfo.apiPassword)
         if (digest == digestParameters.response) {
           Some(LoginInfo(id, digestParameters.username))
         } else {
@@ -103,14 +90,6 @@ class DigestAuthProvider(
     }
   }
 
-  private def createDigest(digestParameters: DigestParameters, pass: String): String = {
-    val username = digestParameters.username
-    val realm = digestParameters.realm
-    val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
-    val digest2 = DigestUtils.md5Hex(digestParameters.method + ":" + digestParameters.uri)
-    DigestUtils.md5Hex(digest1 + ":" + digestParameters.nonce + ":" + digest2)
-  }
-
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
     getDigestParameters(request) match {
       case Some(params: DigestParameters) =>
@@ -119,5 +98,15 @@ class DigestAuthProvider(
         logger.warn("Failed to parse digest request.")
         Future.successful(None)
     }
+  }
+}
+
+object DigestAuthProvider {
+  def createDigest(digestParameters: DigestParameters, pass: String): String = {
+    val username = digestParameters.username
+    val realm = digestParameters.realm
+    val digest1 = DigestUtils.md5Hex(username + ":" + realm + ":" + pass)
+    val digest2 = DigestUtils.md5Hex(digestParameters.method + ":" + digestParameters.uri)
+    DigestUtils.md5Hex(digest1 + ":" + digestParameters.nonce + ":" + digest2)
   }
 }

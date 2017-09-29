@@ -1,21 +1,33 @@
 package utils.auth
 
+import java.security.SecureRandom
+import javax.inject.Inject
+
 import com.mohiva.play.silhouette.api.actions.SecuredErrorHandler
-import play.api.mvc.{ RequestHeader, Result }
-import play.api.mvc.Results.{ Unauthorized, Forbidden }
+import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
+import play.api.mvc.{RequestHeader, Result}
+import play.api.mvc.Results.{Forbidden, Unauthorized}
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import scala.concurrent.Future
 
 /**
  * When twilio requests our PDF document, it will initially do so with no auth.
  * This response will indicate to twilio to try again with digest auth.
  */
-class DigestAuthErrorHandler extends SecuredErrorHandler {
+class DigestAuthErrorHandler @Inject() (secureRandomIDGenerator: SecureRandomIDGenerator) () extends SecuredErrorHandler {
 
   override def onNotAuthorized(implicit request: RequestHeader): Future[Result] = {
     Future.successful(Forbidden)
   }
 
+  /**
+   * Issue the Digest Authentication challenge if they are not authenticated.
+   */
   override def onNotAuthenticated(implicit request: RequestHeader): Future[Result] = {
-    Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> "Digest realm=\"twilio\",qop=auth,nonce="))
+    secureRandomIDGenerator.generate.map {
+      nonce =>
+        Unauthorized.withHeaders("WWW-Authenticate" -> s"Digest realm=twilio,qop=auth,nonce=$nonce")
+    }
   }
 }

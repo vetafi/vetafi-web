@@ -5,6 +5,7 @@ import java.util.UUID
 
 import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
 import com.typesafe.config.ConfigFactory
 import models.daos.FormDAO
@@ -27,6 +28,7 @@ trait TwilioPdfControllerTestContext extends Scope {
   val mockDigestAuthProvider: DigestAuthProvider = Mockito.mock(classOf[DigestAuthProvider])
   val mockTwilioUserDao: DelegableAuthInfoDAO[TwilioUser] = Mockito.mock(classOf[DelegableAuthInfoDAO[TwilioUser]])
   val mockPdfConcatenator: PDFConcatenator = Mockito.mock(classOf[PDFConcatenator])
+  val mockSecureRandomIdGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
 
   val userID: UUID = UUID.randomUUID()
 
@@ -66,6 +68,7 @@ trait TwilioPdfControllerTestContext extends Scope {
       bind[DigestAuthProvider].toInstance(mockDigestAuthProvider)
       bind[DelegableAuthInfoDAO[TwilioUser]].toInstance(mockTwilioUserDao)
       bind[PDFConcatenator].toInstance(mockPdfConcatenator)
+      bind[SecureRandomIDGenerator].toInstance(mockSecureRandomIdGenerator)
     }
   }
 
