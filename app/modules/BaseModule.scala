@@ -2,17 +2,18 @@ package modules
 
 import java.time.Clock
 
-import com.google.inject.AbstractModule
+import com.google.inject.{AbstractModule, Provides}
+import com.twilio.rest.fax.v1.Fax
 import models.daos._
 import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
-import services.documents.{ DocumentService, ITextDocumentService, SeamlessDocsDocumentService }
+import services.documents.{DocumentService, ITextDocumentService, SeamlessDocsDocumentService}
 import services._
 import services.documents.pdf._
 import services.forms._
 import services.submission._
-import utils.seamlessdocs.{ RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl }
-import utils.secrets.{ BiscuitSecretsManager, SecretsManager, StaticSecrets }
+import utils.seamlessdocs.{RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl}
+import utils.secrets.{BiscuitSecretsManager, SecretsManager, StaticSecrets}
 
 /**
  * The base Guice module, manages Dependency Injection for interfaces defined by our project.
@@ -46,5 +47,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[EmailSubmissionService].to[SESEmailSubmissionService]
     bind[RecipientService].to[RecipientServiceImpl]
     bind[PDFConcatenator].to[ITextPDFConcatenator]
+    bind[Fax].to[Fax]
   }
 }
