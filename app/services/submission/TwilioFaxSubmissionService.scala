@@ -2,18 +2,19 @@ package services.submission
 
 import java.net.URL
 import java.time.Instant
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import com.twilio.Twilio
-import com.twilio.rest.fax.v1.{ Fax, FaxCreator }
-import models.daos.{ ClaimDAO, TwilioFaxDAO }
-import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
+import com.twilio.rest.fax.v1.{Fax, FaxCreator}
+import models.daos.{ClaimDAO, TwilioFaxDAO}
+import models.{Claim, ClaimSubmission, TwilioFax, TwilioUser}
 import play.api.Configuration
 import reactivemongo.api.commands.WriteResult
 import services.TwilioUserService
+import services.time.ClockService
 import utils.auth.DigestAuthProvider
 import utils.secrets.SecretsManager
 
@@ -30,7 +31,8 @@ class TwilioFaxSubmissionService @Inject() (
   twilioFaxDAO: TwilioFaxDAO,
   secureRandomIDGenerator: SecureRandomIDGenerator,
   claimDAO: ClaimDAO,
-  faxApi: FaxApi
+  faxApi: FaxApi,
+  clockService: ClockService
 ) extends FaxSubmissionService {
 
   val fromNumber: String = configuration.getString("twilio.number").get
@@ -56,7 +58,6 @@ class TwilioFaxSubmissionService @Inject() (
     )
   }
 
-
   def saveResults(claimSubmission: ClaimSubmission, claim: Claim, fax: TwilioFax): Future[ClaimSubmission] = {
     saveTwilioFax(fax).flatMap {
       case faxWrite if faxWrite.ok =>
@@ -79,8 +80,9 @@ class TwilioFaxSubmissionService @Inject() (
           toNumber,
           fromNumber,
           getClass.getSimpleName,
-          Date.from(Instant.now()),
-          success = true)
+          Date.from(clockService.getCurrentTime),
+          success = true
+        )
         val twilioFax = faxApi.sendFax(claim, claimSubmission, twilioUser)
         saveResults(claimSubmission, claim, twilioFax).map {
           claimSubmission => claimSubmission

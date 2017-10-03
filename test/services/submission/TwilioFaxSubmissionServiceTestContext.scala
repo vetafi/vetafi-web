@@ -18,6 +18,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.{Application, Configuration}
 import services.TwilioUserService
+import services.time.ClockService
 import utils.secrets.SecretsManager
 
 trait TwilioFaxSubmissionServiceTestContext extends Scope {
@@ -28,6 +29,7 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
   val mockSecureRandomIDGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
   val mockClaimDAO: ClaimDAO = Mockito.mock(classOf[ClaimDAO])
   val mockFaxApi: FaxApi = Mockito.mock(classOf[FaxApi])
+  val mockClockService: ClockService = Mockito.mock(classOf[ClockService])
   val userID: UUID = UUID.randomUUID()
 
   /**
@@ -67,6 +69,7 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
       bind[SecureRandomIDGenerator].toInstance(mockSecureRandomIDGenerator)
       bind[ClaimDAO].toInstance(mockClaimDAO)
       bind[FaxApi].toInstance(mockFaxApi)
+      bind[ClockService].toInstance(mockClockService)
     }
   }
 

@@ -18,18 +18,18 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       val twilioUser = TwilioUser(UUID.randomUUID(), "password")
       val claimSubmission = ClaimSubmission(
         claimSubmissionID = UUID.randomUUID(),
-        to = "xxx",
-        from = "xxx",
-        method = "xxx",
-        dateSubmitted = Date.from(Instant.now()),
+        to = application.configuration.getString("submission.va.fax").get,
+        from = application.configuration.getString("twilio.number").get,
+        method = application.injector.instanceOf(classOf[FaxSubmissionService]).getClass.getSimpleName,
+        dateSubmitted = Date.from(Instant.EPOCH),
         success = true
       )
 
       val fakeTwilioFax = TwilioFax(
         claimID = UUID.randomUUID(),
         claimSubmissionID = UUID.randomUUID(),
-        dateCreated = Date.from(Instant.now()),
-        dateUpdated = Date.from(Instant.now()),
+        dateCreated = Date.from(Instant.EPOCH),
+        dateUpdated = Date.from(Instant.EPOCH),
         to = "toNumber",
         from = "fromNumber",
         twilioFaxId = "twilioFaxId",
@@ -54,12 +54,19 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       Mockito.when(mockFaxApi.sendFax(Matchers.any(), Matchers.any(), Matchers.any()))
         .thenReturn(fakeTwilioFax)
 
+      Mockito.when(mockClockService.getCurrentTime)
+        .thenReturn(Instant.EPOCH)
+
       new WithApplication(application) {
         val twilioFaxSubmissionService: TwilioFaxSubmissionService =
           app.injector.instanceOf(classOf[TwilioFaxSubmissionService])
 
         val result: Future[ClaimSubmission] = twilioFaxSubmissionService.submit(testClaim)
-        Await.result(result, Duration.Inf) must be equalTo claimSubmission
+
+        // Compare results, sans UUID
+        val testUUID: UUID = UUID.randomUUID()
+        Await.result(result, Duration.Inf).copy(claimSubmissionID = testUUID) must be equalTo
+          claimSubmission.copy(claimSubmissionID = testUUID)
       }
     }
   }

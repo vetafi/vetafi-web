@@ -1,6 +1,6 @@
 package services.submission
 
-import models.{Claim, ClaimSubmission, TwilioFax, TwilioUser}
+import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
 
 trait FaxApi {
 
