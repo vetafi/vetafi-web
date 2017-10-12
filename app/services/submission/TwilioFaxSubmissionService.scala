@@ -70,7 +70,7 @@ class TwilioFaxSubmissionService @Inject() (
   }
 
   def getResource(claim: Claim, twilioUser: TwilioUser): URL = {
-    val hostname = configuration.getString("hostname")
+    val hostname: String = configuration.getString("hostname").get
     new URL(s"https://${twilioUser.userID}:${twilioUser.apiPassword}@$hostname/api/twilioPdfEndpoint/${claim.userID}/${claim.claimID}")
   }
 

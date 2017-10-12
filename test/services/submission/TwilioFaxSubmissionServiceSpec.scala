@@ -1,5 +1,6 @@
 package services.submission
 
+import java.net.URL
 import java.time.Instant
 import java.util.{Date, UUID}
 
@@ -14,8 +15,22 @@ import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
+  sequential
 
   "Twilio fax submission service" should {
+
+    "create URL correctly" in new TwilioFaxSubmissionServiceTestContext {
+      new WithApplication(application) {
+        val service: TwilioFaxSubmissionService = app.injector.instanceOf(classOf[TwilioFaxSubmissionService])
+        val twilioUser = TwilioUser(UUID.randomUUID(), "password")
+
+        val resource: URL = service.getResource(testClaim, twilioUser)
+
+        resource.toString must be equalTo s"https://${twilioUser.userID}:${twilioUser.apiPassword}@testhost/api/twilioPdfEndpoint/${testClaim.userID}/${testClaim.claimID}"
+      }
+
+    }
+
     "Submit claim if successful" in new TwilioFaxSubmissionServiceTestContext {
       val twilioUser = TwilioUser(UUID.randomUUID(), "password")
       val claimSubmission = ClaimSubmission(
