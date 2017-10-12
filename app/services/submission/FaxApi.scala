@@ -1,8 +1,13 @@
 package services.submission
 
-import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
+import java.net.URL
+
+import models.{Claim, ClaimSubmission, TwilioFax, TwilioUser}
 
 trait FaxApi {
 
-  def sendFax(claim: Claim, claimSubmission: ClaimSubmission, twilioUser: TwilioUser): TwilioFax
+  def sendFax(claim: Claim,
+              claimSubmission: ClaimSubmission,
+              twilioUser: TwilioUser,
+              faxResource: URL): TwilioFax
 }

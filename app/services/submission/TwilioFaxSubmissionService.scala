@@ -1,16 +1,13 @@
 package services.submission
 
 import java.net.URL
-import java.time.Instant
-import java.util.{Date, UUID}
+import java.util.{ Date, UUID }
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import com.twilio.Twilio
-import com.twilio.rest.fax.v1.{Fax, FaxCreator}
-import models.daos.{ClaimDAO, TwilioFaxDAO}
-import models.{Claim, ClaimSubmission, TwilioFax, TwilioUser}
+import models.daos.{ ClaimDAO, TwilioFaxDAO }
+import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
 import play.api.Configuration
 import reactivemongo.api.commands.WriteResult
 import services.TwilioUserService
@@ -72,6 +69,11 @@ class TwilioFaxSubmissionService @Inject() (
     }
   }
 
+  def getResource(claim: Claim, twilioUser: TwilioUser): URL = {
+    val hostname = configuration.getString("hostname")
+    new URL(s"https://${twilioUser.userID}:${twilioUser.apiPassword}@$hostname/api/twilioPdfEndpoint/${claim.userID}/${claim.claimID}")
+  }
+
   override def submit(claim: Claim): Future[ClaimSubmission] = {
     createNewTwilioUser(claim).flatMap {
       twilioUser =>
@@ -83,7 +85,10 @@ class TwilioFaxSubmissionService @Inject() (
           Date.from(clockService.getCurrentTime),
           success = true
         )
-        val twilioFax = faxApi.sendFax(claim, claimSubmission, twilioUser)
+        val twilioFax = faxApi.sendFax(claim,
+          claimSubmission,
+          twilioUser,
+          getResource(claim, twilioUser))
         saveResults(claimSubmission, claim, twilioFax).map {
           claimSubmission => claimSubmission
         }

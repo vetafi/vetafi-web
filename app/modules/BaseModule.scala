@@ -8,12 +8,12 @@ import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
 import services._
 import services.documents.pdf._
-import services.documents.{DocumentService, ITextDocumentService}
+import services.documents.{ DocumentService, ITextDocumentService }
 import services.forms._
 import services.submission._
-import services.time.{ClockService, SystemClockService}
+import services.time.{ ClockService, SystemClockService }
 import utils.seamlessdocs.RequestUtils
-import utils.secrets.{BiscuitSecretsManager, SecretsManager}
+import utils.secrets.{ BiscuitSecretsManager, SecretsManager }
 
 /**
  * The base Guice module, manages Dependency Injection for interfaces defined by our project.
