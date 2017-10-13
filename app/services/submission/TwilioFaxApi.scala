@@ -9,8 +9,10 @@ import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
 import play.api.Configuration
 import utils.secrets.SecretsManager
 
-class TwilioFaxApi @Inject() (configuration: Configuration,
-                              secretsManager: SecretsManager) extends FaxApi {
+class TwilioFaxApi @Inject() (
+  configuration: Configuration,
+  secretsManager: SecretsManager
+) extends FaxApi {
   lazy val accountSid: String = secretsManager.getSecretUtf8(
     configuration.getString("twilio.accountSidSecretName").get
   )

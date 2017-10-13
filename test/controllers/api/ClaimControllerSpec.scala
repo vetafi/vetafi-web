@@ -16,7 +16,6 @@ import utils.auth.DefaultEnv
 import scala.concurrent.Future
 
 class ClaimControllerSpec extends PlaySpecification with CSRFTest {
-  sequential
 
   "The `subscribe` action" should {
     "return 200 and claim as json if found" in new ClaimControllerTestContext {
@@ -163,7 +162,8 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
     "return 200" in new ClaimControllerTestContext {
       val testRecipients = Seq(
         Recipient(Recipient.Type.FAX, "18005555555"),
-        Recipient(Recipient.Type.EMAIL, "test@x.com"))
+        Recipient(Recipient.Type.EMAIL, "test@x.com")
+      )
 
       Mockito.when(mockClaimDao.findClaim(identity.userID, testIncompleteClaim.claimID))
         .thenReturn(Future.successful(Some(testIncompleteClaim)))
@@ -174,7 +174,8 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
       Mockito.when(mockClaimDao.submit(
         Matchers.eq(identity.userID),
         Matchers.eq(testIncompleteClaim.claimID),
-        Matchers.any()))
+        Matchers.any()
+      ))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
       new WithApplication(application) {

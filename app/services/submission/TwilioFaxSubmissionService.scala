@@ -85,10 +85,12 @@ class TwilioFaxSubmissionService @Inject() (
           Date.from(clockService.getCurrentTime),
           success = true
         )
-        val twilioFax = faxApi.sendFax(claim,
+        val twilioFax = faxApi.sendFax(
+          claim,
           claimSubmission,
           twilioUser,
-          getResource(claim, twilioUser))
+          getResource(claim, twilioUser)
+        )
         saveResults(claimSubmission, claim, twilioFax).map {
           claimSubmission => claimSubmission
         }

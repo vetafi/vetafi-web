@@ -9,14 +9,14 @@ import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import com.twilio.rest.fax.v1.Fax
 import com.typesafe.config.ConfigFactory
 import models._
-import models.daos.{ClaimDAO, TwilioFaxDAO}
+import models.daos.{ ClaimDAO, TwilioFaxDAO }
 import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.mockito.Mockito
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
-import play.api.{Application, Configuration}
+import play.api.{ Application, Configuration }
 import services.TwilioUserService
 import services.time.ClockService
 import utils.secrets.SecretsManager

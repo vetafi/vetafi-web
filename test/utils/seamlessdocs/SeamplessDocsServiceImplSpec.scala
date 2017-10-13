@@ -67,7 +67,6 @@ trait SeamplessDocsServiceTestContext extends Scope {
 }
 
 class SeamplessDocsServiceImplSpec extends PlaySpecification {
-  sequential
 
   "The SeamplessDocsServiceImpl formPrepare method" should {
 

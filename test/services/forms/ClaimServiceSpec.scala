@@ -13,7 +13,6 @@ import play.api.test.{ PlaySpecification, WithApplication }
 import services.forms.ClaimServiceImpl
 
 class ClaimServiceSpec extends PlaySpecification with Mockito {
-  sequential
 
   "The ClaimServiceImpl" should {
     "evaluate hide expressions correctly" in new WithApplication(GuiceApplicationBuilder()

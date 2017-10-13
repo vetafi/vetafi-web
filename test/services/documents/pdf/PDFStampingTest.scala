@@ -93,21 +93,28 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
         pdfTemplate,
         Map("claimant_ssn" -> JsString("111-11-1111")),
         Seq(
-          PDFFieldLocator(pdfId=Some("F[0].Page_1[0].VeteransSocialSecurityNumber_FirstThreeNumbers[0]"),
-            elementId="claimant_ssn",
+          PDFFieldLocator(
+            pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_FirstThreeNumbers[0]"),
+            elementId = "claimant_ssn",
             substringStart = Some(0),
             substringEnd = Some(3),
-            isBase64ImageBlob = None),
-          PDFFieldLocator(pdfId=Some("F[0].Page_1[0].VeteransSocialSecurityNumber_SecondTwoNumbers[0]"),
-            elementId="claimant_ssn",
+            isBase64ImageBlob = None
+          ),
+          PDFFieldLocator(
+            pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_SecondTwoNumbers[0]"),
+            elementId = "claimant_ssn",
             substringStart = Some(4),
             substringEnd = Some(6),
-            isBase64ImageBlob = None),
-          PDFFieldLocator(pdfId=Some("F[0].Page_1[0].VeteransSocialSecurityNumber_LastFourNumbers[0]"),
-            elementId="claimant_ssn",
+            isBase64ImageBlob = None
+          ),
+          PDFFieldLocator(
+            pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_LastFourNumbers[0]"),
+            elementId = "claimant_ssn",
             substringStart = Some(7),
             substringEnd = Some(11),
-            isBase64ImageBlob = None)),
+            isBase64ImageBlob = None
+          )
+        ),
         new FileOutputStream(tmpFile)
       )
 

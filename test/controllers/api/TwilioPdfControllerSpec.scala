@@ -4,17 +4,16 @@ import java.util.UUID
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import controllers.CSRFTest
-import models.{Claim, ClaimForm, TwilioUser}
+import models.{ Claim, ClaimForm, TwilioUser }
 import org.apache.commons.io.IOUtils
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ Matchers, Mockito }
 import play.api.libs.json.JsResult
-import play.api.mvc.{AnyContentAsEmpty, Result}
-import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
+import play.api.mvc.{ AnyContentAsEmpty, Result }
+import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
 
 import scala.concurrent.Future
 
 class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
-  sequential
 
   "the getPdf action should" should {
     "return 401 with www-authenticate set if no Digest Auth credentials are provided" in new TwilioPdfControllerTestContext {

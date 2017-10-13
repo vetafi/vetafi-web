@@ -50,7 +50,6 @@ libraryDependencies ++= Seq(
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
   "com.twilio.sdk" % "twilio" % "7.14.5",
   specs2 % Test,
-  cache,
   filters
 )
 

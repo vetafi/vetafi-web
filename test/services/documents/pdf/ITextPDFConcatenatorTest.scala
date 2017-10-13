@@ -1,11 +1,10 @@
 package services.documents.pdf
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.ByteArrayInputStream
 
 import com.itextpdf.text.pdf.PdfReader
 import org.apache.commons.io.IOUtils
 import play.api.test.PlaySpecification
-import services.documents.pdf.ITextPDFConcatenator
 
 class ITextPDFConcatenatorTest extends PlaySpecification {
 

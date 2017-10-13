@@ -15,7 +15,6 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{ Await, Future }
 
 class ContactInfoServiceImplSpec extends PlaySpecification with Mockito {
-  sequential
 
   "The ClaimInfoServiceImpl" should {
 

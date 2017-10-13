@@ -10,7 +10,6 @@ import play.api.libs.ws.{ WSClient, WSRequest }
 import play.api.test.{ PlaySpecification, WithApplication }
 
 class RequestUtilsSpec extends PlaySpecification {
-  sequential
 
   "RequestUtils.generateRequestSignature" should {
     "return correct signature" in {

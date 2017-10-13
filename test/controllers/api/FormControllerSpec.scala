@@ -23,7 +23,6 @@ class IsSignedClaimForm extends ArgumentMatcher[ClaimForm] {
 }
 
 class FormControllerSpec extends PlaySpecification with CSRFTest {
-  sequential
 
   "The `getForm` action" should {
     "return 200 and form when get" in new FormControllerTestContext {

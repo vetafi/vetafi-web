@@ -31,7 +31,6 @@ trait BiscuitSecretsManagerSpecTestContext extends Scope {
 }
 
 class BiscuitSecretsManagerSpec extends PlaySpecification with Mockito {
-  sequential
 
   "The BiscuitSecretsManager" should {
     "return unencrypted secret" in new BiscuitSecretsManagerSpecTestContext {

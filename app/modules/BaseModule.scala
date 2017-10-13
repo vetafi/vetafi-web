@@ -3,6 +3,7 @@ package modules
 import java.time.Clock
 
 import com.google.inject.AbstractModule
+import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import models.daos._
 import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -14,6 +15,7 @@ import services.submission._
 import services.time.{ ClockService, SystemClockService }
 import utils.seamlessdocs.RequestUtils
 import utils.secrets.{ BiscuitSecretsManager, SecretsManager }
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * The base Guice module, manages Dependency Injection for interfaces defined by our project.
@@ -33,6 +35,7 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[ClaimDAO].to[ClaimDAOImpl]
     bind[FormDAO].to[FormDAOImpl]
     bind[MailingListDAO].to[MailingListDAOImpl]
+    bind[TwilioFaxDAO].to[TwilioFaxDAOImpl]
     bind[SecretsManager].to[BiscuitSecretsManager]
     bind[FormConfigManager].to[JsonResourceFormConfigManager]
     bind[ContactInfoService].to[ContactInfoServiceImpl]
@@ -49,5 +52,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[PDFConcatenator].to[ITextPDFConcatenator]
     bind[FaxApi].to[TwilioFaxApi]
     bind[ClockService].to[SystemClockService]
+    bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator())
   }
 }
