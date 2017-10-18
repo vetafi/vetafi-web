@@ -2,49 +2,46 @@ package services.forms
 
 import java.util.UUID
 
-import com.typesafe.config.ConfigFactory
-import models.{ ClaimForm, Field, TemplateOptions }
-import modules.JobModule
-import org.specs2.mock.Mockito
-import play.api.Configuration
-import play.api.inject.guice.GuiceApplicationBuilder
+import models._
+import org.mockito.Mockito
 import play.api.libs.json.JsString
 import play.api.test.{ PlaySpecification, WithApplication }
-import services.forms.ClaimServiceImpl
 
-class ClaimServiceSpec extends PlaySpecification with Mockito {
+class ClaimServiceSpec extends PlaySpecification {
 
   "The ClaimServiceImpl" should {
-    "evaluate hide expressions correctly" in new WithApplication(GuiceApplicationBuilder()
-      .configure(Configuration(ConfigFactory.load("application.test.conf")))
-      .disable(classOf[JobModule])
-      .build()) {
+    "evaluate hide expressions correctly" in new FormTestContext {
 
-      val claimService: ClaimServiceImpl = app.injector.instanceOf[ClaimServiceImpl]
+      new WithApplication(application) {
 
-      claimService.shouldBeAnswered(Map("condition" -> JsString("x")))(
-        Field(
-          "test",
-          Field.TemplateType.input,
-          TemplateOptions("test", None, None, None, None),
-          None,
-          Some("model.condition === \"x\"")
-        )
-      ) must beFalse
+        val claimService: ClaimServiceImpl = app.injector.instanceOf[ClaimServiceImpl]
 
-      claimService.shouldBeAnswered(Map("condition" -> JsString("y")))(
-        Field(
-          "test",
-          Field.TemplateType.input,
-          TemplateOptions("test", None, None, None, None),
-          None,
-          Some("model.condition === \"x\"")
-        )
-      ) must beTrue
+        claimService.shouldBeAnswered(Map("condition" -> JsString("x")))(
+          Field(
+            "test",
+            Field.TemplateType.input,
+            TemplateOptions("test", None, None, None, None),
+            None,
+            Some("model.condition === \"x\"")
+          )
+        ) must beFalse
+
+        claimService.shouldBeAnswered(Map("condition" -> JsString("y")))(
+          Field(
+            "test",
+            Field.TemplateType.input,
+            TemplateOptions("test", None, None, None, None),
+            None,
+            Some("model.condition === \"x\"")
+          )
+        ) must beTrue
+      }
     }
   }
 
   "calculate remaining questions correctly" in new FormTestContext {
+    Mockito.when(mockFormConfigManager.getFormConfigs).thenReturn(mockFormConfig)
+
     new WithApplication(application) {
       val claimService: ClaimServiceImpl = app.injector.instanceOf[ClaimServiceImpl]
 

@@ -1,16 +1,16 @@
 package controllers.api
 
-import java.util.UUID
+import java.util.{Date, UUID}
 
 import com.mohiva.play.silhouette.api.LoginInfo
-import controllers.{ CSRFTest, SilhouetteTestContext }
+import controllers.{CSRFTest, SilhouetteTestContext}
 import com.mohiva.play.silhouette.test._
 import models._
-import org.mockito.{ Matchers, Mockito }
-import play.api.libs.json.{ JsResult, Json }
-import play.api.mvc.{ AnyContentAsEmpty, Result }
-import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
-import reactivemongo.api.commands.{ UpdateWriteResult, WriteResult }
+import org.mockito.{Matchers, Mockito}
+import play.api.libs.json.{JsResult, Json}
+import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
+import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
@@ -86,9 +86,6 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
   }
 
   "The `create` action" should {
-
-    // TODO mockout DAO
-
     "return 201 if created" in new ClaimControllerTestContext {
       Mockito.when(mockClaimDao.findIncompleteClaim(identity.userID))
         .thenReturn(Future.successful(None))
@@ -177,6 +174,13 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
         Matchers.any()
       ))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
+
+      Mockito.when(mockTwilioUserService.save(Matchers.any(), Matchers.any()))
+        .thenReturn(Future.successful(TwilioUser(UUID.randomUUID(), "password")))
+
+      Mockito.when(mockSecretsManager.getSecretUtf8(Matchers.any())).thenReturn("fake-secret")
+      Mockito.when(mockSubmissionService.submit(Matchers.any()))
+        .thenReturn(Future.successful(ClaimSubmission(UUID.randomUUID(), "", "", "", Date.from(new Instant(0)))))
 
       new WithApplication(application) {
         val req = FakeRequest(POST, controllers.api.routes.ClaimController.submit(testIncompleteClaim.claimID).url)

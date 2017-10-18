@@ -9,6 +9,7 @@ import org.specs2.specification.Scope
 import play.api.{ Application, Configuration }
 import play.api.inject.guice.GuiceApplicationBuilder
 import _root_.services.forms.FormConfigManager
+import org.mockito.Mockito
 
 trait FormTestContext extends Scope {
   val condition1DependentField = Field(
@@ -59,22 +60,22 @@ trait FormTestContext extends Scope {
     None
   )
 
-  class FakeFormConfig extends FormConfigManager {
-    override def getFormConfigs: Map[String, FormConfig] = Map("test" -> FormConfig(
-      "test",
-      "Test config.",
-      VetafiInfo("test", "Test config.", required = true, externalId = "test", externalSignerId = "test"),
-      Seq(condition1DependentField, condition2DependentField,
-        requiredField1, requiredField2, optionalField1, optionalField2)
-    ))
-  }
+  val mockFormConfigManager: FormConfigManager = Mockito.mock(classOf[FormConfigManager])
+
+  val mockFormConfig: Map[String, FormConfig] = Map("test" -> FormConfig(
+    "test",
+    "Test config.",
+    VetafiInfo("test", "Test config.", required = true, externalId = "test", externalSignerId = "test"),
+    Seq(condition1DependentField, condition2DependentField,
+      requiredField1, requiredField2, optionalField1, optionalField2)
+  ))
 
   /**
    * A fake Guice module.
    */
   class FakeModule extends AbstractModule with ScalaModule {
     def configure(): Unit = {
-      bind[FormConfigManager].toInstance(new FakeFormConfig())
+      bind[FormConfigManager].toInstance(mockFormConfigManager)
     }
   }
 
