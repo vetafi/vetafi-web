@@ -1,17 +1,17 @@
 package controllers.api
 
 import java.time.Instant
-import java.util.{Date, UUID}
+import java.util.{ Date, UUID }
 
 import com.mohiva.play.silhouette.api.LoginInfo
-import controllers.{CSRFTest, SilhouetteTestContext}
+import controllers.{ CSRFTest, SilhouetteTestContext }
 import com.mohiva.play.silhouette.test._
 import models._
-import org.mockito.{Matchers, Mockito}
-import play.api.libs.json.{JsResult, Json}
-import play.api.mvc.{AnyContentAsEmpty, Result}
-import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
-import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
+import org.mockito.{ Matchers, Mockito }
+import play.api.libs.json.{ JsResult, Json }
+import play.api.mvc.{ AnyContentAsEmpty, Result }
+import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
+import reactivemongo.api.commands.{ UpdateWriteResult, WriteResult }
 import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
