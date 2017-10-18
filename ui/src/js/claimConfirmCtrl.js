@@ -1,7 +1,7 @@
 var app = angular.module('vetafiApp');
 app.controller('claimConfirmCtrl', ['$scope', '$state', '$stateParams', 'net', '$uibModal', 'userValues', 'forms', 'formConfig',
   'user', 'claimService', '$filter',
-  function($scope, $state, $stateParams, net, $uibModal, userValues, forms, formConfig, user, vaService, claimService, $filter) {
+  function($scope, $state, $stateParams, net, $uibModal, userValues, forms, formConfig, user, claimService, $filter) {
     $scope.claimId = $stateParams.claimId;
     $scope.user = user || {};
     $scope.userEmail = $scope.user.email;
@@ -65,14 +65,7 @@ app.controller('claimConfirmCtrl', ['$scope', '$state', '$stateParams', 'net', '
     }
 
     $scope.onClickConfirm = function () {
-      //TODO fix this so address is not trusted to client side.
-      var data = {
-        toAddress: $scope.vaAddress,
-        fromAddress: $scope.userAddress,
-        emails: [$scope.userEmail],                       // copies sent to which emails
-        addresses: [$scope.vaAddress, $scope.userAddress] // copies sent to which addresses
-      };
-      net.submitClaim($stateParams.claimId, data)
+      net.submitClaim($stateParams.claimId, [])
         .then(function (resp) {
           if (resp) {
             claimService.submitCurrentClaim();

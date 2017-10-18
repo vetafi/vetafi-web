@@ -4,15 +4,15 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
-import models.daos.{ ClaimDAO, FormDAO }
 import models._
-import play.api.libs.json.{ JsError, JsValue, Json }
+import models.daos.{ ClaimDAO, FormDAO }
+import org.log4s._
+import play.api.libs.json.{ JsError, JsResult, JsValue, Json }
 import play.api.mvc.{ Action, _ }
 import services.documents.DocumentService
 import services.forms.{ ClaimService, FormConfigManager }
 import services.submission.{ EmailSubmissionService, FaxSubmissionService, RecipientService }
 import utils.auth.DefaultEnv
-import org.log4s._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -116,26 +116,28 @@ class ClaimController @Inject() (
   }
 
   def findUpdateAndSubmitClaim(claim: Claim, recipients: Seq[Recipient]): Future[Result] = {
-    claimDAO.save(claim.userID, claim.claimID, claim.copy(recipients = recipients)).flatMap {
-      case updateRecipients if updateRecipients.ok => submitClaimToRecipients(claim).flatMap {
-        submissions =>
-          claimDAO.submit(claim.userID, claim.claimID, submissions).flatMap {
-            case submitted if submitted.ok =>
-              val allSuccess: Boolean = submissions.map(_.success).reduce(_ && _)
-              if (allSuccess) {
+    val claimWithRecipients = claim.copy(recipients = recipients)
+    logger.info("recipients: " + recipients.toString())
+    claimDAO.save(claimWithRecipients.userID, claimWithRecipients.claimID, claimWithRecipients).flatMap {
+      case updateRecipients if updateRecipients.ok => submitClaimToRecipients(claimWithRecipients).flatMap {
+        (submissions: Seq[ClaimSubmission]) =>
+          logger.info("got submissions" + submissions.toString())
+          val allSuccess: Boolean = submissions.map(_.success).reduce(_ && _)
+          if (allSuccess) {
+            claimDAO.submit(claimWithRecipients.userID, claimWithRecipients.claimID, submissions).flatMap {
+              case submitted if submitted.ok =>
                 Future.successful(Ok(Json.obj("status" -> "ok", "errors" -> Json.arr())))
-              } else {
-                val failures: Seq[ClaimSubmission] = submissions.filter(!_.success)
-                Future.successful(InternalServerError(
-                  Json.obj(
-                    "status" -> "error",
-                    "errors" -> Json.toJson(failures)
-                  )
-                ))
-              }
-            case _ => Future.successful(InternalServerError)
+              case _ => Future.successful(InternalServerError)
+            }
+          } else {
+            val failures: Seq[ClaimSubmission] = submissions.filter(!_.success)
+            Future.successful(InternalServerError(
+              Json.obj(
+                "status" -> "error",
+                "errors" -> Json.toJson(failures)
+              )
+            ))
           }
-
       }
       case _ => Future.successful(InternalServerError)
     }
@@ -144,7 +146,7 @@ class ClaimController @Inject() (
   def submit(claimID: UUID): Action[JsValue] = silhouette.SecuredAction.async(BodyParsers.parse.json) {
     request =>
       {
-        val recipientsResult = request.body.validate[Seq[Recipient]]
+        val recipientsResult: JsResult[Seq[Recipient]] = request.body.validate[Seq[Recipient]]
         recipientsResult.fold(
           errors => {
             Future.successful(BadRequest(Json.obj("status" -> "error", "message" -> JsError.toJson(errors))))
