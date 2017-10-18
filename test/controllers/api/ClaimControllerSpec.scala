@@ -1,5 +1,6 @@
 package controllers.api
 
+import java.time.Instant
 import java.util.{Date, UUID}
 
 import com.mohiva.play.silhouette.api.LoginInfo
@@ -180,7 +181,7 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
 
       Mockito.when(mockSecretsManager.getSecretUtf8(Matchers.any())).thenReturn("fake-secret")
       Mockito.when(mockSubmissionService.submit(Matchers.any()))
-        .thenReturn(Future.successful(ClaimSubmission(UUID.randomUUID(), "", "", "", Date.from(new Instant(0)))))
+        .thenReturn(Future.successful(ClaimSubmission(UUID.randomUUID(), "", "", "", Date.from(Instant.EPOCH), true)))
 
       new WithApplication(application) {
         val req = FakeRequest(POST, controllers.api.routes.ClaimController.submit(testIncompleteClaim.claimID).url)
