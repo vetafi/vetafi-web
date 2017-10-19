@@ -7,14 +7,6 @@
       "forms": [
         "VBA-21-0966-ARE"
       ]
-    },
-    {
-      "key": "disability_compensation",
-      "name": "Disability Compensation",
-      "description": "This option will allow you to complete a fully developed claim for disability compensation and related benefits.",
-      "forms": [
-        "VBA-21-526EZ-ARE"
-      ]
     }
   ]
 }
