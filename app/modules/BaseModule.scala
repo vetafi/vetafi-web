@@ -44,7 +44,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[DocumentService].to[ITextDocumentService]
     bind[PDFStampingConfigProvider].to[ResourcesPDFStampingConfigProvider]
     bind[PDFTemplateProvider].to[ResourcesPDFTemplateProvider]
-
     bind[UserValuesService].to[UserValuesServiceImpl]
     bind[RequestUtils].toInstance(new RequestUtils(Clock.systemUTC()))
     bind[EmailSubmissionService].to[SESEmailSubmissionService]
@@ -52,6 +51,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[PDFConcatenator].to[ITextPDFConcatenator]
     bind[FaxApi].to[TwilioFaxApi]
     bind[ClockService].to[SystemClockService]
-    bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator())
+    bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator(32))
   }
 }

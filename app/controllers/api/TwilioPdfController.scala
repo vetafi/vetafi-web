@@ -37,7 +37,7 @@ class TwilioPdfController @Inject() (
       ) {
           logger.info("Received request from twilio for claim PDF.")
 
-          val formsFuture = formDAO.find(request.identity.userID, claimID)
+          val formsFuture = formDAO.find(userID, claimID)
 
           formsFuture.flatMap(
             forms => {
@@ -46,6 +46,7 @@ class TwilioPdfController @Inject() (
             }
           ).map(
               (pdfs: Seq[Array[Byte]]) => {
+                logger.info(s"Concatenating ${pdfs.length} of sizes " + pdfs.map(_.length).toString())
                 pdfConcatenator.concat(pdfs)
               }
             ).map {
