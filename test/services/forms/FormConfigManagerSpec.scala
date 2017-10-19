@@ -34,7 +34,6 @@ trait FormConfigManagerSpecTestContext extends Scope {
 }
 
 class FormConfigManagerSpec extends PlaySpecification with Mockito {
-  sequential
 
   "The JsonResourceFormConfigManagerSpec" should {
     "Load enums ok" in new FormConfigManagerSpecTestContext {

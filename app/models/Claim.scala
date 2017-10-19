@@ -5,50 +5,24 @@ import java.util.UUID
 import play.api.libs.json.{ Format, Json, OFormat }
 import utils.EnumUtils
 
-/*var ClaimSchema = new Schema({
-userId: {
-type: mongoose.Schema.Types.ObjectId,
-ref: 'User'
-},
-state: String,         // Claim.State
-stateUpdatedAt: Date,  // Date of last state modification
-sentTo: {
-emails: [String],
-addresses: [AddressSchema]
-}
-}, {
-timestamps: true
-});
-
-var State = {
-INCOMPLETE: 'incomplete',
-DISCARDED: 'discarded',
-SUBMITTED: 'submitted',
-PROCESSED: 'processed'
-};
-
-var addressSchema = new Schema({
-  name: String,                   // Name of Address (Home) (optional)
-  street1: String,                // Street name & number
-  street2: String,                // Secondary Address (Suite, Apt, Room, P.O.)
-  city: String,                   // City
-  province: String,               // Province or U.S. State
-  postal: String,                 // Postal or U.S. Zip Code
-  country: String                 // Country
-}, {minimize: false, timestamps: false});
-
-*/
-
-case class Recipients(
-  toAddress: Option[Address],
-  fromAddress: Option[Address],
-  emails: Seq[String],
-  addresses: Seq[Address]
+case class Recipient(
+  recipientType: Recipient.Type.Value,
+  value: String
 ) {
+
 }
 
-object Recipients {
-  implicit val jsonFormat: OFormat[Recipients] = Json.format[Recipients]
+object Recipient {
+
+  object Type extends Enumeration {
+    type Type = Value
+    val FAX, EMAIL = Value
+  }
+
+  implicit val enumFormat: Format[Recipient.Type.Value] = EnumUtils.enumFormat(Recipient.Type)
+
+  implicit val jsonFormat: OFormat[Recipient] = Json.format[Recipient]
+
 }
 
 case class StartClaimRequest(
@@ -72,7 +46,8 @@ case class Claim(
   key: String,
   state: Claim.State.Value,
   stateUpdatedAt: java.util.Date,
-  sentTo: Recipients
+  recipients: Seq[Recipient],
+  submissions: Seq[ClaimSubmission] = Seq.empty[ClaimSubmission]
 ) {
 
 }
@@ -90,10 +65,12 @@ object Claim {
 }
 
 case class ClaimSubmission(
-  externalId: String,
-  success: Boolean,
-  message: Option[String],
-  dateSubmitted: java.util.Date
+  claimSubmissionID: UUID,
+  to: String,
+  from: String,
+  method: String,
+  dateSubmitted: java.util.Date,
+  success: Boolean
 ) {
 
 }

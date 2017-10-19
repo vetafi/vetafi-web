@@ -8,7 +8,6 @@ import play.api.libs.json.JsString
 import play.api.test.PlaySpecification
 
 class UserValuesServiceImplSpec extends PlaySpecification {
-  sequential
 
   "The updateUserValues method" should {
     "Populate user email into contact email" in {

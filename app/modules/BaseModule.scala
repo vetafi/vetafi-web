@@ -3,15 +3,19 @@ package modules
 import java.time.Clock
 
 import com.google.inject.AbstractModule
+import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import models.daos._
 import net.codingwell.scalaguice.ScalaModule
 import play.modules.reactivemongo.ReactiveMongoApi
-import services.documents.{ DocumentService, SeamlessDocsDocumentService }
 import services._
+import services.documents.pdf._
+import services.documents.{ DocumentService, ITextDocumentService }
 import services.forms._
-import services.submission.{ FaxSubmissionService, SubmissionService }
-import utils.seamlessdocs.{ RequestUtils, SeamlessDocsService, SeamlessDocsServiceImpl }
-import utils.secrets.{ BiscuitSecretsManager, SecretsManager, StaticSecrets }
+import services.submission._
+import services.time.{ ClockService, SystemClockService }
+import utils.seamlessdocs.RequestUtils
+import utils.secrets.{ BiscuitSecretsManager, SecretsManager }
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * The base Guice module, manages Dependency Injection for interfaces defined by our project.
@@ -31,15 +35,22 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[ClaimDAO].to[ClaimDAOImpl]
     bind[FormDAO].to[FormDAOImpl]
     bind[MailingListDAO].to[MailingListDAOImpl]
+    bind[TwilioFaxDAO].to[TwilioFaxDAOImpl]
     bind[SecretsManager].to[BiscuitSecretsManager]
     bind[FormConfigManager].to[JsonResourceFormConfigManager]
     bind[ContactInfoService].to[ContactInfoServiceImpl]
     bind[ClaimService].to[ClaimServiceImpl]
-    bind[SubmissionService].to[FaxSubmissionService]
-    bind[DocumentService].to[SeamlessDocsDocumentService]
-    bind[SeamlessDocsService].to[SeamlessDocsServiceImpl]
-    bind[ReactiveMongoApi].to[BiscuitPasswordMongoApi]
+    bind[FaxSubmissionService].to[TwilioFaxSubmissionService]
+    bind[DocumentService].to[ITextDocumentService]
+    bind[PDFStampingConfigProvider].to[ResourcesPDFStampingConfigProvider]
+    bind[PDFTemplateProvider].to[ResourcesPDFTemplateProvider]
     bind[UserValuesService].to[UserValuesServiceImpl]
     bind[RequestUtils].toInstance(new RequestUtils(Clock.systemUTC()))
+    bind[EmailSubmissionService].to[SESEmailSubmissionService]
+    bind[RecipientService].to[RecipientServiceImpl]
+    bind[PDFConcatenator].to[ITextPDFConcatenator]
+    bind[FaxApi].to[TwilioFaxApi]
+    bind[ClockService].to[SystemClockService]
+    bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator(32))
   }
 }

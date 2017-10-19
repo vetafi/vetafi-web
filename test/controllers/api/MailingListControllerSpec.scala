@@ -46,7 +46,6 @@ trait MailingListControllerTestContext extends SilhouetteTestContext {
 }
 
 class MailingListControllerSpec extends PlaySpecification with CSRFTest {
-  sequential
 
   "The `subscribe` action" should {
     "return 200 for proper post data" in new MailingListControllerTestContext {

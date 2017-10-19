@@ -17,6 +17,7 @@
     <logger name="filters" level="DEBUG" />
     <logger name="services" level="DEBUG" />
     <logger name="utils" level="DEBUG" />
+    <logger name="org.ghost4j.Ghostscript" level="DEBUG" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT" />

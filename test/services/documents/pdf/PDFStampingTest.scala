@@ -47,7 +47,7 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
   "pdf stamper" should {
     "stamp checkboxes" in { TMP: File =>
       val pdfTemplate =
-        getClass.getClassLoader.getResourceAsStream("forms/VBA-21-0966-ARE.pdf")
+        getClass.getClassLoader.getResourceAsStream("forms/pdf_templates/VBA-21-0966-ARE.pdf")
       val tmpFile = new File(TMP, "test.pdf")
 
       val idMap = Map(
@@ -59,7 +59,7 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
         pdfTemplate,
         Map("veteran_previous_claim_with_va_y_n" -> JsString("Yes")),
         Seq(
-          PDFFieldLocator(null, "veteran_previous_claim_with_va_y_n", 0, Some(idMap), None, None, false)
+          PDFFieldLocator(None, "veteran_previous_claim_with_va_y_n", Some(0), Some(idMap), None, None, None)
         ),
         new FileOutputStream(tmpFile)
       )
@@ -69,14 +69,51 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
 
     "stamp radios" in { TMP: File =>
       val pdfTemplate =
-        getClass.getClassLoader.getResourceAsStream("forms/VBA-21-0966-ARE.pdf")
+        getClass.getClassLoader.getResourceAsStream("forms/pdf_templates/VBA-21-0966-ARE.pdf")
       val tmpFile = new File(TMP, "test.pdf")
 
       PDFStamping.stampPdf(
         pdfTemplate,
         Map("veteran_previous_claim_with_va_y_n" -> JsBoolean(true)),
         Seq(
-          PDFFieldLocator("F[0].Page_1[0].Compensation[1]", "veteran_previous_claim_with_va_y_n", 0, None, None, None, false)
+          PDFFieldLocator(Some("F[0].Page_1[0].Compensation[1]"), "veteran_previous_claim_with_va_y_n", None, None, None, None, None)
+        ),
+        new FileOutputStream(tmpFile)
+      )
+
+      success
+    }
+
+    "stamp split text" in { TMP: File =>
+      val pdfTemplate =
+        getClass.getClassLoader.getResourceAsStream("forms/pdf_templates/VBA-21-0966-ARE.pdf")
+      val tmpFile = new File(TMP, "test.pdf")
+
+      PDFStamping.stampPdf(
+        pdfTemplate,
+        Map("claimant_ssn" -> JsString("111-11-1111")),
+        Seq(
+          PDFFieldLocator(
+            pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_FirstThreeNumbers[0]"),
+            elementId = "claimant_ssn",
+            substringStart = Some(0),
+            substringEnd = Some(3),
+            isBase64ImageBlob = None
+          ),
+          PDFFieldLocator(
+            pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_SecondTwoNumbers[0]"),
+            elementId = "claimant_ssn",
+            substringStart = Some(4),
+            substringEnd = Some(6),
+            isBase64ImageBlob = None
+          ),
+          PDFFieldLocator(
+            pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_LastFourNumbers[0]"),
+            elementId = "claimant_ssn",
+            substringStart = Some(7),
+            substringEnd = Some(11),
+            isBase64ImageBlob = None
+          )
         ),
         new FileOutputStream(tmpFile)
       )
@@ -86,7 +123,7 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
 
     "stamp signature" in {
       TMP: File =>
-        val pdfTemplate = getClass.getClassLoader.getResourceAsStream("forms/VBA-21-0966-ARE.pdf")
+        val pdfTemplate = getClass.getClassLoader.getResourceAsStream("forms/pdf_templates/VBA-21-0966-ARE.pdf")
         val tmpFile = new File(TMP, "test.pdf")
 
         PDFStamping.stampPdf(
@@ -96,8 +133,8 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
           ),
           Seq(
             PDFFieldLocator(
-              "F[0].Page_1[0].SignatureField1[0]",
-              "signature", 0, None, None, None, true
+              Some("F[0].Page_1[0].SignatureField1[0]"),
+              "signature", None, None, None, None, None
             )
           ),
           new FileOutputStream(tmpFile)

@@ -30,26 +30,5 @@ app.controller('claimSelectFormsCtrl', ['$scope', 'claimService', 'formConfig', 
     $scope.onClickCancel = function() {
       $state.go('root.home');
     };
-
-    $scope.onClickDone = function() {
-      busySpinner.showBusy();
-      net.signClaim($stateParams.claimId).then(
-        function success(res) {
-          $state.go('root.sign', {claimId: $stateParams.claimId}).then(
-            function success() {
-              busySpinner.hideBusy();
-            },
-            function failure(err) {
-              busySpinner.hideBusy();
-              console.error(err);
-            }
-          );
-        },
-        function failure(err) {
-          busySpinner.hideBusy();
-          console.error(err);
-        }
-      )
-    };
   }
 ]);

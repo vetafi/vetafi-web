@@ -14,7 +14,6 @@ import utils.auth.DefaultEnv
 import scala.concurrent.Future
 
 class UserValuesControllerSpec extends PlaySpecification with CSRFTest {
-  sequential
 
   "The `getUserValues` action" should {
     "return 401 if unauthorized" in new UserValuesControllerTestContext {

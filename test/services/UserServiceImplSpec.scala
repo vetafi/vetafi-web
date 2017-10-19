@@ -67,7 +67,6 @@ trait UserServiceTestContext extends Scope {
 }
 
 class UserServiceImplSpec extends PlaySpecification {
-  sequential
 
   "The save method" should {
     "Save the user and update user values" in new UserServiceTestContext {

@@ -47,7 +47,6 @@ trait UserControllerTestContext extends SilhouetteTestContext {
 }
 
 class UserControllerSpec extends PlaySpecification with CSRFTest {
-  sequential
 
   "The `getUser` action" should {
 

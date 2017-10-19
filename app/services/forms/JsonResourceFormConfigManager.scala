@@ -2,9 +2,9 @@ package services.forms
 
 import com.google.inject.Inject
 import models.FormConfig
-import play.Configuration
 import play.api.libs.json._
 import org.log4s._
+import play.api.Configuration
 
 import scala.collection.JavaConversions._
 
@@ -14,16 +14,17 @@ import scala.collection.JavaConversions._
 class JsonResourceFormConfigManager @Inject() (configuration: Configuration) extends FormConfigManager {
 
   private[this] val logger = getLogger
+  val formlyConfigsDir: String = configuration.getString("forms.formlyConfigsDir").get
 
   def loadFormConfigFromResource(formKey: String): FormConfig = {
     val inputStream = getClass.getClassLoader.getResource(
-      s"${configuration.getString("forms.dir")}/${formKey}.json"
+      s"$formlyConfigsDir/$formKey.json"
     ).openStream()
     val result: JsResult[FormConfig] = Json.parse(inputStream).validate[FormConfig]
 
     result.fold(
       errors => {
-        val msg = s"Errors while parsing form config JSON at ${configuration.getString("forms.dir")}/$formKey: ${errors.toString}"
+        val msg = s"Errors while parsing form config JSON at $formlyConfigsDir/$formKey: ${errors.toString}"
         logger.error(msg)
         throw new RuntimeException(msg)
       },
@@ -34,7 +35,7 @@ class JsonResourceFormConfigManager @Inject() (configuration: Configuration) ext
   }
 
   lazy val formConfigs: Map[String, FormConfig] = {
-    val enabledForms = configuration.getStringList("forms.enabled")
+    val enabledForms = configuration.getStringList("forms.enabled").get
     enabledForms.map(
       (formKey: String) => {
         (formKey, loadFormConfigFromResource(formKey))

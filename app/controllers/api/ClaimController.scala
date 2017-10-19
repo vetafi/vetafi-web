@@ -4,15 +4,15 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
+import models._
 import models.daos.{ ClaimDAO, FormDAO }
-import models.{ Claim, ClaimForm, Recipients, StartClaimRequest }
-import play.api.libs.json.{ JsError, JsValue, Json }
+import org.log4s._
+import play.api.libs.json.{ JsError, JsResult, JsValue, Json }
 import play.api.mvc.{ Action, _ }
 import services.documents.DocumentService
 import services.forms.{ ClaimService, FormConfigManager }
-import services.submission.SubmissionService
+import services.submission.{ EmailSubmissionService, FaxSubmissionService, RecipientService }
 import utils.auth.DefaultEnv
-import org.log4s._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -26,8 +26,10 @@ class ClaimController @Inject() (
   val claimService: ClaimService,
   val documentService: DocumentService,
   val formConfigManager: FormConfigManager,
+  val recipientService: RecipientService,
   silhouette: Silhouette[DefaultEnv],
-  submissionService: SubmissionService
+  faxSubmissionService: FaxSubmissionService,
+  emailSubmissionService: EmailSubmissionService
 ) extends Controller {
 
   private[this] val logger = getLogger
@@ -104,42 +106,47 @@ class ClaimController @Inject() (
       }
   }
 
-  def findUpdateAndSubmitClaim(claim: Claim, recipients: Recipients): Future[Result] = {
-    claimDAO.save(claim.userID, claim.claimID, claim.copy(sentTo = recipients)).flatMap {
-      case updateRecipients if updateRecipients.ok => submissionService.submit(claim).flatMap {
-        case success if success.success =>
-          claimDAO.submit(claim.userID, claim.claimID).flatMap {
-            case submitted if submitted.ok => Future.successful(Ok(Json.obj("status" -> "ok")))
-            case _ => Future.successful(InternalServerError)
+  def submitClaimToRecipients(claim: Claim): Future[Seq[ClaimSubmission]] = {
+    Future.sequence(claim.recipients.map {
+      case faxDestination if faxDestination.recipientType == Recipient.Type.FAX =>
+        faxSubmissionService.submit(claim)
+      case emailDestination if emailDestination.recipientType == Recipient.Type.EMAIL =>
+        faxSubmissionService.submit(claim)
+    })
+  }
+
+  def findUpdateAndSubmitClaim(claim: Claim, recipients: Seq[Recipient]): Future[Result] = {
+    val claimWithRecipients = claim.copy(recipients = recipients)
+    logger.info("recipients: " + recipients.toString())
+    claimDAO.save(claimWithRecipients.userID, claimWithRecipients.claimID, claimWithRecipients).flatMap {
+      case updateRecipients if updateRecipients.ok => submitClaimToRecipients(claimWithRecipients).flatMap {
+        (submissions: Seq[ClaimSubmission]) =>
+          logger.info("got submissions" + submissions.toString())
+          val allSuccess: Boolean = submissions.map(_.success).reduce(_ && _)
+          if (allSuccess) {
+            claimDAO.submit(claimWithRecipients.userID, claimWithRecipients.claimID, submissions).flatMap {
+              case submitted if submitted.ok =>
+                Future.successful(Ok(Json.obj("status" -> "ok", "errors" -> Json.arr())))
+              case _ => Future.successful(InternalServerError)
+            }
+          } else {
+            val failures: Seq[ClaimSubmission] = submissions.filter(!_.success)
+            Future.successful(InternalServerError(
+              Json.obj(
+                "status" -> "error",
+                "errors" -> Json.toJson(failures)
+              )
+            ))
           }
-        case fail =>
-          Future.successful(InternalServerError(
-            Json.obj(
-              "status" -> "error",
-              "message" -> fail.message
-            )
-          ))
       }
       case _ => Future.successful(InternalServerError)
     }
   }
 
-  def sign(claimID: UUID): Action[AnyContent] = silhouette.SecuredAction.async {
-    request =>
-      {
-        formDAO.find(request.identity.userID, claimID).flatMap {
-          forms =>
-            Future.sequence(forms.map(documentService.submitForSignature))
-        }.map {
-          _ => Ok
-        }
-      }
-  }
-
   def submit(claimID: UUID): Action[JsValue] = silhouette.SecuredAction.async(BodyParsers.parse.json) {
     request =>
       {
-        val recipientsResult = request.body.validate[Recipients]
+        val recipientsResult: JsResult[Seq[Recipient]] = request.body.validate[Seq[Recipient]]
         recipientsResult.fold(
           errors => {
             Future.successful(BadRequest(Json.obj("status" -> "error", "message" -> JsError.toJson(errors))))
@@ -148,7 +155,8 @@ class ClaimController @Inject() (
             claimDAO.findClaim(request.identity.userID, claimID).flatMap {
               case Some(claim) =>
                 if (claim.state == Claim.State.INCOMPLETE) {
-                  findUpdateAndSubmitClaim(claim, recipients)
+                  val defaultRecipients = recipientService.getDefaultRecipients(claim)
+                  findUpdateAndSubmitClaim(claim, (defaultRecipients ++ recipients).toSeq)
                 } else {
                   Future.successful(InternalServerError)
                 }

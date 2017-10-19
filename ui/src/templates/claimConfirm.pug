@@ -27,28 +27,13 @@
 
     div.section.mailing-list
       div.section-header
-        h4 Mail form to:
+        h4 Fax form to:
       div.container-fluid
         div.row-wrapper.row
           h5.title.col-sm-5
-            b {{vaAddress.name}}
+            b VA Claims Intake Center
           div.address.col-sm-5
-            div.address-line {{vaAddress.street1}} {{vaAddress.street2}}
-            div.address-line {{vaAddress.city}}, {{vaAddress.province}}, {{vaAddress.country}} {{vaAddress.postal}}
-
-    div.section.mailing-list
-      div.section-header
-        h4 Mail copy of form to me at:
-      div.container-fluid
-        div.row-wrapper.row
-          h5.title.col-sm-5
-            b {{userAddress.name}}
-          div.address.col-sm-5
-            div.address-line {{userAddress.street1}} {{userAddress.street2}}
-            div.address-line {{userAddress.city}}, {{userAddress.province}}, {{userAddress.country}} {{userAddress.postal}}
-          button.col-sm-2(ng-click="onClickEditAddress()")
-            div.edit-icon
-            | Edit
+            div.address-line 844-531-7818
 
     div.section.email-list
       div.section-header
