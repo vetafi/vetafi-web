@@ -53,6 +53,8 @@ GET         /beta                                 controllers.ApplicationControl
 POST        /api/subscribe                        controllers.api.MailingListController.subscribe()
 
 GET         /api/twilioPdfEndpoint/:userID/:claimID            controllers.api.TwilioPdfController.getPdf(userID: java.util.UUID, claimID: java.util.UUID)
+POST        /api/twilioCallback                                controllers.api.TwilioPdfController.callback()
+
 
 # Gulp managed static assets
 GET         /*file                                controllers.GulpAssets.at(file)

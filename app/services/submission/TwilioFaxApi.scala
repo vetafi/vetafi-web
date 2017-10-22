@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 import com.twilio.Twilio
 import com.twilio.rest.fax.v1.{ Fax, FaxCreator }
+import controllers.api.routes
 import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
 import play.api.Configuration
 import utils.secrets.SecretsManager
@@ -21,7 +22,7 @@ class TwilioFaxApi @Inject() (
     configuration.getString("twilio.accountSidSecretName").get
   )
 
-  lazy val authTokenSecretName: String = secretsManager.getSecretUtf8(
+  lazy val authToken: String = secretsManager.getSecretUtf8(
     configuration.getString("twilio.authTokenSecretName").get
   )
 
@@ -31,12 +32,15 @@ class TwilioFaxApi @Inject() (
     twilioUser: TwilioUser,
     faxResource: URL
   ): TwilioFax = {
-    Twilio.init(accountSid, authTokenSecretName)
+    Twilio.init(accountSid, authToken)
     MDC.withCtx("userID" -> claim.userID.toString, "claimID" -> claim.claimID.toString) {
       logger.info(s"Sending ${faxResource.toURI} to ${claimSubmission.to}")
     }
     val faxCreator: FaxCreator = Fax.creator(claimSubmission.to, faxResource.toURI)
-    faxCreator.setFrom(claimSubmission.from)
+      .setFrom(claimSubmission.from)
+      .setStatusCallback(configuration.getString("scheme").get +
+          configuration.getString("hostname").get +
+          routes.TwilioPdfController.callback())
     val fax = faxCreator.create()
 
     TwilioFax(

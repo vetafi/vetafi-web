@@ -10,7 +10,7 @@ import play.api.mvc.{ Action, AnyContent, Controller }
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
 import services.forms.{ ClaimService, ContactInfoService }
-import utils.auth.{ DigestAuthErrorHandler, TwilioAuthEnv }
+import utils.auth.{ DigestAuthErrorHandler, TwilioAuthEnv, TwilioRequestValidator }
 
 import scala.collection.parallel.ParSeq
 import scala.concurrent.Future
@@ -24,10 +24,21 @@ class TwilioPdfController @Inject() (
   val documentService: DocumentService,
   silhouette: Silhouette[TwilioAuthEnv],
   val digestAuthErrorHandler: DigestAuthErrorHandler,
-  val pdfConcatenator: PDFConcatenator
+  val pdfConcatenator: PDFConcatenator,
+  val twilioRequestValidator: TwilioRequestValidator
 ) extends Controller {
 
   private[this] val logger = getLogger
+
+  def callback(): Action[AnyContent] = Action.async {
+    request =>
+      if (twilioRequestValidator.authenticate(request)) {
+        logger.info("Got a callback: " + request.body)
+        Future.successful(Ok)
+      } else {
+        Future.successful(Unauthorized)
+      }
+  }
 
   def getPdf(userID: UUID, claimID: UUID): Action[AnyContent] = silhouette.SecuredAction(digestAuthErrorHandler).async {
     implicit request =>
