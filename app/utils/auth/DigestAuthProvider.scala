@@ -92,7 +92,7 @@ class DigestAuthProvider(
   }
 
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
-    logger.info("Authenticating request: " + request.toString())
+    logger.info("Authenticating request: " + request.toString() + " headers " + request.headers.toSimpleMap.toString())
     getDigestParameters(request) match {
       case Some(params: DigestParameters) =>
         getAuthorizedUser(params)
