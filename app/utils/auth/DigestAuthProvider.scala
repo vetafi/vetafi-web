@@ -71,6 +71,7 @@ class DigestAuthProvider(
       ))
     } else {
       val missingHeaders = expectedHeaders -- params.keys.toSet
+      logger.info(s"Digest auth request missing required headers: ${missingHeaders.toString()}")
       logger.warn(s"Digest auth request missing required headers: ${missingHeaders.toString()}")
       None
     }
@@ -91,6 +92,7 @@ class DigestAuthProvider(
   }
 
   override def authenticate[B](request: Request[B]): Future[Option[LoginInfo]] = {
+    logger.info("Authenticating request: " + request.toString())
     getDigestParameters(request) match {
       case Some(params: DigestParameters) =>
         getAuthorizedUser(params)
