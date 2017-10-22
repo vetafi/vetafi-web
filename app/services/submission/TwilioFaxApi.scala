@@ -39,8 +39,8 @@ class TwilioFaxApi @Inject() (
     val faxCreator: FaxCreator = Fax.creator(claimSubmission.to, faxResource.toURI)
       .setFrom(claimSubmission.from)
       .setStatusCallback(configuration.getString("scheme").get +
-          configuration.getString("hostname").get +
-          routes.TwilioPdfController.callback())
+        configuration.getString("hostname").get +
+        routes.TwilioPdfController.callback())
     val fax = faxCreator.create()
 
     TwilioFax(
