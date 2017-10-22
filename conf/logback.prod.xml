@@ -13,6 +13,9 @@
     <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
     <logger name="controllers" level="INFO" />
     <logger name="filters.AccessLogFilter" level="DEBUG" />
+    <logger name="com.digitaltangible" level="WARN" />
+    <logger name="sun" level="WARN" />
+    <logger name="com.amazonaws" level="WARN" />
     <logger name="services" level="INFO" />
     <logger name="utils" level="INFO" />
     <root level="DEBUG">
