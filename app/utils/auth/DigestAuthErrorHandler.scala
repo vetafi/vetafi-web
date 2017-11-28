@@ -35,7 +35,9 @@ class DigestAuthErrorHandler @Inject() (secureRandomIDGenerator: SecureRandomIDG
     logger.info(request.method)
     secureRandomIDGenerator.generate.map {
       nonce =>
-        Unauthorized.withHeaders("WWW-Authenticate" -> s"Digest realm=\"twilio\",nonce=\"$nonce\"")
+        Unauthorized.withHeaders("WWW-Authenticate" ->
+          s"""Digest realm="twilio",
+             |nonce="$nonce"""".stripMargin)
     }
   }
 }
