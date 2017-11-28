@@ -38,7 +38,7 @@ libraryDependencies ++= Seq(
   "com.digitaltangible" %% "play-guard" % "2.0.0",
   "me.lessis" %% "retry" % "0.2.0",
   ("com.github.dcoker" % "biscuit-java" % "ebed4b3a238a45c007da138175f1132a6bf26b71").exclude("com.github.emstlk", "nacl4s_2.10"),
-  "net.logstash.logback" % "logstash-logback-encoder" % "4.9",
+  "net.logstash.logback" % "logstash-logback-encoder" % "4.11",
   "ch.qos.logback" % "logback-core" % "1.2.3",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.log4s" %% "log4s" % "1.3.6",

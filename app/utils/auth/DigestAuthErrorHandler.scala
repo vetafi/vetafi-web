@@ -6,8 +6,8 @@ import javax.inject.Inject
 import com.mohiva.play.silhouette.api.actions.SecuredErrorHandler
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import org.log4s.getLogger
-import play.api.mvc.{RequestHeader, Result}
-import play.api.mvc.Results.{Forbidden, Unauthorized}
+import play.api.mvc.{ RequestHeader, Result }
+import play.api.mvc.Results.{ Forbidden, Unauthorized }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
