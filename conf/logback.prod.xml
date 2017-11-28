@@ -2,6 +2,12 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
+
+    <appender name="STDOUT2" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%logger{15} - %message%n%xException{10}</pattern>
+        </encoder>
+    </appender>
     <logger name="play" level="INFO" />
     <logger name="application" level="INFO" />
     <logger name="com.mohiva" level="INFO" />
@@ -20,5 +26,6 @@
     <logger name="utils" level="INFO" />
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT2" />
     </root>
 </configuration>
