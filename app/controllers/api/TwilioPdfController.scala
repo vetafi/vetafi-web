@@ -10,7 +10,7 @@ import play.api.mvc.{ Action, AnyContent, Controller }
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
 import services.forms.{ ClaimService, ContactInfoService }
-import utils.auth.{ DigestAuthErrorHandler, TwilioAuthEnv, TwilioRequestValidator }
+import utils.auth.{ BasicAuthErrorHandler, DigestAuthErrorHandler, TwilioAuthEnv, TwilioRequestValidator }
 
 import scala.collection.parallel.ParSeq
 import scala.concurrent.Future
@@ -23,7 +23,7 @@ class TwilioPdfController @Inject() (
   val contactInfoService: ContactInfoService,
   val documentService: DocumentService,
   silhouette: Silhouette[TwilioAuthEnv],
-  val digestAuthErrorHandler: DigestAuthErrorHandler,
+  val basicAuthErrorHandler: BasicAuthErrorHandler,
   val pdfConcatenator: PDFConcatenator,
   val twilioRequestValidator: TwilioRequestValidator
 ) extends Controller {
@@ -40,7 +40,7 @@ class TwilioPdfController @Inject() (
       }
   }
 
-  def getPdf(userID: UUID, claimID: UUID): Action[AnyContent] = silhouette.SecuredAction(digestAuthErrorHandler).async {
+  def getPdf(userID: UUID, claimID: UUID): Action[AnyContent] = silhouette.SecuredAction(basicAuthErrorHandler).async {
     implicit request =>
       MDC.withCtx(
         "userID" -> userID.toString,

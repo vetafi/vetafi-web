@@ -4,7 +4,10 @@ import java.net.URL
 import java.util.{ Date, UUID }
 import javax.inject.Inject
 
-import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
+import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
+import com.mohiva.play.silhouette.api.{ LoginInfo, Silhouette }
+import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import models.daos.{ ClaimDAO, TwilioFaxDAO }
 import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
@@ -12,7 +15,7 @@ import play.api.Configuration
 import reactivemongo.api.commands.WriteResult
 import services.TwilioUserService
 import services.time.ClockService
-import utils.auth.DigestAuthProvider
+import utils.auth.TwilioAuthEnv
 import utils.secrets.SecretsManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,7 +32,10 @@ class TwilioFaxSubmissionService @Inject() (
   secureRandomIDGenerator: SecureRandomIDGenerator,
   claimDAO: ClaimDAO,
   faxApi: FaxApi,
-  clockService: ClockService
+  clockService: ClockService,
+  silhouette: Silhouette[TwilioAuthEnv],
+  authInfoRepository: AuthInfoRepository,
+  passwordHasherRegistry: PasswordHasherRegistry
 ) extends FaxSubmissionService {
 
   val fromNumber: String = configuration.getString("twilio.number").get
@@ -38,10 +44,15 @@ class TwilioFaxSubmissionService @Inject() (
   def createNewTwilioUser(claim: Claim): Future[TwilioUser] = {
     secureRandomIDGenerator.generate.flatMap {
       password =>
-        twilioUserService.save(
-          LoginInfo(DigestAuthProvider.ID, claim.claimID.toString),
-          TwilioUser(claim.claimID, password)
-        )
+        val loginInfo = LoginInfo(BasicAuthProvider.ID, claim.claimID.toString)
+        val authInfo = passwordHasherRegistry.current.hash(password)
+        authInfoRepository.add(loginInfo, authInfo).flatMap {
+          passwordInfo =>
+            twilioUserService.save(
+              loginInfo,
+              TwilioUser(claim.claimID, password)
+            )
+        }
     }
   }
 

@@ -5,8 +5,9 @@ import java.util.UUID
 
 import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, MongoAuthInfoDAO }
+import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
 import com.typesafe.config.ConfigFactory
 import models.daos.FormDAO
 import models._
@@ -16,16 +17,15 @@ import org.mockito.Mockito
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
-import play.api.{ Application, Configuration }
+import play.api.{Application, Configuration}
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
-import utils.auth.DigestAuthProvider
 
 trait TwilioPdfControllerTestContext extends Scope {
 
   val mockFormDao: FormDAO = Mockito.mock(classOf[FormDAO])
   val mockDocumentService: DocumentService = Mockito.mock(classOf[DocumentService])
-  val mockDigestAuthProvider: DigestAuthProvider = Mockito.mock(classOf[DigestAuthProvider])
+  val mockBasicAuthProvider: BasicAuthProvider = Mockito.mock(classOf[BasicAuthProvider])
   val mockTwilioUserDao: DelegableAuthInfoDAO[TwilioUser] = Mockito.mock(classOf[DelegableAuthInfoDAO[TwilioUser]])
   val mockPdfConcatenator: PDFConcatenator = Mockito.mock(classOf[PDFConcatenator])
   val mockSecureRandomIdGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
@@ -65,7 +65,7 @@ trait TwilioPdfControllerTestContext extends Scope {
     def configure(): Unit = {
       bind[FormDAO].toInstance(mockFormDao)
       bind[DocumentService].toInstance(mockDocumentService)
-      bind[DigestAuthProvider].toInstance(mockDigestAuthProvider)
+      bind[BasicAuthProvider].toInstance(mockBasicAuthProvider)
       bind[DelegableAuthInfoDAO[TwilioUser]].toInstance(mockTwilioUserDao)
       bind[PDFConcatenator].toInstance(mockPdfConcatenator)
       bind[SecureRandomIDGenerator].toInstance(mockSecureRandomIdGenerator)
