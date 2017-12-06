@@ -30,7 +30,7 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
         val getResult: Future[Result] = route(app, csrfReq).get
 
         status(getResult) must be equalTo UNAUTHORIZED
-        headers(getResult).get("WWW-Authenticate").get must be equalTo "Digest realm=twilio,nonce=nonce"
+        headers(getResult).get("WWW-Authenticate").get must be equalTo """Basic realm="twilio""""
       }
     }
 

@@ -5,13 +5,12 @@ import java.util.UUID
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.PasswordHasherRegistry
-import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import models.TwilioUser
 import org.mockito.Mockito
 import play.api.http.HeaderNames
-import play.api.test.{FakeRequest, PlaySpecification}
+import play.api.test.{ FakeRequest, PlaySpecification }
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -21,7 +20,7 @@ class DigestAuthProviderSpec extends PlaySpecification {
     "not authenticate if authorization header is missing" in {
       val mockAuthInfoRepository = Mockito.mock(classOf[AuthInfoRepository])
       val mockPasswordHasherRegistry = Mockito.mock(classOf[PasswordHasherRegistry])
-      val digestAuthProvider = new BasicAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
+      val digestAuthProvider = new DigestAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
       val request = FakeRequest(play.api.http.HttpVerbs.GET, "/test")
       val authenticated: Future[Option[LoginInfo]] = digestAuthProvider.authenticate(request)
 
@@ -31,7 +30,7 @@ class DigestAuthProviderSpec extends PlaySpecification {
     "not authenticate if header fields are missing" in {
       val mockAuthInfoRepository = Mockito.mock(classOf[AuthInfoRepository])
       val mockPasswordHasherRegistry = Mockito.mock(classOf[PasswordHasherRegistry])
-      val digestAuthProvider = new BasicAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
+      val digestAuthProvider = new DigestAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
 
       val request = FakeRequest(play.api.http.HttpVerbs.GET, "/test").withHeaders(
         HeaderNames.AUTHORIZATION -> s"Digest realm=realm"
@@ -82,7 +81,7 @@ class DigestAuthProviderSpec extends PlaySpecification {
         .thenReturn(Future.successful(Some(TwilioUser(userID, "password"))))
 
       val mockPasswordHasherRegistry = Mockito.mock(classOf[PasswordHasherRegistry])
-      val digestAuthProvider = new BasicAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
+      val digestAuthProvider = new DigestAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
 
       val response = DigestAuthProvider.createDigest(DigestParameters(
         username = "username",

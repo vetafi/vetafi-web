@@ -7,7 +7,7 @@ import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
+import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, MongoAuthInfoDAO }
 import com.typesafe.config.ConfigFactory
 import models.daos.FormDAO
 import models._
@@ -17,7 +17,7 @@ import org.mockito.Mockito
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
-import play.api.{Application, Configuration}
+import play.api.{ Application, Configuration }
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
 

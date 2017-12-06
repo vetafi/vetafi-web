@@ -2,16 +2,17 @@ package services.submission
 
 import java.net.URL
 import java.time.Instant
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
 
-import models.{ ClaimSubmission, TwilioFax, TwilioUser }
-import org.mockito.{ Matchers, Mockito }
-import play.api.test.{ PlaySpecification, WithApplication }
+import com.mohiva.play.silhouette.api.util.{PasswordHasher, PasswordInfo}
+import models.{ClaimSubmission, TwilioFax, TwilioUser}
+import org.mockito.{Matchers, Mockito}
+import play.api.test.{PlaySpecification, WithApplication}
 import reactivemongo.api.commands.UpdateWriteResult
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ Await, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
@@ -73,6 +74,12 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       Mockito.when(mockClockService.getCurrentTime)
         .thenReturn(Instant.EPOCH)
 
+      Mockito.when(mockAuthInfoRepository.add[PasswordInfo](Matchers.any(), Matchers.any()))
+        .thenReturn(Future.successful(PasswordInfo(hasher = "test", password = "test")))
+
+      Mockito.when(mockPasswordHasher.hash(Matchers.any()))
+        .thenReturn(PasswordInfo(hasher = "test", password = "test"))
+
       new WithApplication(application) {
         val twilioFaxSubmissionService: TwilioFaxSubmissionService =
           app.injector.instanceOf(classOf[TwilioFaxSubmissionService])
@@ -128,6 +135,12 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
 
       Mockito.when(mockClockService.getCurrentTime)
         .thenReturn(Instant.EPOCH)
+
+      Mockito.when(mockAuthInfoRepository.add[PasswordInfo](Matchers.any(), Matchers.any()))
+        .thenReturn(Future.successful(PasswordInfo(hasher = "test", password = "test")))
+
+      Mockito.when(mockPasswordHasher.hash(Matchers.any()))
+        .thenReturn(PasswordInfo(hasher = "test", password = "test"))
 
       new WithApplication(application) {
         val twilioFaxSubmissionService: TwilioFaxSubmissionService =
