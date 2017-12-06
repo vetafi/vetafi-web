@@ -19,7 +19,7 @@
     <logger name="utils" level="DEBUG" />
     <logger name="org.ghost4j.Ghostscript" level="DEBUG" />
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

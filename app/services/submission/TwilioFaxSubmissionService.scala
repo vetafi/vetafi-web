@@ -1,16 +1,16 @@
 package services.submission
 
 import java.net.URL
-import java.util.{Date, UUID}
+import java.util.{ Date, UUID }
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.util.{PasswordHasherRegistry, PasswordInfo}
-import com.mohiva.play.silhouette.api.{LoginInfo, Silhouette}
+import com.mohiva.play.silhouette.api.util.{ PasswordHasherRegistry, PasswordInfo }
+import com.mohiva.play.silhouette.api.{ LoginInfo, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import models.daos.{ClaimDAO, TwilioFaxDAO}
-import models.{Claim, ClaimSubmission, TwilioFax, TwilioUser}
+import models.daos.{ ClaimDAO, TwilioFaxDAO }
+import models.{ Claim, ClaimSubmission, TwilioFax, TwilioUser }
 import play.api.Configuration
 import reactivemongo.api.commands.WriteResult
 import services.TwilioUserService
