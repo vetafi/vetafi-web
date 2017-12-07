@@ -9,7 +9,7 @@ import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
 import com.typesafe.config.ConfigFactory
-import models.daos.FormDAO
+import models.daos.{ClaimDAO, FormDAO, TwilioFaxDAO}
 import models._
 import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
@@ -23,7 +23,7 @@ import services.documents.pdf.PDFConcatenator
 import utils.auth.{TwilioRequestValidator, TwilioRequestValidatorImpl}
 import utils.secrets.SecretsManager
 
-trait TwilioPdfControllerTestContext extends Scope {
+trait TwilioControllerTestContext extends Scope {
 
   val mockFormDao: FormDAO = Mockito.mock(classOf[FormDAO])
   val mockDocumentService: DocumentService = Mockito.mock(classOf[DocumentService])
@@ -33,6 +33,9 @@ trait TwilioPdfControllerTestContext extends Scope {
   val mockSecureRandomIdGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
   val mockConfiguration: Configuration = Mockito.mock(classOf[Configuration])
   val mockSecretsManager: SecretsManager = Mockito.mock(classOf[SecretsManager])
+  val mockClaimDao: ClaimDAO = Mockito.mock(classOf[ClaimDAO])
+  val mockTwilioFaxDao: TwilioFaxDAO = Mockito.mock(classOf[TwilioFaxDAO])
+
   Mockito.when(mockConfiguration.getString("twilio.authTokenSecretName"))
     .thenReturn(Some("fakeSecretName"))
   Mockito.when(mockSecretsManager.getSecretUtf8("fakeSecretName")).thenReturn("12345")

@@ -44,6 +44,7 @@ class TwilioFaxApi @Inject() (
     val fax = faxCreator.create()
 
     TwilioFax(
+      userID = claim.userID,
       claimID = claim.claimID,
       claimSubmissionID = claimSubmission.claimSubmissionID,
       dateCreated = fax.getDateCreated.toDate,

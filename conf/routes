@@ -52,8 +52,8 @@ GET         /api/form/:claimID/:formKey/issigned  controllers.api.FormController
 GET         /beta                                 controllers.ApplicationController.googleForm()
 POST        /api/subscribe                        controllers.api.MailingListController.subscribe()
 
-GET         /api/twilioPdfEndpoint/:userID/:claimID            controllers.api.TwilioPdfController.getPdf(userID: java.util.UUID, claimID: java.util.UUID)
-POST        /api/twilioCallback                                controllers.api.TwilioPdfController.callback()
+GET         /api/twilioPdfEndpoint/:userID/:claimID            controllers.api.TwilioController.getPdf(userID: java.util.UUID, claimID: java.util.UUID)
+POST        /api/twilioCallback                                controllers.api.TwilioController.faxCallback()
 
 
 # Gulp managed static assets
