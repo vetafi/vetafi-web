@@ -19,7 +19,9 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
     "return 200 if the request can be validated" in new TwilioPdfControllerTestContext {
       new WithApplication(application) {
         val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(controllers.api.routes.TwilioPdfController.callback())
-          .withHeaders("X-Twilio-Signature" -> "yFkFXpUSG5aHdzUxL3PIliSbI1M=")
+          .withHeaders("X-Twilio-Signature" -> "q1wvXf0FHdKw3kXxgCLXiKm9ZR4=",
+            "X-Forwarded-Proto" -> "http",
+            "Host" -> "www.vetafi.org")
           .withFormUrlEncodedBody(
             "CallSid" -> "CA1234567890ABCDE",
             "Caller" -> "+14158675309",
