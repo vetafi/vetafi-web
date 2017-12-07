@@ -5,8 +5,9 @@ import java.util.UUID
 
 import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.LoginInfo
+import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
+import com.mohiva.play.silhouette.api.util.{ PasswordHasher, PasswordHasherRegistry }
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import com.twilio.rest.fax.v1.Fax
 import com.typesafe.config.ConfigFactory
 import models._
 import models.daos.{ ClaimDAO, TwilioFaxDAO }
@@ -31,6 +32,9 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
   val mockFaxApi: FaxApi = Mockito.mock(classOf[FaxApi])
   val mockClockService: ClockService = Mockito.mock(classOf[ClockService])
   val userID: UUID = UUID.randomUUID()
+  val mockAuthInfoRepository: AuthInfoRepository = Mockito.mock(classOf[AuthInfoRepository])
+  val mockPasswordHasher: PasswordHasher = Mockito.mock(classOf[PasswordHasher])
+  val mockPasswordHasherRegistry: PasswordHasherRegistry = PasswordHasherRegistry(mockPasswordHasher, Seq())
 
   /**
    * An identity.
@@ -70,6 +74,8 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
       bind[ClaimDAO].toInstance(mockClaimDAO)
       bind[FaxApi].toInstance(mockFaxApi)
       bind[ClockService].toInstance(mockClockService)
+      bind[PasswordHasherRegistry].toInstance(mockPasswordHasherRegistry)
+      bind[AuthInfoRepository].toInstance(mockAuthInfoRepository)
     }
   }
 

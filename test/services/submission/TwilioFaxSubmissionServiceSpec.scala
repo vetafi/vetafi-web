@@ -4,6 +4,7 @@ import java.net.URL
 import java.time.Instant
 import java.util.{ Date, UUID }
 
+import com.mohiva.play.silhouette.api.util.{ PasswordHasher, PasswordInfo }
 import models.{ ClaimSubmission, TwilioFax, TwilioUser }
 import org.mockito.{ Matchers, Mockito }
 import play.api.test.{ PlaySpecification, WithApplication }
@@ -73,6 +74,12 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       Mockito.when(mockClockService.getCurrentTime)
         .thenReturn(Instant.EPOCH)
 
+      Mockito.when(mockAuthInfoRepository.add[PasswordInfo](Matchers.any(), Matchers.any()))
+        .thenReturn(Future.successful(PasswordInfo(hasher = "test", password = "test")))
+
+      Mockito.when(mockPasswordHasher.hash(Matchers.any()))
+        .thenReturn(PasswordInfo(hasher = "test", password = "test"))
+
       new WithApplication(application) {
         val twilioFaxSubmissionService: TwilioFaxSubmissionService =
           app.injector.instanceOf(classOf[TwilioFaxSubmissionService])
@@ -128,6 +135,12 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
 
       Mockito.when(mockClockService.getCurrentTime)
         .thenReturn(Instant.EPOCH)
+
+      Mockito.when(mockAuthInfoRepository.add[PasswordInfo](Matchers.any(), Matchers.any()))
+        .thenReturn(Future.successful(PasswordInfo(hasher = "test", password = "test")))
+
+      Mockito.when(mockPasswordHasher.hash(Matchers.any()))
+        .thenReturn(PasswordInfo(hasher = "test", password = "test"))
 
       new WithApplication(application) {
         val twilioFaxSubmissionService: TwilioFaxSubmissionService =

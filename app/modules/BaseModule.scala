@@ -13,8 +13,10 @@ import services.documents.{ DocumentService, ITextDocumentService }
 import services.forms._
 import services.submission._
 import services.time.{ ClockService, SystemClockService }
+import utils.auth.{ TwilioRequestValidator, TwilioRequestValidatorImpl }
 import utils.seamlessdocs.RequestUtils
 import utils.secrets.{ BiscuitSecretsManager, SecretsManager }
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -52,5 +54,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[FaxApi].to[TwilioFaxApi]
     bind[ClockService].to[SystemClockService]
     bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator(32))
+    bind[TwilioRequestValidator].to[TwilioRequestValidatorImpl]
   }
 }

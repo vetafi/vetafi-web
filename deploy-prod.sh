@@ -8,10 +8,10 @@ AUTHENTICATOR_COOKIE_SIGNER_KEY="$(biscuit get --filename=conf/biscuit/secrets.y
 VETAFI_CLIENT_ID="$(biscuit get --filename=conf/biscuit/secrets.yaml prod::id-me-client-id)"
 VETAFI_CLIENT_SECRET="$(biscuit get --filename=conf/biscuit/secrets.yaml prod::id-me-client-secret)"
 
-BOXFUSE_USER="$(biscuit get --filename=../config/biscuit/secrets.yaml boxfuse-user)"
-BOXFUSE_SECRET="$(biscuit get --filename=../config/biscuit/secrets.yaml boxfuse-secret)"
+BOXFUSE_USER="$(biscuit get --filename=conf/biscuit/secrets.yaml boxfuse-user)"
+BOXFUSE_SECRET="$(biscuit get --filename=conf/biscuit/secrets.yaml boxfuse-secret)"
 
-NEWRELIC_LICENSE_KEY="$(biscuit get --filename=../config/biscuit/secrets.yaml newrelic-license-key)"
+NEWRELIC_LICENSE_KEY="$(biscuit get --filename=conf/biscuit/secrets.yaml newrelic-license-key)"
 
 sbt clean dist
 

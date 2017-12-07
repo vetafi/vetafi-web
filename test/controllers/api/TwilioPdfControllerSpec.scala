@@ -17,7 +17,7 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
 
   "the getPdf action should" should {
     "return 401 with www-authenticate set if no Digest Auth credentials are provided" in new TwilioPdfControllerTestContext {
-      Mockito.when(mockDigestAuthProvider.authenticate(Matchers.any()))
+      Mockito.when(mockBasicAuthProvider.authenticate(Matchers.any()))
         .thenReturn(Future.successful(None))
 
       Mockito.when(mockSecureRandomIdGenerator.generate)
@@ -30,15 +30,15 @@ class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
         val getResult: Future[Result] = route(app, csrfReq).get
 
         status(getResult) must be equalTo UNAUTHORIZED
-        headers(getResult).get("WWW-Authenticate").get must be equalTo "Digest realm=twilio,nonce=nonce"
+        headers(getResult).get("WWW-Authenticate").get must be equalTo """Basic realm="twilio""""
       }
     }
 
     "return 200 with pdf if digest credentials are authenticated" in new TwilioPdfControllerTestContext {
       val userUUID: UUID = UUID.randomUUID()
       val claimUUID: UUID = UUID.randomUUID()
-      Mockito.when(mockDigestAuthProvider.authenticate(Matchers.any()))
-        .thenReturn(Future.successful(Some(LoginInfo("digest-auth", "user"))))
+      Mockito.when(mockBasicAuthProvider.authenticate(Matchers.any()))
+        .thenReturn(Future.successful(Some(LoginInfo("basic-auth", "user"))))
 
       Mockito.when(mockFormDao.find(Matchers.eq(userUUID), Matchers.eq(claimUUID)))
         .thenReturn(Future.successful(Seq(testForm)))

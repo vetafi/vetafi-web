@@ -4,16 +4,16 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+import _root_.services.{ AuthTokenService, UserService }
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import _root_.services.{ AuthTokenService, UserService }
-import com.mohiva.play.silhouette.api.services.AvatarService
+import com.mohiva.play.silhouette.api.services.{ AuthenticatorResult, AvatarService }
 import com.mohiva.play.silhouette.api.util.{ Clock, PasswordHasherRegistry, PasswordInfo }
 import com.mohiva.play.silhouette.impl.providers._
 import forms.VetafiSignUpForm
 import models.User
 import play.api.Configuration
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc.{ Action, AnyContent, Controller }
 import utils.auth.DefaultEnv
@@ -93,54 +93,47 @@ class SignUpController @Inject() (
       error => Future.successful(BadRequest(error.errorsAsJson)),
       data => {
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
-        userService.retrieve(loginInfo).flatMap {
-          case Some(_) =>
-            Future.successful(Redirect(routes.GulpAssets.index()))
-          case None =>
-            val authInfo = passwordHasherRegistry.current.hash(data.password)
-            val user = User(
-              userID = UUID.randomUUID(),
-              loginInfo = loginInfo,
-              firstName = None,
-              lastName = None,
-              fullName = None,
-              email = Some(data.email),
-              avatarURL = None,
-              activated = true,
-              contact = None
-            )
+        val authInfo = passwordHasherRegistry.current.hash(data.password)
 
-            userService.save(user).flatMap {
-              val expirationDateTime = clock.now.withDurationAdded(
-                configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorExpiry").get,
-                1
-              )
-              val idleTimeout = Some(FiniteDuration(
-                configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorIdleTimeout").get,
-                TimeUnit.MILLISECONDS
-              ))
-              val cookieMaxAge = Some(FiniteDuration(
-                configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorIdleTimeout").get,
-                TimeUnit.MILLISECONDS
-              ))
+        val result = for {
+          avatar <- avatarService.retrieveURL(data.email)
+          maybeUser: Option[User] <- maybeCreateUser(loginInfo, data)
+          authInfo <- authInfoRepository.add(loginInfo, authInfo)
+        } yield {
+          val expirationDateTime = clock.now.withDurationAdded(
+            configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorExpiry").get,
+            1
+          )
+          val idleTimeout = Some(FiniteDuration(
+            configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorIdleTimeout").get,
+            TimeUnit.MILLISECONDS
+          ))
+          val cookieMaxAge = Some(FiniteDuration(
+            configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorIdleTimeout").get,
+            TimeUnit.MILLISECONDS
+          ))
 
-              user =>
-                silhouette.env.eventBus.publish(SignUpEvent(user, request))
-                silhouette.env.authenticatorService.create(loginInfo).map {
-                  authenticator =>
-                    authenticator.copy(
-                      expirationDateTime = expirationDateTime,
-                      idleTimeout = idleTimeout,
-                      cookieMaxAge = cookieMaxAge
-                    )
-                }.flatMap { authenticator =>
-                  silhouette.env.eventBus.publish(LoginEvent(user, request))
-                  silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-                    silhouette.env.authenticatorService.embed(v, Redirect(routes.GulpAssets.index()))
-                  }
+          maybeUser match {
+            case None =>
+              Future.successful(Redirect(routes.GulpAssets.index()))
+            case Some(user) =>
+              silhouette.env.eventBus.publish(SignUpEvent(user, request))
+              silhouette.env.authenticatorService.create(loginInfo).map {
+                authenticator =>
+                  authenticator.copy(
+                    expirationDateTime = expirationDateTime,
+                    idleTimeout = idleTimeout,
+                    cookieMaxAge = cookieMaxAge
+                  )
+              }.flatMap { authenticator =>
+                silhouette.env.eventBus.publish(LoginEvent(user, request))
+                silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
+                  silhouette.env.authenticatorService.embed(v, Redirect(routes.GulpAssets.index()))
                 }
-            }
+              }
+          }
         }
+        result.flatMap(identity)
       }
     )
   }

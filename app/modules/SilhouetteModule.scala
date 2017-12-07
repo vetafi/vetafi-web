@@ -100,12 +100,12 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
     eventBus: EventBus,
     authInfoRepository: AuthInfoRepository,
     passwordHasherRegistry: PasswordHasherRegistry,
-    digestAuthProvider: DigestAuthProvider
+    basicAuthProvider: BasicAuthProvider
   ): Environment[TwilioAuthEnv] = {
     Environment[TwilioAuthEnv](
       userService,
       authenticatorService,
-      Seq(digestAuthProvider),
+      Seq(basicAuthProvider),
       eventBus
     )
   }
@@ -400,11 +400,11 @@ class SilhouetteModule extends AbstractModule with ScalaModule {
   }
 
   @Provides
-  def provideDigestAuthProvider(
+  def provideBasicDigestAuthProvider(
     authInfoRepository: AuthInfoRepository,
     passwordHasherRegistry: PasswordHasherRegistry
-  ): DigestAuthProvider = {
-    new DigestAuthProvider(authInfoRepository, passwordHasherRegistry)
+  ): BasicAuthProvider = {
+    new BasicAuthProvider(authInfoRepository, passwordHasherRegistry)
   }
 
   /**
