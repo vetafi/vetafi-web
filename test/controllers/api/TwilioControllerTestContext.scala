@@ -9,7 +9,7 @@ import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, MongoAuthInfoDAO }
 import com.typesafe.config.ConfigFactory
-import models.daos.FormDAO
+import models.daos.{ ClaimDAO, FormDAO, TwilioFaxDAO }
 import models._
 import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
@@ -20,8 +20,10 @@ import play.api.libs.json.JsValue
 import play.api.{ Application, Configuration }
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
+import utils.auth.{ TwilioRequestValidator, TwilioRequestValidatorImpl }
+import utils.secrets.SecretsManager
 
-trait TwilioPdfControllerTestContext extends Scope {
+trait TwilioControllerTestContext extends Scope {
 
   val mockFormDao: FormDAO = Mockito.mock(classOf[FormDAO])
   val mockDocumentService: DocumentService = Mockito.mock(classOf[DocumentService])
@@ -29,6 +31,15 @@ trait TwilioPdfControllerTestContext extends Scope {
   val mockTwilioUserDao: DelegableAuthInfoDAO[TwilioUser] = Mockito.mock(classOf[DelegableAuthInfoDAO[TwilioUser]])
   val mockPdfConcatenator: PDFConcatenator = Mockito.mock(classOf[PDFConcatenator])
   val mockSecureRandomIdGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
+  val mockConfiguration: Configuration = Mockito.mock(classOf[Configuration])
+  val mockSecretsManager: SecretsManager = Mockito.mock(classOf[SecretsManager])
+  val mockClaimDao: ClaimDAO = Mockito.mock(classOf[ClaimDAO])
+  val mockTwilioFaxDao: TwilioFaxDAO = Mockito.mock(classOf[TwilioFaxDAO])
+
+  Mockito.when(mockConfiguration.getString("twilio.authTokenSecretName"))
+    .thenReturn(Some("fakeSecretName"))
+  Mockito.when(mockSecretsManager.getSecretUtf8("fakeSecretName")).thenReturn("12345")
+  val requestValidator = new TwilioRequestValidatorImpl(mockConfiguration, mockSecretsManager)
 
   val userID: UUID = UUID.randomUUID()
 
@@ -64,11 +75,14 @@ trait TwilioPdfControllerTestContext extends Scope {
   class FakeModule extends AbstractModule with ScalaModule {
     def configure(): Unit = {
       bind[FormDAO].toInstance(mockFormDao)
+      bind[ClaimDAO].toInstance(mockClaimDao)
+      bind[TwilioFaxDAO].toInstance(mockTwilioFaxDao)
       bind[DocumentService].toInstance(mockDocumentService)
       bind[BasicAuthProvider].toInstance(mockBasicAuthProvider)
       bind[DelegableAuthInfoDAO[TwilioUser]].toInstance(mockTwilioUserDao)
       bind[PDFConcatenator].toInstance(mockPdfConcatenator)
       bind[SecureRandomIDGenerator].toInstance(mockSecureRandomIdGenerator)
+      bind[TwilioRequestValidator].toInstance(requestValidator)
     }
   }
 

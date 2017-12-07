@@ -46,6 +46,21 @@ class TwilioRequestValidatorImpl @Inject() (
     }
   }
 
+  /**
+   * Reconstruct the originally requested URL based on the headers.
+   * This is specific to being behind a AWS ELB.
+   *
+   * @param request
+   * @return
+   */
+  def getOriginalUrlOfRequest(request: Request[AnyContent]): String = {
+
+    val xProtoOpt = request.headers.get("x-forwarded-proto")
+    val hostOpt = request.headers.get("host")
+
+    s"${xProtoOpt.getOrElse("")}://${hostOpt.getOrElse("")}${request.uri}"
+  }
+
   def maybeValidateSignature(signatue: String, request: Request[AnyContent]): Boolean = {
     val bodyParamsOpt: Option[Map[String, Seq[String]]] = request.body.asFormUrlEncoded
 
@@ -54,13 +69,15 @@ class TwilioRequestValidatorImpl @Inject() (
         logger.info("Request did not contain form url encoded data.")
         false
       case Some(bodyParams) =>
-        validateBodyParams(bodyParams, signatue, request.uri)
+        validateBodyParams(bodyParams, signatue, getOriginalUrlOfRequest(request))
     }
   }
 
   override def authenticate[B <: AnyContent](request: Request[B]): Boolean = {
-    logger.info("Validating request: " + request.toString())
-    logger.info("Validating request: " + request.body)
+    logger.info("Validating request: " + request.toString() + " " +
+      request.uri + " " +
+      request.body + " " +
+      request.headers.toSimpleMap.toString())
 
     val signatureOpt = request.headers.get("x-twilio-signature")
 

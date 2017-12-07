@@ -40,10 +40,11 @@ class TwilioFaxApi @Inject() (
       .setFrom(claimSubmission.from)
       .setStatusCallback(configuration.getString("scheme").get +
         configuration.getString("hostname").get +
-        routes.TwilioPdfController.callback())
+        routes.TwilioController.faxCallback())
     val fax = faxCreator.create()
 
     TwilioFax(
+      userID = claim.userID,
       claimID = claim.claimID,
       claimSubmissionID = claimSubmission.claimSubmissionID,
       dateCreated = fax.getDateCreated.toDate,

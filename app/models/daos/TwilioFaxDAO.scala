@@ -6,5 +6,7 @@ import reactivemongo.api.commands.WriteResult
 import scala.concurrent.Future
 
 trait TwilioFaxDAO {
-  def save(twilioFax: TwilioFax): Future[WriteResult]
+  def save(twilioFaxId: String, twilioFax: TwilioFax): Future[WriteResult]
+
+  def find(twilioFaxId: String): Future[Option[TwilioFax]]
 }

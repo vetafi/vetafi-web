@@ -43,6 +43,7 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       )
 
       val fakeTwilioFax = TwilioFax(
+        userID = UUID.randomUUID(),
         claimID = UUID.randomUUID(),
         claimSubmissionID = UUID.randomUUID(),
         dateCreated = Date.from(Instant.EPOCH),
@@ -59,7 +60,7 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       Mockito.when(mockTwilioUserService.save(Matchers.any(), Matchers.any()))
         .thenReturn(Future.successful(twilioUser))
 
-      Mockito.when(mockTwilioFaxDAO.save(Matchers.any()))
+      Mockito.when(mockTwilioFaxDAO.save(Matchers.any(), Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
       Mockito.when(mockSecureRandomIDGenerator.generate)
@@ -105,6 +106,7 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       )
 
       val fakeTwilioFax = TwilioFax(
+        userID = UUID.randomUUID(),
         claimID = UUID.randomUUID(),
         claimSubmissionID = UUID.randomUUID(),
         dateCreated = Date.from(Instant.EPOCH),
@@ -121,7 +123,7 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       Mockito.when(mockTwilioUserService.save(Matchers.any(), Matchers.any()))
         .thenReturn(Future.successful(twilioUser))
 
-      Mockito.when(mockTwilioFaxDAO.save(Matchers.any()))
+      Mockito.when(mockTwilioFaxDAO.save(Matchers.any(), Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
       Mockito.when(mockSecureRandomIDGenerator.generate)

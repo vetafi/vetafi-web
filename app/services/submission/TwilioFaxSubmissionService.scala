@@ -61,6 +61,7 @@ class TwilioFaxSubmissionService @Inject() (
 
   def saveTwilioFax(twilioFax: TwilioFax): Future[WriteResult] = {
     twilioFaxDAO.save(
+      twilioFax.twilioFaxId,
       twilioFax
     )
   }
