@@ -7,7 +7,7 @@ import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, MongoAuthInfoDAO }
+import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
 import com.typesafe.config.ConfigFactory
 import models.daos.FormDAO
 import models._
@@ -17,9 +17,11 @@ import org.mockito.Mockito
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
-import play.api.{ Application, Configuration }
+import play.api.{Application, Configuration}
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
+import utils.auth.{TwilioRequestValidator, TwilioRequestValidatorImpl}
+import utils.secrets.SecretsManager
 
 trait TwilioPdfControllerTestContext extends Scope {
 
@@ -29,6 +31,12 @@ trait TwilioPdfControllerTestContext extends Scope {
   val mockTwilioUserDao: DelegableAuthInfoDAO[TwilioUser] = Mockito.mock(classOf[DelegableAuthInfoDAO[TwilioUser]])
   val mockPdfConcatenator: PDFConcatenator = Mockito.mock(classOf[PDFConcatenator])
   val mockSecureRandomIdGenerator: SecureRandomIDGenerator = Mockito.mock(classOf[SecureRandomIDGenerator])
+  val mockConfiguration: Configuration = Mockito.mock(classOf[Configuration])
+  val mockSecretsManager: SecretsManager = Mockito.mock(classOf[SecretsManager])
+  Mockito.when(mockConfiguration.getString("twilio.authTokenSecretName"))
+    .thenReturn(Some("fakeSecretName"))
+  Mockito.when(mockSecretsManager.getSecretUtf8("fakeSecretName")).thenReturn("12345")
+  val requestValidator = new TwilioRequestValidatorImpl(mockConfiguration, mockSecretsManager)
 
   val userID: UUID = UUID.randomUUID()
 
@@ -69,6 +77,7 @@ trait TwilioPdfControllerTestContext extends Scope {
       bind[DelegableAuthInfoDAO[TwilioUser]].toInstance(mockTwilioUserDao)
       bind[PDFConcatenator].toInstance(mockPdfConcatenator)
       bind[SecureRandomIDGenerator].toInstance(mockSecureRandomIdGenerator)
+      bind[TwilioRequestValidator].toInstance(requestValidator)
     }
   }
 

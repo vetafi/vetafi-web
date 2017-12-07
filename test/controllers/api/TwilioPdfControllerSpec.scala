@@ -4,18 +4,36 @@ import java.util.UUID
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import controllers.CSRFTest
-import models.{ Claim, ClaimForm, TwilioUser }
+import models.{Claim, ClaimForm, TwilioUser}
 import org.apache.commons.io.IOUtils
-import org.mockito.{ Matchers, Mockito }
+import org.mockito.{Matchers, Mockito}
 import play.api.libs.json.JsResult
-import play.api.mvc.{ AnyContentAsEmpty, Result }
-import play.api.test.{ FakeRequest, PlaySpecification, WithApplication }
+import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
+import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
 
 import scala.concurrent.Future
 
 class TwilioPdfControllerSpec extends PlaySpecification with CSRFTest {
 
-  "the getPdf action should" should {
+  "the twilio callback" should {
+    "return 200 if the request can be validated" in new TwilioPdfControllerTestContext {
+      new WithApplication(application) {
+        val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(controllers.api.routes.TwilioPdfController.callback())
+          .withHeaders("X-Twilio-Signature" -> "yFkFXpUSG5aHdzUxL3PIliSbI1M=")
+          .withFormUrlEncodedBody(
+            "CallSid" -> "CA1234567890ABCDE",
+            "Caller" -> "+14158675309",
+            "Digits" -> "1234",
+            "From" -> "+14158675309",
+            "To" -> "+18005551212")
+        val csrfReq: FakeRequest[AnyContentAsFormUrlEncoded] = addToken(request)
+        val getResult: Future[Result] = route(app, csrfReq).get
+        status(getResult) must be equalTo OK
+      }
+    }
+  }
+
+  "the getPdf action" should {
     "return 401 with www-authenticate set if no Digest Auth credentials are provided" in new TwilioPdfControllerTestContext {
       Mockito.when(mockBasicAuthProvider.authenticate(Matchers.any()))
         .thenReturn(Future.successful(None))

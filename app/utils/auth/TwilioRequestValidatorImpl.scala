@@ -59,8 +59,10 @@ class TwilioRequestValidatorImpl @Inject() (
   }
 
   override def authenticate[B <: AnyContent](request: Request[B]): Boolean = {
-    logger.info("Validating request: " + request.toString())
-    logger.info("Validating request: " + request.body)
+    logger.info("Validating request: " + request.toString() + " " +
+      request.uri + " " +
+      request.body + " " +
+      request.headers.toSimpleMap.toString())
 
     val signatureOpt = request.headers.get("x-twilio-signature")
 

@@ -36,6 +36,7 @@ class TwilioPdfController @Inject() (
         logger.info("Got a callback: " + request.body)
         Future.successful(Ok)
       } else {
+        logger.info("Got a bad callback: " + request.body + request.headers.toSimpleMap)
         Future.successful(Unauthorized)
       }
   }
