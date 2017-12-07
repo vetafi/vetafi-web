@@ -111,7 +111,7 @@ class ClaimController @Inject() (
       case faxDestination if faxDestination.recipientType == Recipient.Type.FAX =>
         faxSubmissionService.submit(claim)
       case emailDestination if emailDestination.recipientType == Recipient.Type.EMAIL =>
-        faxSubmissionService.submit(claim)
+        throw new NotImplementedError("Email submission not complete")
     })
   }
 

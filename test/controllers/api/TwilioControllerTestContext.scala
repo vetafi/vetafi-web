@@ -7,9 +7,9 @@ import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.impl.providers.BasicAuthProvider
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
-import com.mohiva.play.silhouette.persistence.daos.{DelegableAuthInfoDAO, MongoAuthInfoDAO}
+import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, MongoAuthInfoDAO }
 import com.typesafe.config.ConfigFactory
-import models.daos.{ClaimDAO, FormDAO, TwilioFaxDAO}
+import models.daos.{ ClaimDAO, FormDAO, TwilioFaxDAO }
 import models._
 import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
@@ -17,10 +17,10 @@ import org.mockito.Mockito
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
-import play.api.{Application, Configuration}
+import play.api.{ Application, Configuration }
 import services.documents.DocumentService
 import services.documents.pdf.PDFConcatenator
-import utils.auth.{TwilioRequestValidator, TwilioRequestValidatorImpl}
+import utils.auth.{ TwilioRequestValidator, TwilioRequestValidatorImpl }
 import utils.secrets.SecretsManager
 
 trait TwilioControllerTestContext extends Scope {
@@ -75,6 +75,8 @@ trait TwilioControllerTestContext extends Scope {
   class FakeModule extends AbstractModule with ScalaModule {
     def configure(): Unit = {
       bind[FormDAO].toInstance(mockFormDao)
+      bind[ClaimDAO].toInstance(mockClaimDao)
+      bind[TwilioFaxDAO].toInstance(mockTwilioFaxDao)
       bind[DocumentService].toInstance(mockDocumentService)
       bind[BasicAuthProvider].toInstance(mockBasicAuthProvider)
       bind[DelegableAuthInfoDAO[TwilioUser]].toInstance(mockTwilioUserDao)

@@ -2,7 +2,7 @@ package models.daos
 
 import javax.inject.Inject
 
-import models.{Claim, TwilioFax}
+import models.{ Claim, TwilioFax }
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.commands.WriteResult

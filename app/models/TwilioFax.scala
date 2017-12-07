@@ -5,7 +5,7 @@ import java.util.UUID
 import play.api.libs.json.{ Json, OFormat }
 
 case class TwilioFax(
-                      userID: UUID,
+  userID: UUID,
   claimID: UUID,
   claimSubmissionID: UUID,
   dateCreated: java.util.Date,

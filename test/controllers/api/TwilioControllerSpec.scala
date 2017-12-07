@@ -11,6 +11,7 @@ import org.mockito.{Matchers, Mockito}
 import play.api.libs.json.JsResult
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Result}
 import play.api.test.{FakeRequest, PlaySpecification, WithApplication}
+import reactivemongo.api.commands.UpdateWriteResult
 
 import scala.concurrent.Future
 
@@ -22,6 +23,9 @@ class TwilioControllerSpec extends PlaySpecification with CSRFTest {
       Mockito.when(mockClaimDao.findClaim(Matchers.eq(testClaim.userID), Matchers.eq(testClaim.claimID)))
         .thenReturn(Future.successful(Some(testClaim.copy())))
 
+      Mockito.when(mockClaimDao.save(Matchers.eq(testClaim.userID), Matchers.eq(testClaim.claimID), Matchers.any()))
+        .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
+
       Mockito.when(mockTwilioFaxDao.find(Matchers.eq(twilioFaxId)))
         .thenReturn(Future.successful(Some(TwilioFax(
           userID = testClaim.userID,
@@ -32,16 +36,23 @@ class TwilioControllerSpec extends PlaySpecification with CSRFTest {
           to = "to",
           from = "from",
           twilioFaxId = twilioFaxId,
-          status = "status"))))
+          status = "status"
+        ))))
+
+      Mockito.when(mockTwilioFaxDao.save(Matchers.eq(twilioFaxId), Matchers.any()))
+        .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
       new WithApplication(application) {
-        val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(controllers.api.routes.TwilioPdfController.callback())
-          .withHeaders("X-Twilio-Signature" -> "q1wvXf0FHdKw3kXxgCLXiKm9ZR4=",
+        val request: FakeRequest[AnyContentAsFormUrlEncoded] = FakeRequest(controllers.api.routes.TwilioController.faxCallback())
+          .withHeaders(
+            "X-Twilio-Signature" -> "jm9SluOI0TvBJ6CJqLEBqSSfpgs=",
             "X-Forwarded-Proto" -> "http",
-            "Host" -> "www.vetafi.org")
+            "Host" -> "www.vetafi.org"
+          )
           .withFormUrlEncodedBody(
             "FaxSid" -> twilioFaxId,
-            "FaxStatus" -> "delivered")
+            "FaxStatus" -> "delivered"
+          )
         val csrfReq: FakeRequest[AnyContentAsFormUrlEncoded] = addToken(request)
         val getResult: Future[Result] = route(app, csrfReq).get
         status(getResult) must be equalTo OK
@@ -59,7 +70,7 @@ class TwilioControllerSpec extends PlaySpecification with CSRFTest {
 
       new WithApplication(application) {
         val getRequest: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(controllers.api.routes.TwilioPdfController.getPdf(UUID.randomUUID(), UUID.randomUUID()))
+          FakeRequest(controllers.api.routes.TwilioController.getPdf(UUID.randomUUID(), UUID.randomUUID()))
         val csrfReq: FakeRequest[AnyContentAsEmpty.type] = addToken(getRequest)
         val getResult: Future[Result] = route(app, csrfReq).get
 
@@ -88,7 +99,7 @@ class TwilioControllerSpec extends PlaySpecification with CSRFTest {
 
       new WithApplication(application) {
         val getRequest: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(controllers.api.routes.TwilioPdfController.getPdf(userUUID, claimUUID))
+          FakeRequest(controllers.api.routes.TwilioController.getPdf(userUUID, claimUUID))
         val csrfReq: FakeRequest[AnyContentAsEmpty.type] = addToken(getRequest)
         val getResult: Future[Result] = route(app, csrfReq).get
 
