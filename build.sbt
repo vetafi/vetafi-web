@@ -49,6 +49,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.6",
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
   "com.twilio.sdk" % "twilio" % "7.14.5",
+  "com.amazonaws" % "aws-java-sdk-ses" % "1.11.244",
   specs2 % Test,
   filters
 )
