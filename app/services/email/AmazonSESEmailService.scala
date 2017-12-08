@@ -17,6 +17,7 @@ import play.api.Configuration
 import play.api.http.MimeTypes
 
 import scala.collection.JavaConversions._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class AmazonSESEmailService @Inject()(configuration: Configuration) extends EmailService {
