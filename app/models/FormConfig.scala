@@ -10,8 +10,7 @@ case class FormConfig(
   name: String,
   description: String,
   vfi: VetafiInfo,
-  fields: Seq[Field]
-) {
+  fields: Seq[Field]) {
 
 }
 
@@ -33,8 +32,7 @@ case class Field(
   `type`: Field.TemplateType.Value,
   templateOptions: TemplateOptions,
   optionsTypes: Option[Seq[Field.ValidationType.Value]],
-  hideExpression: Option[String]
-) {
+  hideExpression: Option[String]) {
 
 }
 
@@ -47,7 +45,7 @@ object Field {
 
   object ValidationType extends Enumeration {
     type ValidationType = Value
-    val email, date, state, country, zipCode, phoneNumber, ssn = Value
+    val email, date, state, country, zipCode, phoneNumber, ssn, middleInitial = Value
   }
 
   implicit val templateTypeFormat: Format[Field.TemplateType.Value] = EnumUtils.enumFormat(Field.TemplateType)
@@ -62,8 +60,7 @@ case class TemplateOptions(
   placeHolder: Option[String],
   rows: Option[Int],
   columns: Option[Int],
-  optional: Boolean = false
-) {
+  optional: Boolean = false) {
 
 }
 

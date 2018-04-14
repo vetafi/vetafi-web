@@ -13,8 +13,7 @@ trait SeamlessDocsService {
     name: String,
     email: String,
     signerId: String,
-    data: Map[String, JsValue]
-  ): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]]
+    data: Map[String, JsValue]): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]]
 
   def formSubmit(formId: String, data: Map[String, JsValue]): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]]
 

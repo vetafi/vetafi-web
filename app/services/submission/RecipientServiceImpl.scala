@@ -7,6 +7,6 @@ import play.api.Configuration
 class RecipientServiceImpl @Inject() (configuration: Configuration) extends RecipientService {
 
   override def getDefaultRecipients(claim: Claim): Set[Recipient] = {
-    Set(Recipient(Recipient.Type.FAX, configuration.getString("submission.va.fax").get))
+    Set(Recipient(Recipient.Type.FAX, configuration.get[String]("submission.va.fax")))
   }
 }

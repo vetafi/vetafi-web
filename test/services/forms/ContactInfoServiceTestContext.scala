@@ -8,7 +8,6 @@ import com.typesafe.config.ConfigFactory
 import controllers.SilhouetteTestContext
 import models.daos.UserDAO
 import models.{ Contact, User, UserValues }
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{ Application, Configuration }
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -27,9 +26,7 @@ trait ContactInfoServiceTestContext extends SilhouetteTestContext {
     },
       Seq(
         Seq("attr1_1", "attr2_1"),
-        Seq("attr1_2", "attr2_2")
-      ))
-  )
+        Seq("attr1_2", "attr2_2"))))
 
   class FakeUserDao extends UserDAO {
     override def find(loginInfo: LoginInfo): Future[Option[User]] = {
@@ -64,7 +61,6 @@ trait ContactInfoServiceTestContext extends SilhouetteTestContext {
 
   override lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

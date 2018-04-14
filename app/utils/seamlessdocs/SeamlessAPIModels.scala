@@ -16,8 +16,7 @@ object SeamlessErrorResponse {
 case class SeamlessAPIError(
   error_code: String,
   error_message: String,
-  error_description: Option[String]
-) {
+  error_description: Option[String]) {
 
 }
 
@@ -80,8 +79,7 @@ case class SeamlessApplication(
   form_id: String,
   is_active: String,
   application_data: Option[Map[String, SeamlessApplicationDatum]],
-  submission_pdf_url: String
-) {
+  submission_pdf_url: String) {
 
 }
 
@@ -117,8 +115,7 @@ object SeamlessApplicationDatum {
 case class SeamlessFormPreparation(
   singer_data: SeamlessRecipientInfo,
   recipients: SeamlessRecipient,
-  answers: Map[String, JsValue]
-) {
+  answers: Map[String, JsValue]) {
 
 }
 
@@ -153,8 +150,7 @@ object SeamlessRecipientInfo {
 case class SeamlessErrorLog(
   error_code: String,
   error_message: String,
-  error_description: String
-)
+  error_description: String)
 
 object SeamlessErrorLog {
   implicit val jsonFormat: OFormat[SeamlessErrorLog] = Json.format[SeamlessErrorLog]
@@ -170,8 +166,7 @@ object SeamlessErrorLog {
 case class SeamlessApplicationCreateResponse(
   result: Boolean,
   application_id: String,
-  description: String
-) {
+  description: String) {
 
 }
 
@@ -189,8 +184,7 @@ object SeamlessApplicationCreateResponse {
 case class SeamlessApplicationStatus(
   status: String,
   total_signers: Int,
-  signatures: Int
-) {
+  signatures: Int) {
 
 }
 
@@ -208,8 +202,7 @@ case class SeamlessSigner(
   reference: String,
   color: String,
   signer_type: String,
-  signer_key: String
-)
+  signer_key: String)
 
 object SeamlessSigner {
   implicit val jsonFormat: OFormat[SeamlessSigner] = Json.format[SeamlessSigner]

@@ -2,7 +2,6 @@ package services.forms
 
 import com.typesafe.config.ConfigFactory
 import models.UserValues
-import modules.JobModule
 import org.specs2.mock.Mockito
 import play.api.Configuration
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -27,10 +26,8 @@ class ContactInfoServiceImplSpec extends PlaySpecification with Mockito {
           UserValues(
             identity.userID,
             Map("attr1_1" -> JsString("a"), "attr2_1" -> JsString("b"),
-              "attr1_2" -> JsString("y"), "attr2_2" -> JsString("z"))
-          ),
-          testMapping
-        )
+              "attr1_2" -> JsString("y"), "attr2_2" -> JsString("z"))),
+          testMapping)
 
         identity.firstName.get must be equalTo "a b"
       }
@@ -45,11 +42,8 @@ class ContactInfoServiceImplSpec extends PlaySpecification with Mockito {
           UserValues(
             identity.userID,
             Map(
-              "attr1_2" -> JsString("y"), "attr2_2" -> JsString("z")
-            )
-          ),
-          testMapping
-        )
+              "attr1_2" -> JsString("y"), "attr2_2" -> JsString("z"))),
+          testMapping)
 
         identity.firstName.get must be equalTo "y z"
       }
@@ -65,10 +59,8 @@ class ContactInfoServiceImplSpec extends PlaySpecification with Mockito {
           identity,
           UserValues(
             identity.userID,
-            Map("attr1_1" -> JsString("a"))
-          ),
-          testMapping
-        )
+            Map("attr1_1" -> JsString("a"))),
+          testMapping)
 
         identity.firstName.get must be equalTo "unchanged"
       }
@@ -84,10 +76,8 @@ class ContactInfoServiceImplSpec extends PlaySpecification with Mockito {
           identity,
           UserValues(
             identity.userID,
-            Map()
-          ),
-          testMapping
-        )
+            Map()),
+          testMapping)
 
         identity.firstName.get must be equalTo "unchanged"
       }
@@ -103,9 +93,7 @@ class ContactInfoServiceImplSpec extends PlaySpecification with Mockito {
           identity.userID,
           UserValues(
             identity.userID,
-            Map("veteran_first_name" -> JsString("joe"))
-          )
-        )
+            Map("veteran_first_name" -> JsString("joe"))))
 
         Await.result(future, Duration.Inf).ok must beTrue
 

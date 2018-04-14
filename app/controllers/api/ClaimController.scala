@@ -29,8 +29,7 @@ class ClaimController @Inject() (
   val recipientService: RecipientService,
   silhouette: Silhouette[DefaultEnv],
   faxSubmissionService: FaxSubmissionService,
-  emailSubmissionService: EmailSubmissionService
-) extends Controller {
+  emailSubmissionService: EmailSubmissionService) extends Controller {
 
   private[this] val logger = getLogger
 
@@ -38,8 +37,7 @@ class ClaimController @Inject() (
     request =>
       {
         claimDAO.findClaims(request.identity.userID).map(
-          claims => Ok(Json.toJson(claims))
-        )
+          claims => Ok(Json.toJson(claims)))
       }
   }
 
@@ -86,23 +84,19 @@ class ClaimController @Inject() (
                       MDC.withCtx(
                         "userID" -> claim.userID.toString,
                         "claimID" -> claim.claimID.toString,
-                        "claimKey" -> claim.key
-                      ) {
+                        "claimKey" -> claim.key) {
                           logger.info(s"Created new claim: $claim")
                         }
                       Created(Json.toJson(claim))
                   }
                   case None => Future.successful(InternalServerError(Json.obj(
-                    "status" -> "error"
-                  )))
+                    "status" -> "error")))
                 }
                 case _ => Future.successful(InternalServerError(Json.obj(
-                  "status" -> "error"
-                )))
+                  "status" -> "error")))
               }
             }
-          }
-        )
+          })
       }
   }
 
@@ -134,9 +128,7 @@ class ClaimController @Inject() (
             Future.successful(InternalServerError(
               Json.obj(
                 "status" -> "error",
-                "errors" -> Json.toJson(failures)
-              )
-            ))
+                "errors" -> Json.toJson(failures))))
           }
       }
       case _ => Future.successful(InternalServerError)
@@ -162,8 +154,7 @@ class ClaimController @Inject() (
                 }
               case None => Future.successful(NotFound)
             }
-          }
-        )
+          })
       }
   }
 }

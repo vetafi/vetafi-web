@@ -12,15 +12,12 @@ class PDFMappingTest extends PlaySpecification {
           ("field1", JsString("a")),
           ("field2", JsString("b")),
           ("field3", JsString("c")),
-          ("field4", JsString("abc"))
-        ),
+          ("field4", JsString("abc"))),
         Seq(
           PDFFieldLocator(Some("pdfField"), "field1", Some(0), None, None, None, None),
           PDFFieldLocator(Some("pdfField"), "field2", Some(1), None, None, None, None),
           PDFFieldLocator(Some("pdfField"), "field3", Some(2), None, None, None, None),
-          PDFFieldLocator(Some("pdfSubSField"), "field4", Some(0), None, Some(0), Some(1), None)
-        )
-      )
+          PDFFieldLocator(Some("pdfSubSField"), "field4", Some(0), None, Some(0), Some(1), None)))
 
       "a b c" must be equalTo stringStringMap("pdfField")
       "a" must be equalTo stringStringMap("pdfSubSField")

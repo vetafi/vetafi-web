@@ -20,8 +20,7 @@ import scala.concurrent.Future
  */
 class ContactInfoServiceImpl @Inject() (
   userDAO: UserDAO,
-  userValuesDAO: UserValuesDAO
-) extends ContactInfoService {
+  userValuesDAO: UserValuesDAO) extends ContactInfoService {
   /**
    * This is a mapping of user value keys to User object properties
    * The keys and values are interpreted as JSON path strings
@@ -33,8 +32,7 @@ class ContactInfoServiceImpl @Inject() (
     },
       Seq(
         Seq("veteran_first_name", "veteran_middle_initial", "veteran_last_name"),
-        Seq("claimant_first_name", "claimant_middle_initial", "claimant_last_name")
-      )),
+        Seq("claimant_first_name", "claimant_middle_initial", "claimant_last_name"))),
 
     ((user: User, value: Option[String]) => {
       user.copy(contact = Some(user.contact.get.copy(address =
@@ -74,20 +72,17 @@ class ContactInfoServiceImpl @Inject() (
     ((user: User, value: Option[String]) => {
       user.copy(lastName = value)
     },
-      Seq(Seq("veteran_last_name"), Seq("claimant_last_name")))
-  )
+      Seq(Seq("veteran_last_name"), Seq("claimant_last_name"))))
 
   def getPreferredConcatenatedValue(keySets: Seq[Seq[String]], values: Map[String, JsValue]): Option[String] = {
     for (keys: Seq[String] <- keySets) {
       if (keys.map(values.contains).reduce(_ && _)) {
         return Some(
           JsonUnbox.unbox(keys.map(values.apply)
-          .reduce(
-            (a: JsValue, b: JsValue) => {
-              JsString(JsonUnbox.unbox(a).toString + " " + JsonUnbox.unbox(b).toString)
-            }
-          )).toString
-        )
+            .reduce(
+              (a: JsValue, b: JsValue) => {
+                JsString(JsonUnbox.unbox(a).toString + " " + JsonUnbox.unbox(b).toString)
+              })).toString)
       }
     }
     None
@@ -96,8 +91,7 @@ class ContactInfoServiceImpl @Inject() (
   def updateUserInfo(
     user: User,
     values: UserValues,
-    mapping: Map[(User, Option[String]) => User, Seq[Seq[String]]] = USER_VALUES_TO_USER_PROPERTIES_MAPPING
-  ): Future[WriteResult] = {
+    mapping: Map[(User, Option[String]) => User, Seq[Seq[String]]] = USER_VALUES_TO_USER_PROPERTIES_MAPPING): Future[WriteResult] = {
     var updatedUser: User = user.copy()
 
     if (updatedUser.contact.isEmpty) {
@@ -110,8 +104,7 @@ class ContactInfoServiceImpl @Inject() (
           case foundValue if foundValue.nonEmpty => t._1(u, foundValue)
           case _ => u
         }
-      }
-    )
+      })
 
     userDAO.save(finalUser)
   }

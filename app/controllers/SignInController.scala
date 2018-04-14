@@ -43,8 +43,7 @@ class SignInController @Inject() (
   credentialsProvider: CredentialsProvider,
   socialProviderRegistry: SocialProviderRegistry,
   configuration: Configuration,
-  clock: Clock
-)
+  clock: Clock)
   extends Controller with I18nSupport {
 
   /**
@@ -56,11 +55,8 @@ class SignInController @Inject() (
     Future.successful(Ok(
       views.html.authLayout(
         "login-view",
-        ""
-      )(
-          views.html.signinForm(routes.SocialAuthController.authenticate("idme").url)
-        )
-    ))
+        "")(
+          views.html.signinForm(routes.SocialAuthController.authenticate("idme").url))))
   }
 
   /**
@@ -74,7 +70,7 @@ class SignInController @Inject() (
       data => {
         val credentials = Credentials(data.email, data.password)
         credentialsProvider.authenticate(credentials).flatMap { loginInfo =>
-          val result = Redirect(routes.GulpAssets.index())
+          val result = Redirect("/")
           userService.retrieve(loginInfo).flatMap {
             case Some(user) =>
               val c: Config = configuration.underlying
@@ -83,8 +79,7 @@ class SignInController @Inject() (
                   authenticator.copy(
                     expirationDateTime = clock.now + c.as[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorExpiry"),
                     idleTimeout = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"),
-                    cookieMaxAge = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge")
-                  )
+                    cookieMaxAge = c.getAs[FiniteDuration]("silhouette.authenticator.rememberMe.cookieMaxAge"))
                 case authenticator => authenticator
               }.flatMap { authenticator =>
                 silhouette.env.eventBus.publish(LoginEvent(user, request))
@@ -98,7 +93,6 @@ class SignInController @Inject() (
           case e: ProviderException =>
             Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.credentials"))
         }
-      }
-    )
+      })
   }
 }

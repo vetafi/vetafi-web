@@ -2,7 +2,7 @@ error.email = Valid email required
 error.required = This field is required
 invalid.credentials = Invalid credentials!
 access.denied = Access denied!
-could.not.authenticate = Could not authenticate with social provider! Please try again!
+could.not.authenticate = Could not authenticate with ID.me. Please try signing up by email.
 
 home.title = Silhouette - Home
 sign.up.title = Silhouette - Sign Up

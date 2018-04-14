@@ -1,20 +1,20 @@
-import com.typesafe.sbt.SbtScalariform._
-import PlayGulp._
 import scalariform.formatter.preferences._
-import com.typesafe.sbt.packager.archetypes.ServerLoader
+import com.typesafe.sbt.packager.debian._
+
+// TODO https://github.com/yohangz/java-play-angular-seed/blob/master/ui/src/app/app.module.ts
 
 name := "vetafi-web"
 
-version := "0.0.4"
+version := "0.0.5"
 
 scalaVersion := "2.11.8"
 autoScalaLibrary := false
 
-maintainer in Linux := "Jeff Quinn jeff@vetafi.org"
+version in Debian := version.toString
 
-packageSummary in Linux := "Vetafi.org web application."
+maintainer in Debian := "Jeff Quinn jeff@vetafi.org"
 
-serverLoading in Debian := ServerLoader.Systemd
+packageSummary in Debian := "Vetafi.org web application."
 
 unmanagedClasspath in Runtime += baseDirectory.value / "conf"
 
@@ -25,17 +25,17 @@ resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven
 
 libraryDependencies ++= Seq(
   "org.reactivemongo" %% "play2-reactivemongo" % "0.12.1",
-  "com.mohiva" %% "play-silhouette" % "4.0.0",
-  "com.mohiva" %% "play-silhouette-password-bcrypt" % "4.0.0",
-  "com.mohiva" %% "play-silhouette-persistence" % "4.0.0",
-  "com.mohiva" %% "play-silhouette-crypto-jca" % "4.0.0",
-  "com.mohiva" %% "play-silhouette-persistence-reactivemongo" % "4.0.1",
+  "com.mohiva" %% "play-silhouette" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-persistence" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.0",
+  "com.mohiva" %% "play-silhouette-persistence-reactivemongo" % "5.0.1",
   "net.codingwell" %% "scala-guice" % "4.0.1",
   "com.iheart" %% "ficus" % "1.2.6",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.5.0-akka-2.4.x",
-  "com.mohiva" %% "play-silhouette-testkit" % "4.0.0" % "test",
-  "com.digitaltangible" %% "play-guard" % "2.0.0",
+  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % "test",
+  "com.digitaltangible" %% "play-guard" % "2.1.0",
   "me.lessis" %% "retry" % "0.2.0",
   ("com.github.dcoker" % "biscuit-java" % "ebed4b3a238a45c007da138175f1132a6bf26b71").exclude("com.github.emstlk", "nacl4s_2.10"),
   "net.logstash.logback" % "logstash-logback-encoder" % "4.11",
@@ -50,13 +50,17 @@ libraryDependencies ++= Seq(
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
   "com.twilio.sdk" % "twilio" % "7.14.5",
   "com.amazonaws" % "aws-java-sdk-ses" % "1.11.244",
+  "com.typesafe.play" %% "play-json-joda" % "2.6.8",
   specs2 % Test,
-  filters
+  filters,
+  guice
 )
 
 lazy val root = (project in file("."))
-    .enablePlugins(PlayScala, DebianPlugin)
-    .settings(playGulpSettings)
+    .enablePlugins(PlayScala, DebianPlugin).settings(
+      watchSources ++= (baseDirectory.value / "public/ui" ** "*").get
+    )
+
 
 routesGenerator := InjectedRoutesGenerator
 
@@ -66,15 +70,6 @@ routesImport += "utils.route.Binders._"
 // Scalariform settings
 //********************************************************
 
-defaultScalariformSettings
-
-ScalariformKeys.preferences := ScalariformKeys.preferences.value
-  .setPreference(FormatXml, false)
-  .setPreference(DoubleIndentClassDeclaration, false)
-  .setPreference(PreserveDanglingCloseParenthesis, true)
-
-
-// play-gulp settings
-unmanagedResourceDirectories in Assets <+= (gulpDirectory in Compile)(base => base / "build")
+scalariformPreferences := scalariformPreferences.value
 
 fork in run := false

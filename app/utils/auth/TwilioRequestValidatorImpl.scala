@@ -10,14 +10,12 @@ import utils.secrets.SecretsManager
 
 class TwilioRequestValidatorImpl @Inject() (
   configuration: Configuration,
-  secretsManager: SecretsManager
-) extends TwilioRequestValidator {
+  secretsManager: SecretsManager) extends TwilioRequestValidator {
 
   private[this] val logger = getLogger
 
   lazy val authToken: String = secretsManager.getSecretUtf8(
-    configuration.getString("twilio.authTokenSecretName").get
-  )
+    configuration.get[String]("twilio.authTokenSecretName"))
 
   def validateBodyParams(params: Map[String, Seq[String]], signature: String, uri: String): Boolean = {
     import scala.collection.JavaConversions._
@@ -36,8 +34,7 @@ class TwilioRequestValidatorImpl @Inject() (
     if (requestValidator.validate(
       uri,
       paramsMap,
-      signature
-    )) {
+      signature)) {
       logger.info("Validation succeeded.")
       true
     } else {

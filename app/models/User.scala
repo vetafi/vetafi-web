@@ -7,8 +7,7 @@ import com.mohiva.play.silhouette.api.{ AuthInfo, Identity, LoginInfo }
 
 case class Contact(
   phoneNumber: Option[String],
-  address: Option[Address]
-)
+  address: Option[Address])
 
 object Contact {
   implicit val jsonFormat = Json.format[Contact]
@@ -35,8 +34,7 @@ case class User(
   email: Option[String],
   avatarURL: Option[String],
   activated: Boolean,
-  contact: Option[Contact]
-) extends Identity {
+  contact: Option[Contact]) extends Identity {
 
   /**
    * Tries to construct a name.

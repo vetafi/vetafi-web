@@ -8,7 +8,6 @@ import com.mohiva.play.silhouette.impl.authenticators.CookieAuthenticator
 import com.mohiva.play.silhouette.test.FakeEnvironment
 import com.typesafe.config.ConfigFactory
 import models.User
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.specs2.specification.Scope
 import play.api.{ Application, Configuration }
@@ -43,8 +42,7 @@ trait SilhouetteTestContext extends Scope {
     email = None,
     avatarURL = None,
     activated = true,
-    contact = None
-  )
+    contact = None)
 
   /**
    * A Silhouette fake environment.
@@ -53,7 +51,6 @@ trait SilhouetteTestContext extends Scope {
 
   lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

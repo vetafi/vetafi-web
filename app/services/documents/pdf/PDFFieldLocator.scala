@@ -15,8 +15,7 @@ case class PDFFieldLocator(
   substringStart: Option[Int] = None,
   substringEnd: Option[Int] = None,
   // Is the value a base64 encoded image to be overlayed?
-  isBase64ImageBlob: Option[Boolean] = None
-) {
+  isBase64ImageBlob: Option[Boolean] = None) {
 }
 
 object PDFFieldLocator {

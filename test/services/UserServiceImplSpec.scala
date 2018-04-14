@@ -8,7 +8,6 @@ import com.mohiva.play.silhouette.api.LoginInfo
 import com.typesafe.config.ConfigFactory
 import models.{ FormConfig, User, UserValues }
 import models.daos.{ UserDAO, UserValuesDAO }
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.mockito.{ ArgumentCaptor, Matchers, Mockito }
 import org.specs2.specification.Scope
@@ -56,12 +55,10 @@ trait UserServiceTestContext extends Scope {
     email = Some("user@website.com"),
     avatarURL = None,
     activated = true,
-    contact = None
-  )
+    contact = None)
 
   lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }
@@ -73,20 +70,17 @@ class UserServiceImplSpec extends PlaySpecification {
       Mockito.when(mockUserDAO.save(Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(
           ok = true,
-          1, 1, Seq(), Seq(), None, None, None
-        )))
+          1, 1, Seq(), Seq(), None, None, None)))
 
       Mockito.when(mockUserValuesDAO.update(Matchers.eq(userID), Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(
           ok = true,
-          1, 1, Seq(), Seq(), None, None, None
-        )))
+          1, 1, Seq(), Seq(), None, None, None)))
 
       Mockito.when(mockUserValuesDAO.initialize(Matchers.eq(userID)))
         .thenReturn(Future.successful(UpdateWriteResult(
           ok = true,
-          1, 1, Seq(), Seq(), None, None, None
-        )))
+          1, 1, Seq(), Seq(), None, None, None)))
 
       Mockito.when(mockUserValuesDAO.find(Matchers.eq(userID)))
         .thenReturn(Future.successful(Some(UserValues(userID, Map()))))
@@ -106,8 +100,7 @@ class UserServiceImplSpec extends PlaySpecification {
 
         Mockito.verify(mockUserValuesDAO, Mockito.times(1)).update(
           mockUserValuesDAOUpdateIdCapture.capture(),
-          mockUserValuesDAOUpdateValuesCapture.capture()
-        )
+          mockUserValuesDAOUpdateValuesCapture.capture())
 
         mockUserValuesDAOUpdateValuesCapture.getValue must be equalTo Map("test" -> JsString("test"))
       }

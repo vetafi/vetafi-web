@@ -27,8 +27,7 @@ class TwilioController @Inject() (
   silhouette: Silhouette[TwilioAuthEnv],
   val basicAuthErrorHandler: BasicAuthErrorHandler,
   val pdfConcatenator: PDFConcatenator,
-  val twilioRequestValidator: TwilioRequestValidator
-) extends Controller {
+  val twilioRequestValidator: TwilioRequestValidator) extends Controller {
 
   private[this] val logger = getLogger
 
@@ -117,8 +116,7 @@ class TwilioController @Inject() (
     implicit request =>
       MDC.withCtx(
         "userID" -> userID.toString,
-        "claimID" -> claimID.toString
-      ) {
+        "claimID" -> claimID.toString) {
           logger.info("Received request from twilio for claim PDF.")
 
           val formsFuture = formDAO.find(userID, claimID)
@@ -127,13 +125,11 @@ class TwilioController @Inject() (
             forms => {
               logger.info(s"Will concatenate ${forms.length} forms.")
               Future.sequence(forms.par.map(documentService.render).seq)
-            }
-          ).map(
+            }).map(
               (pdfs: Seq[Array[Byte]]) => {
                 logger.info(s"Concatenating ${pdfs.length} of sizes " + pdfs.map(_.length).toString())
                 pdfConcatenator.concat(pdfs)
-              }
-            ).map {
+              }).map {
                 (concatedPdf: Array[Byte]) =>
                   logger.info("Serving concatenated pdf.")
                   Ok(concatedPdf).as("application/pdf")

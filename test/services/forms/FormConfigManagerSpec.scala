@@ -4,7 +4,6 @@ import com.google.inject.AbstractModule
 import com.typesafe.config.ConfigFactory
 import models.FormConfig
 import models.TemplateOptions.AutocompleteType
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.specs2.mock.Mockito
 import org.specs2.specification.Scope
@@ -28,7 +27,6 @@ trait FormConfigManagerSpecTestContext extends Scope {
 
   lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }
@@ -59,7 +57,7 @@ class FormConfigManagerSpec extends PlaySpecification with Mockito {
 
         val formConfigs: Map[String, FormConfig] = formManager.getFormConfigs
 
-        formConfigs.keys must be equalTo config.getStringList("forms.enabled")
+        formConfigs.keys must be equalTo config.getStringList("forms.enabled").toSet
       }
     }
   }

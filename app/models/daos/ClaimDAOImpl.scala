@@ -32,8 +32,7 @@ class ClaimDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Cl
       {
         (agg: Seq[Claim], str: Claim) => Cursor.Cont(agg :+ str)
       },
-      Cursor.FailOnError()
-    ))
+      Cursor.FailOnError()))
   }
 
   /**
@@ -50,8 +49,7 @@ class ClaimDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Cl
   override def findIncompleteClaim(userID: UUID): Future[Option[Claim]] = {
     val query = Json.obj(
       "userID" -> userID,
-      "state" -> Claim.State.INCOMPLETE.toString
-    )
+      "state" -> Claim.State.INCOMPLETE.toString)
     collection.flatMap({
       _.find(query).one[Claim]
     })
@@ -64,8 +62,7 @@ class ClaimDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Cl
       key = key,
       Claim.State.INCOMPLETE,
       java.util.Date.from(Instant.now()),
-      Seq.empty[Recipient]
-    )
+      Seq.empty[Recipient])
 
     collection.flatMap(_.insert(claim))
   }
@@ -77,15 +74,11 @@ class ClaimDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Cl
         Json.obj("$set" -> Json.obj(
           "state" -> Claim.State.SUBMITTED,
           "stateUpdatedAt" -> java.util.Date.from(Instant.now()),
-          "submissions" -> Json.toJson(submissions)
-        ))
-      )
-    )
+          "submissions" -> Json.toJson(submissions)))))
   }
 
   override def save(userID: UUID, claimID: UUID, claim: Claim): Future[WriteResult] = {
     collection.flatMap(
-      _.update(Json.obj("userID" -> userID, "claimID" -> claimID), claim)
-    )
+      _.update(Json.obj("userID" -> userID, "claimID" -> claimID), claim))
   }
 }

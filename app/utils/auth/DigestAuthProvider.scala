@@ -19,15 +19,13 @@ case class DigestParameters(
   uri: String,
   nonce: String,
   response: String,
-  method: String
-) {
+  method: String) {
 
 }
 
 class DigestAuthProvider(
   protected val authInfoRepository: AuthInfoRepository,
-  protected val passwordHasherRegistry: PasswordHasherRegistry
-)(implicit val executionContext: ExecutionContext)
+  protected val passwordHasherRegistry: PasswordHasherRegistry)(implicit val executionContext: ExecutionContext)
   extends RequestProvider with PasswordProvider with Logger {
 
   private[this] val logger = getLogger
@@ -35,8 +33,7 @@ class DigestAuthProvider(
   override def id: String = DigestAuthProvider.ID
 
   private val expectedHeaders: Set[String] = Set(
-    "username", "realm", "uri", "nonce", "response"
-  )
+    "username", "realm", "uri", "nonce", "response")
 
   def getDigestParameters(request: RequestHeader): Option[DigestParameters] = {
     if (!request.headers.toMap.contains(HeaderNames.AUTHORIZATION)) return None
@@ -54,8 +51,7 @@ class DigestAuthProvider(
         val key = data(0)
         val value = data(1).replaceAll("\"", "")
         (key, value)
-      }
-    ).filter {
+      }).filter {
         case (key, value) =>
           StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)
       }.toMap
@@ -67,8 +63,7 @@ class DigestAuthProvider(
         params("uri"),
         params("nonce"),
         params("response"),
-        request.method
-      ))
+        request.method))
     } else {
       val missingHeaders = expectedHeaders -- params.keys.toSet
       logger.info(s"Digest auth request missing required headers: ${missingHeaders.toString()}")

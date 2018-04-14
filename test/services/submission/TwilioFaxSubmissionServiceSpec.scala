@@ -35,12 +35,11 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       val twilioUser = TwilioUser(UUID.randomUUID(), "password")
       val claimSubmission = ClaimSubmission(
         claimSubmissionID = UUID.randomUUID(),
-        to = application.configuration.getString("submission.va.fax").get,
-        from = application.configuration.getString("twilio.number").get,
+        to = application.configuration.get[String]("submission.va.fax"),
+        from = application.configuration.get[String]("twilio.number"),
         method = application.injector.instanceOf(classOf[FaxSubmissionService]).getClass.getSimpleName,
         dateSubmitted = Date.from(Instant.EPOCH),
-        success = true
-      )
+        success = true)
 
       val fakeTwilioFax = TwilioFax(
         userID = UUID.randomUUID(),
@@ -51,8 +50,7 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
         to = "toNumber",
         from = "fromNumber",
         twilioFaxId = "twilioFaxId",
-        status = "status"
-      )
+        status = "status")
 
       Mockito.when(mockSecretsManager.getSecretUtf8(Matchers.any()))
         .thenReturn("SECRET")
@@ -98,12 +96,11 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
       val twilioUser = TwilioUser(UUID.randomUUID(), "password")
       val claimSubmission = ClaimSubmission(
         claimSubmissionID = UUID.randomUUID(),
-        to = application.configuration.getString("submission.va.fax").get,
-        from = application.configuration.getString("twilio.number").get,
+        to = application.configuration.get[String]("submission.va.fax"),
+        from = application.configuration.get[String]("twilio.number"),
         method = application.injector.instanceOf(classOf[FaxSubmissionService]).getClass.getSimpleName,
         dateSubmitted = Date.from(Instant.EPOCH),
-        success = true
-      )
+        success = true)
 
       val fakeTwilioFax = TwilioFax(
         userID = UUID.randomUUID(),
@@ -114,8 +111,7 @@ class TwilioFaxSubmissionServiceSpec extends PlaySpecification {
         to = "toNumber",
         from = "fromNumber",
         twilioFaxId = "twilioFaxId",
-        status = "status"
-      )
+        status = "status")
 
       Mockito.when(mockSecretsManager.getSecretUtf8(Matchers.any()))
         .thenReturn("SECRET")

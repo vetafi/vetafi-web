@@ -48,8 +48,7 @@ class FormDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends For
       {
         (agg: Seq[ClaimForm], str: ClaimForm) => Cursor.Cont(agg :+ str)
       },
-      Cursor.FailOnError()
-    ))
+      Cursor.FailOnError()))
   }
 
   override def save(userID: UUID, claimID: UUID, key: String, claimForm: ClaimForm): Future[WriteResult] = {
@@ -72,7 +71,6 @@ class FormDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends For
           )
         )
         */
-      )
-    )
+      ))
   }
 }

@@ -28,10 +28,8 @@ class ITextPDFConcatenator extends PDFConcatenator {
           val reader = new PdfReader(bytes)
 
           (1 to reader.getNumberOfPages).foreach(
-            i => pdfCopy.addPage(pdfCopy.getImportedPage(reader, i))
-          )
-        }
-      )
+            i => pdfCopy.addPage(pdfCopy.getImportedPage(reader, i)))
+        })
     } finally {
       document.close()
     }

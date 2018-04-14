@@ -13,9 +13,7 @@ object VetafiSignUpForm {
   val form = Form(
     mapping(
       "email" -> email,
-      "password" -> nonEmptyText
-    )(Data.apply)(Data.unapply)
-  )
+      "password" -> nonEmptyText)(Data.apply)(Data.unapply))
 
   /**
    * The form data.
@@ -25,6 +23,5 @@ object VetafiSignUpForm {
    */
   case class Data(
     email: String,
-    password: String
-  )
+    password: String)
 }

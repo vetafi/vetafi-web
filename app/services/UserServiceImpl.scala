@@ -21,8 +21,7 @@ import scala.concurrent.Future
 class UserServiceImpl @Inject() (
   userDAO: UserDAO,
   userValuesDAO: UserValuesDAO,
-  userValuesService: UserValuesService
-) extends UserService {
+  userValuesService: UserValuesService) extends UserService {
 
   private[this] val logger = getLogger
 
@@ -67,8 +66,7 @@ class UserServiceImpl @Inject() (
                     Future.successful(user)
                   case _ => throw new RuntimeException
                 }
-              }
-            )
+              })
           case _ => throw new RuntimeException
         }
       case _ => throw new RuntimeException
@@ -91,8 +89,7 @@ class UserServiceImpl @Inject() (
           lastName = profile.lastName,
           fullName = profile.fullName,
           email = profile.email,
-          avatarURL = profile.avatarURL
-        )).flatMap(_ => userDAO.find(user.userID))
+          avatarURL = profile.avatarURL)).flatMap(_ => userDAO.find(user.userID))
           .flatMap((saved: Option[User]) => {
             Future.successful(saved.get)
           })
@@ -107,8 +104,7 @@ class UserServiceImpl @Inject() (
           email = profile.email,
           avatarURL = profile.avatarURL,
           activated = true,
-          contact = None
-        )).flatMap(_ => userDAO.find(id))
+          contact = None)).flatMap(_ => userDAO.find(id))
           .flatMap((saved: Option[User]) => {
             Future.successful(saved.get)
           })

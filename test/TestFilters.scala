@@ -11,9 +11,7 @@ import play.filters.headers.SecurityHeadersFilter
 class TestFilters @Inject() (
   csrfFilter: CSRFFilter,
   securityHeadersFilter: SecurityHeadersFilter,
-  guardFilter: GuardFilter
-) extends DefaultHttpFilters(
+  guardFilter: GuardFilter) extends DefaultHttpFilters(
   csrfFilter,
   securityHeadersFilter,
-  guardFilter
-)
+  guardFilter)

@@ -8,7 +8,7 @@ import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.impl.providers._
 import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{ Action, Controller }
+import play.api.mvc.{ AbstractController, ControllerComponents }
 import _root_.services.UserService
 import utils.auth.DefaultEnv
 
@@ -24,13 +24,13 @@ import scala.concurrent.Future
  * @param socialProviderRegistry The social provider registry.
  */
 class SocialAuthController @Inject() (
-  val messagesApi: MessagesApi,
+  override val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
-  socialProviderRegistry: SocialProviderRegistry
-)
-  extends Controller with I18nSupport with Logger {
+  socialProviderRegistry: SocialProviderRegistry,
+  components: ControllerComponents)
+  extends AbstractController(components) with I18nSupport with Logger {
 
   /**
    * Authenticates a user against a social provider.
@@ -49,7 +49,7 @@ class SocialAuthController @Inject() (
             authInfo <- authInfoRepository.save(profile.loginInfo, authInfo)
             authenticator <- silhouette.env.authenticatorService.create(profile.loginInfo)
             value <- silhouette.env.authenticatorService.init(authenticator)
-            result <- silhouette.env.authenticatorService.embed(value, Redirect(routes.GulpAssets.index()))
+            result <- silhouette.env.authenticatorService.embed(value, Redirect("/"))
           } yield {
             silhouette.env.eventBus.publish(LoginEvent(user, request))
             result

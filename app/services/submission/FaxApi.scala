@@ -10,6 +10,5 @@ trait FaxApi {
     claim: Claim,
     claimSubmission: ClaimSubmission,
     twilioUser: TwilioUser,
-    faxResource: URL
-  ): TwilioFax
+    faxResource: URL): TwilioFax
 }

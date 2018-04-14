@@ -9,7 +9,6 @@ import com.typesafe.config.ConfigFactory
 import controllers.SilhouetteTestContext
 import models._
 import models.daos.{ ClaimDAO, FormDAO }
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{ Application, Configuration }
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -37,9 +36,7 @@ trait ClaimControllerTestContext extends SilhouetteTestContext {
     stateUpdatedAt = java.util.Date.from(Instant.now()),
     recipients = Seq(
       Recipient(Recipient.Type.FAX, "18005555555"),
-      Recipient(Recipient.Type.EMAIL, "test@x.com")
-    )
-  )
+      Recipient(Recipient.Type.EMAIL, "test@x.com")))
 
   var testForm = ClaimForm("VBA-21-0966-ARE", Map.empty[String, JsValue], identity.userID, testIncompleteClaim.claimID, 0, 0, 0, 0)
 
@@ -69,7 +66,6 @@ trait ClaimControllerTestContext extends SilhouetteTestContext {
 
   override lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

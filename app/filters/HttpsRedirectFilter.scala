@@ -12,15 +12,13 @@ import scala.concurrent.Future
 
 class HttpsRedirectFilter(
   enabled: Boolean = HttpsRedirectFilter.DEFAULT_ENABLED,
-  sslPort: String = HttpsRedirectFilter.DEFAULT_SSL_PORT
-)(implicit val mat: Materializer) extends Filter {
+  sslPort: String = HttpsRedirectFilter.DEFAULT_SSL_PORT)(implicit val mat: Materializer) extends Filter {
 
   @Inject
   def this(configuration: Configuration)(implicit mat: Materializer) =
     this(
-      configuration.getBoolean("httpsRedirectFilter.enabled").getOrElse(DEFAULT_ENABLED),
-      configuration.getString("httpsRedirectFilter.sslPort").getOrElse(DEFAULT_SSL_PORT)
-    )
+      configuration.getOptional[Boolean]("httpsRedirectFilter.enabled").getOrElse(DEFAULT_ENABLED),
+      configuration.getOptional[String]("httpsRedirectFilter.sslPort").getOrElse(DEFAULT_SSL_PORT))
 
   def apply(nextFilter: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] =
     if (enabled && !request.secure)

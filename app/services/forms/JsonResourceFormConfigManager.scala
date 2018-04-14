@@ -14,12 +14,11 @@ import scala.collection.JavaConversions._
 class JsonResourceFormConfigManager @Inject() (configuration: Configuration) extends FormConfigManager {
 
   private[this] val logger = getLogger
-  val formlyConfigsDir: String = configuration.getString("forms.formlyConfigsDir").get
+  val formlyConfigsDir: String = configuration.get[String]("forms.formlyConfigsDir")
 
   def loadFormConfigFromResource(formKey: String): FormConfig = {
     val inputStream = getClass.getClassLoader.getResource(
-      s"$formlyConfigsDir/$formKey.json"
-    ).openStream()
+      s"$formlyConfigsDir/$formKey.json").openStream()
     val result: JsResult[FormConfig] = Json.parse(inputStream).validate[FormConfig]
 
     result.fold(
@@ -30,17 +29,15 @@ class JsonResourceFormConfigManager @Inject() (configuration: Configuration) ext
       },
       formConfig => {
         formConfig
-      }
-    )
+      })
   }
 
   lazy val formConfigs: Map[String, FormConfig] = {
-    val enabledForms = configuration.getStringList("forms.enabled").get
+    val enabledForms = configuration.get[Seq[String]]("forms.enabled")
     enabledForms.map(
       (formKey: String) => {
         (formKey, loadFormConfigFromResource(formKey))
-      }
-    ).toMap
+      }).toMap
   }
 
   override def getFormConfigs: Map[String, FormConfig] = formConfigs

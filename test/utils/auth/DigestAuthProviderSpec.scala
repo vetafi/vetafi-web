@@ -33,8 +33,7 @@ class DigestAuthProviderSpec extends PlaySpecification {
       val digestAuthProvider = new DigestAuthProvider(mockAuthInfoRepository, mockPasswordHasherRegistry)
 
       val request = FakeRequest(play.api.http.HttpVerbs.GET, "/test").withHeaders(
-        HeaderNames.AUTHORIZATION -> s"Digest realm=realm"
-      )
+        HeaderNames.AUTHORIZATION -> s"Digest realm=realm")
 
       val authenticated: Future[Option[LoginInfo]] = digestAuthProvider.authenticate(request)
 
@@ -59,12 +58,10 @@ class DigestAuthProviderSpec extends PlaySpecification {
         uri = "/test",
         nonce = "nonce",
         response = "none",
-        method = "GET"
-      ), "different_password")
+        method = "GET"), "different_password")
 
       val request = FakeRequest(play.api.http.HttpVerbs.GET, "/test").withHeaders(
-        HeaderNames.AUTHORIZATION -> s"Digest realm=realm,uri=/test,username=username,auth=qop,nonce=nonce,response=$response"
-      )
+        HeaderNames.AUTHORIZATION -> s"Digest realm=realm,uri=/test,username=username,auth=qop,nonce=nonce,response=$response")
 
       val authenticated: Future[Option[LoginInfo]] = digestAuthProvider.authenticate(request)
 
@@ -89,12 +86,10 @@ class DigestAuthProviderSpec extends PlaySpecification {
         uri = "/test",
         nonce = "nonce",
         response = "none",
-        method = "GET"
-      ), "password")
+        method = "GET"), "password")
 
       val request = FakeRequest(play.api.http.HttpVerbs.GET, "/test").withHeaders(
-        HeaderNames.AUTHORIZATION -> s"Digest realm=realm,uri=/test,username=username,auth=qop,nonce=nonce,response=$response"
-      )
+        HeaderNames.AUTHORIZATION -> s"Digest realm=realm,uri=/test,username=username,auth=qop,nonce=nonce,response=$response")
 
       val authenticated: Future[Option[LoginInfo]] = digestAuthProvider.authenticate(request)
 

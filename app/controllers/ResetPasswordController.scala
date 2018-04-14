@@ -32,8 +32,7 @@ class ResetPasswordController @Inject() (
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,
-  authTokenService: AuthTokenService
-)
+  authTokenService: AuthTokenService)
   extends Controller with I18nSupport {
 
   /**
@@ -47,9 +46,7 @@ class ResetPasswordController @Inject() (
       case Some(authToken) =>
         Ok(
           views.html.authLayout("password-reset-view", "")(
-            views.html.passwordReset(ResetPasswordForm.form, token)
-          )
-        )
+            views.html.passwordReset(ResetPasswordForm.form, token)))
       case None => Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link"))
     }
   }
@@ -72,8 +69,7 @@ class ResetPasswordController @Inject() (
                 Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset"))
               }
             case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link")))
-          }
-        )
+          })
       case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link")))
     }
   }

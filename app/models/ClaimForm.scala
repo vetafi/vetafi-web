@@ -20,8 +20,7 @@ case class ClaimForm(
   externalFormId: Option[String] = None,
   externalApplicationId: Option[String] = None,
   externalSignatureLink: Option[String] = None,
-  isSigned: Boolean = false
-) {
+  isSigned: Boolean = false) {
 
 }
 

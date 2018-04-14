@@ -63,8 +63,7 @@ class UserDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Use
    */
   override def updateContactInfo(user: User): Future[WriteResult] = {
     collection.flatMap(
-      _.update(Json.obj("userID" -> user.userID.toString), Json.obj("$set" -> Json.toJson(user.contact)))
-    )
+      _.update(Json.obj("userID" -> user.userID.toString), Json.obj("$set" -> Json.toJson(user.contact))))
   }
 
   /**
@@ -75,8 +74,7 @@ class UserDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Use
    */
   override def setInactive(user: User): Future[WriteResult] = {
     collection.flatMap(
-      _.update(Json.obj("userID" -> user.userID.toString), Json.obj("$set" -> Json.obj("activated" -> false)))
-    )
+      _.update(Json.obj("userID" -> user.userID.toString), Json.obj("$set" -> Json.obj("activated" -> false))))
   }
 }
 
