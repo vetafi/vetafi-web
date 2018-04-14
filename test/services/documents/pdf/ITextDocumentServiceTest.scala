@@ -4,14 +4,14 @@ import java.util.UUID
 
 import com.typesafe.config.ConfigFactory
 import models.ClaimForm
-import org.mockito.{Matchers, Mockito}
+import org.mockito.{ Matchers, Mockito }
 import play.api.Configuration
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{ JsString, Json }
 import play.api.test.PlaySpecification
 import services.documents.ITextDocumentService
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 class ITextDocumentServiceTest extends PlaySpecification {
 
