@@ -12,8 +12,8 @@ class TwilioRequestValidatorImplSpec extends PlaySpecification {
       val mockConfiguration = Mockito.mock(classOf[Configuration])
       val mockSecretsManager = Mockito.mock(classOf[SecretsManager])
 
-      Mockito.when(mockConfiguration.getString("twilio.authTokenSecretName"))
-        .thenReturn(Some("fakeSecretName"))
+      Mockito.when(mockConfiguration.get[String]("twilio.authTokenSecretName"))
+        .thenReturn("fakeSecretName")
 
       Mockito.when(mockSecretsManager.getSecretUtf8("fakeSecretName")).thenReturn("12345")
 
@@ -29,8 +29,7 @@ class TwilioRequestValidatorImplSpec extends PlaySpecification {
           "Caller" -> "+14158675309",
           "Digits" -> "1234",
           "From" -> "+14158675309",
-          "To" -> "+18005551212"
-        )
+          "To" -> "+18005551212")
 
       val result: Boolean = requestValidator.authenticate(request)
 

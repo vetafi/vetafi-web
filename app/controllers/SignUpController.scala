@@ -7,7 +7,6 @@ import javax.inject.Inject
 import _root_.services.{ AuthTokenService, UserService }
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
-import com.mohiva.play.silhouette.api.services.{ AuthenticatorResult, AvatarService }
 import com.mohiva.play.silhouette.api.util.{ Clock, PasswordHasherRegistry, PasswordInfo }
 import com.mohiva.play.silhouette.impl.providers._
 import forms.VetafiSignUpForm
@@ -29,7 +28,6 @@ import scala.concurrent.duration.FiniteDuration
  * @param userService            The user service implementation.
  * @param authInfoRepository     The auth info repository implementation.
  * @param authTokenService       The auth token service implementation.
- * @param avatarService          The avatar service implementation.
  * @param passwordHasherRegistry The password hasher registry.
  */
 class SignUpController @Inject() (
@@ -38,11 +36,9 @@ class SignUpController @Inject() (
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   authTokenService: AuthTokenService,
-  avatarService: AvatarService,
   passwordHasherRegistry: PasswordHasherRegistry,
   configuration: Configuration,
-  clock: Clock
-)
+  clock: Clock)
   extends Controller with I18nSupport {
 
   /**
@@ -54,11 +50,8 @@ class SignUpController @Inject() (
     Future.successful(Ok(
       views.html.authLayout(
         "signup-view",
-        ""
-      )(
-          views.html.signupForm(routes.SocialAuthController.authenticate("idme").url)
-        )
-    ))
+        "")(
+          views.html.signupForm(routes.SocialAuthController.authenticate("idme").url))))
   }
 
   def maybeCreateUser(loginInfo: LoginInfo, data: VetafiSignUpForm.Data): Future[Option[User]] = {
@@ -75,8 +68,7 @@ class SignUpController @Inject() (
           email = Some(data.email),
           avatarURL = None,
           activated = true,
-          contact = None
-        )
+          contact = None)
         userService.save(newUser).map((u) => {
           Some(u)
         })
@@ -90,32 +82,34 @@ class SignUpController @Inject() (
    */
   def submit: Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     VetafiSignUpForm.form.bindFromRequest.fold(
-      error => Future.successful(BadRequest(error.errorsAsJson)),
+      error =>
+        Future.successful(
+          BadRequest(
+            views.html.authLayout(
+              "signup-view",
+              error.errorsAsJson.toString())(
+                views.html.signupForm(routes.SocialAuthController.authenticate("idme").url)))),
       data => {
         val loginInfo = LoginInfo(CredentialsProvider.ID, data.email)
         val authInfo = passwordHasherRegistry.current.hash(data.password)
 
         val result = for {
-          avatar <- avatarService.retrieveURL(data.email)
           maybeUser: Option[User] <- maybeCreateUser(loginInfo, data)
           authInfo <- authInfoRepository.add(loginInfo, authInfo)
         } yield {
           val expirationDateTime = clock.now.withDurationAdded(
-            configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorExpiry").get,
-            1
-          )
+            configuration.getMillis("silhouette.authenticator.rememberMe.authenticatorExpiry"),
+            1)
           val idleTimeout = Some(FiniteDuration(
-            configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorIdleTimeout").get,
-            TimeUnit.MILLISECONDS
-          ))
+            configuration.getMillis("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"),
+            TimeUnit.MILLISECONDS))
           val cookieMaxAge = Some(FiniteDuration(
-            configuration.getMilliseconds("silhouette.authenticator.rememberMe.authenticatorIdleTimeout").get,
-            TimeUnit.MILLISECONDS
-          ))
+            configuration.getMillis("silhouette.authenticator.rememberMe.authenticatorIdleTimeout"),
+            TimeUnit.MILLISECONDS))
 
           maybeUser match {
             case None =>
-              Future.successful(Redirect(routes.GulpAssets.index()))
+              Future.successful(Redirect("/"))
             case Some(user) =>
               silhouette.env.eventBus.publish(SignUpEvent(user, request))
               silhouette.env.authenticatorService.create(loginInfo).map {
@@ -123,18 +117,16 @@ class SignUpController @Inject() (
                   authenticator.copy(
                     expirationDateTime = expirationDateTime,
                     idleTimeout = idleTimeout,
-                    cookieMaxAge = cookieMaxAge
-                  )
+                    cookieMaxAge = cookieMaxAge)
               }.flatMap { authenticator =>
                 silhouette.env.eventBus.publish(LoginEvent(user, request))
                 silhouette.env.authenticatorService.init(authenticator).flatMap { v =>
-                  silhouette.env.authenticatorService.embed(v, Redirect(routes.GulpAssets.index()))
+                  silhouette.env.authenticatorService.embed(v, Redirect("/"))
                 }
               }
           }
         }
         result.flatMap(identity)
-      }
-    )
+      })
   }
 }

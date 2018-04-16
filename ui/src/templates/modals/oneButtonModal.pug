@@ -1,8 +1,0 @@
-extends modalLayout.pug
-
-block modalContent
-  div#basic-one-button-modal
-    div.message
-      p {{message}}
-    div.button-wrapper
-      button(ng-click="$close()") {{btnText || 'OK'}}

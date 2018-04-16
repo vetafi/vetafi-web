@@ -24,8 +24,7 @@ class ApplicationController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   socialProviderRegistry: SocialProviderRegistry,
   redirectSecuredErrorHandler: RedirectSecuredErrorHandler,
-  configuration: Configuration
-)
+  configuration: Configuration)
   extends Controller with I18nSupport {
 
   /**
@@ -34,12 +33,12 @@ class ApplicationController @Inject() (
    * @return The result to display.
    */
   def signOut: Action[AnyContent] = silhouette.SecuredAction(redirectSecuredErrorHandler).async { implicit request =>
-    val result = Redirect(routes.GulpAssets.index())
+    val result = Redirect("/")
     silhouette.env.eventBus.publish(LogoutEvent(request.identity, request))
     silhouette.env.authenticatorService.discard(request.authenticator, result)
   }
 
   def googleForm: Action[AnyContent] = Action {
-    Ok(views.html.googleForm(configuration.getString("google.formUrl")))
+    Ok(views.html.googleForm(configuration.getOptional[String]("google.formUrl")))
   }
 }

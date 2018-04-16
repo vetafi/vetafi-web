@@ -11,7 +11,6 @@ import com.mohiva.play.silhouette.persistence.daos.{ DelegableAuthInfoDAO, Mongo
 import com.typesafe.config.ConfigFactory
 import models.daos.{ ClaimDAO, FormDAO, TwilioFaxDAO }
 import models._
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.mockito.Mockito
 import org.specs2.specification.Scope
@@ -36,8 +35,8 @@ trait TwilioControllerTestContext extends Scope {
   val mockClaimDao: ClaimDAO = Mockito.mock(classOf[ClaimDAO])
   val mockTwilioFaxDao: TwilioFaxDAO = Mockito.mock(classOf[TwilioFaxDAO])
 
-  Mockito.when(mockConfiguration.getString("twilio.authTokenSecretName"))
-    .thenReturn(Some("fakeSecretName"))
+  Mockito.when(mockConfiguration.get[String]("twilio.authTokenSecretName"))
+    .thenReturn("fakeSecretName")
   Mockito.when(mockSecretsManager.getSecretUtf8("fakeSecretName")).thenReturn("12345")
   val requestValidator = new TwilioRequestValidatorImpl(mockConfiguration, mockSecretsManager)
 
@@ -55,8 +54,7 @@ trait TwilioControllerTestContext extends Scope {
     email = None,
     avatarURL = None,
     activated = true,
-    contact = None
-  )
+    contact = None)
 
   var testClaim = Claim(
     userID = identity.userID,
@@ -66,9 +64,7 @@ trait TwilioControllerTestContext extends Scope {
     stateUpdatedAt = java.util.Date.from(Instant.now()),
     recipients = Seq(
       Recipient(Recipient.Type.FAX, "18005555555"),
-      Recipient(Recipient.Type.EMAIL, "test@x.com")
-    )
-  )
+      Recipient(Recipient.Type.EMAIL, "test@x.com")))
 
   var testForm = ClaimForm("VBA-21-0966-ARE", Map.empty[String, JsValue], identity.userID, testClaim.claimID, 0, 0, 0, 0)
 
@@ -88,7 +84,6 @@ trait TwilioControllerTestContext extends Scope {
 
   val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

@@ -15,8 +15,7 @@ import scala.concurrent.Future
 
 class MailingListController @Inject() (
   val mailingListDAO: MailingListDAO,
-  silhouette: Silhouette[DefaultEnv]
-) extends Controller {
+  silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   def subscribe(): Action[JsValue] = silhouette.UnsecuredAction.async(BodyParsers.parse.json) {
     request =>
@@ -26,22 +25,18 @@ class MailingListController @Inject() (
         mailingListSubscriptionResult.fold(
           errors => {
             Future.successful(BadRequest(Json.obj(
-              "status" -> "error", "message" -> JsError.toJson(errors)
-            )))
+              "status" -> "error", "message" -> JsError.toJson(errors))))
           },
           subscription => {
             mailingListDAO.save(subscription.email).flatMap {
               case ok if ok.ok =>
                 Future.successful(Ok(Json.obj(
-                  "status" -> "success", "message" -> "Subscription successful."
-                )))
+                  "status" -> "success", "message" -> "Subscription successful.")))
               case _ =>
                 Future.successful(InternalServerError(Json.obj(
-                  "status" -> "error", "message" -> "Subscription failed, database error."
-                )))
+                  "status" -> "error", "message" -> "Subscription failed, database error.")))
             }
-          }
-        )
+          })
       }
   }
 }

@@ -13,8 +13,7 @@ case class TwilioFax(
   to: String,
   from: String,
   twilioFaxId: String,
-  status: String
-) {
+  status: String) {
 
 }
 

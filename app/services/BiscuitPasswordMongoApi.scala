@@ -26,33 +26,29 @@ class BiscuitPasswordMongoApi @Inject() (
   configuration: Configuration,
   environment: Environment,
   applicationLifecycle: ApplicationLifecycle,
-  staticSecrets: StaticSecrets
-) extends ReactiveMongoApi {
+  staticSecrets: StaticSecrets) extends ReactiveMongoApi {
 
   private[this] val logger = getLogger
 
   lazy val driver: MongoDriver = new MongoDriver(
     Some(configuration.underlying),
-    Some(this.getClass.getClassLoader)
-  )
+    Some(this.getClass.getClassLoader))
 
   lazy val getNotProdUri: ParsedURI = {
-    MongoConnection.parseURI(configuration.getString("mongodb.uri").get).get
+    MongoConnection.parseURI(configuration.get[String]("mongodb.uri")).get
   }
 
   def getProdConnection(driver: MongoDriver): MongoConnection = {
     val options: MongoConnectionOptions = MongoConnectionOptions(
       sslEnabled = true,
-      sslAllowsInvalidCert = true
-    )
+      sslAllowsInvalidCert = true)
 
     logger.info(s"Authenticating with ${staticSecrets.mongoUsername} to ${staticSecrets.mongoHosts}")
 
     val con = driver.connection(
       staticSecrets.mongoHosts.split(","),
       options,
-      name = Some("vetafi-prod-mongo-connection")
-    )
+      name = Some("vetafi-prod-mongo-connection"))
     con.authenticate("admin", staticSecrets.mongoUsername, staticSecrets.mongoPassword)
     con
   }
@@ -68,7 +64,7 @@ class BiscuitPasswordMongoApi @Inject() (
 
   override def database: Future[DefaultDB] = {
     val db = environment.mode match {
-      case Mode.Prod => configuration.getString("mongodb.db").getOrElse("test")
+      case Mode.Prod => configuration.getOptional[String]("mongodb.db").getOrElse("test")
       case _ => getNotProdUri.db.get
     }
 
@@ -79,7 +75,7 @@ class BiscuitPasswordMongoApi @Inject() (
 
   override def db: DefaultDB = {
     val db = environment.mode match {
-      case Mode.Prod => configuration.getString("mongodb.db").getOrElse("test")
+      case Mode.Prod => configuration.getOptional[String]("mongodb.db").getOrElse("test")
       case _ => getNotProdUri.db.get
     }
 

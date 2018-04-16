@@ -9,7 +9,6 @@ import com.typesafe.config.ConfigFactory
 import controllers.SilhouetteTestContext
 import models._
 import models.daos.{ ClaimDAO, FormDAO, UserDAO, UserValuesDAO }
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{ Application, Configuration }
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -34,16 +33,13 @@ trait FormControllerTestContext extends SilhouetteTestContext {
     stateUpdatedAt = java.util.Date.from(Instant.now()),
     recipients = Seq(
       Recipient(Recipient.Type.FAX, "18005555555"),
-      Recipient(Recipient.Type.EMAIL, "test@x.com")
-    )
-  )
+      Recipient(Recipient.Type.EMAIL, "test@x.com")))
 
   var testForm = ClaimForm("VBA-21-0966-ARE", Map.empty[String, JsValue], identity.userID, testClaim.claimID, 0, 0, 0, 0)
 
   var testUserValues = UserValues(
     identity.userID,
-    Map.empty[String, JsValue]
-  )
+    Map.empty[String, JsValue])
 
   val mockClaimDao: ClaimDAO = Mockito.mock(classOf[ClaimDAO])
   val mockFormDao: FormDAO = Mockito.mock(classOf[FormDAO])
@@ -68,7 +64,6 @@ trait FormControllerTestContext extends SilhouetteTestContext {
 
   override lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

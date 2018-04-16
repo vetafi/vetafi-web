@@ -4,6 +4,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
+import com.mohiva.play.silhouette.api.actions.SecuredRequest
 import models.daos.{ FormDAO, UserValuesDAO }
 import models.{ ClaimForm, User }
 import play.api.Logger
@@ -26,8 +27,8 @@ class FormController @Inject() (
   val claimService: ClaimService,
   val contactInfoService: ContactInfoService,
   val documentService: DocumentService,
-  silhouette: Silhouette[DefaultEnv]
-) extends Controller {
+  components: ControllerComponents,
+  silhouette: Silhouette[DefaultEnv]) extends AbstractController(components) {
 
   private[this] val logger = getLogger
 
@@ -51,9 +52,9 @@ class FormController @Inject() (
       }
   }
 
-  def saveForm(claimID: UUID, formKey: String): Action[JsValue] =
-    silhouette.SecuredAction.async(BodyParsers.parse.json) {
-      request =>
+  def saveForm(claimID: UUID, formKey: String) =
+    silhouette.SecuredAction.async(parse.json) {
+      (request: SecuredRequest[DefaultEnv, JsValue]) =>
         {
           val dataResult = request.body.validate[Map[String, JsValue]]
 
@@ -61,8 +62,7 @@ class FormController @Inject() (
             errors => {
               logger.warn(s"saveForm validation errors: $errors")
               Future.successful(
-                BadRequest(Json.obj("status" -> "error", "message" -> JsError.toJson(errors)))
-              )
+                BadRequest(Json.obj("status" -> "error", "message" -> JsError.toJson(errors))))
             },
             (data: Map[String, JsValue]) => {
               formDAO.find(request.identity.userID, claimID, formKey).flatMap {
@@ -72,6 +72,7 @@ class FormController @Inject() (
 
                   val formWithSignatureStatus: ClaimForm =
                     formWithProgress.copy(isSigned = formWithProgress.responses.contains("signature"))
+                  logger.info(s"Form isSigned = ${formWithSignatureStatus.isSigned}")
 
                   (for {
                     formSaveFuture <- formDAO.save(request.identity.userID, claimID, formKey, formWithSignatureStatus)
@@ -86,8 +87,7 @@ class FormController @Inject() (
                 case None =>
                   Future.successful(NotFound)
               }
-            }
-          )
+            })
         }
     }
 
@@ -109,8 +109,7 @@ class FormController @Inject() (
             content =>
               logger.info(s"PDF rendered for user ${request.identity.userID}")
               Ok(content).as("application/pdf").withCookies(
-                Cookie("fileDownloadToken", "1", secure = false, httpOnly = false)
-              )
+                Cookie("fileDownloadToken", "1", secure = false, httpOnly = false))
           }
         case None =>
           Future.successful(NotFound)
@@ -147,8 +146,7 @@ class FormController @Inject() (
             throw new RuntimeException("Failed to update user info.")
         }
       case _ => Future.successful(
-        throw new RuntimeException("Failed to update user values.")
-      )
+        throw new RuntimeException("Failed to update user values."))
     }
   }
 }

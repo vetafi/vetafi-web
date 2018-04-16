@@ -8,13 +8,12 @@ import play.api.Configuration
 
 class ResourcesPDFTemplateProvider @Inject() (configuration: Configuration) extends PDFTemplateProvider {
 
-  val pdfTemplatesDir: String = configuration.getString("forms.pdfTemplatesDir").get
+  val pdfTemplatesDir: String = configuration.get[String]("forms.pdfTemplatesDir")
   lazy val pdfs: Map[String, Array[Byte]] = {
-    configuration.getStringSeq("forms.enabled").get.map(formKey =>
+    configuration.get[Seq[String]]("forms.enabled").map(formKey =>
       (
         formKey,
-        IOUtils.toByteArray(getClass.getClassLoader.getResourceAsStream(s"$pdfTemplatesDir/$formKey.pdf"))
-      )).toMap
+        IOUtils.toByteArray(getClass.getClassLoader.getResourceAsStream(s"$pdfTemplatesDir/$formKey.pdf")))).toMap
   }
 
   override def getTemplate(key: String): ByteArrayInputStream = {

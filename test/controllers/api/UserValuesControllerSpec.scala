@@ -2,7 +2,7 @@ package controllers.api
 
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.test._
-import controllers.{ CSRFTest, SilhouetteTestContext }
+import controllers.SilhouetteTestContext
 import models.{ ClaimForm, UserValues }
 import org.mockito.{ Matchers, Mockito }
 import play.api.libs.json.{ JsResult, JsString, Json }
@@ -13,7 +13,7 @@ import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
-class UserValuesControllerSpec extends PlaySpecification with CSRFTest {
+class UserValuesControllerSpec extends PlaySpecification {
 
   "The `getUserValues` action" should {
     "return 401 if unauthorized" in new UserValuesControllerTestContext {

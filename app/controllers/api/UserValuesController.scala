@@ -17,8 +17,7 @@ import scala.concurrent.Future
 class UserValuesController @Inject() (
   val reactiveMongoApi: ReactiveMongoApi,
   val userValuesDAO: UserValuesDAO,
-  silhouette: Silhouette[DefaultEnv]
-) extends Controller {
+  silhouette: Silhouette[DefaultEnv]) extends Controller {
 
   def getUserValues: Action[AnyContent] = silhouette.SecuredAction.async {
     request =>

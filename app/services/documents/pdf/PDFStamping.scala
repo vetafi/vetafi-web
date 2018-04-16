@@ -29,8 +29,7 @@ object PDFStamping {
       rectVals(0).toFloat,
       rectVals(1).toFloat,
       rectVals(2).toFloat,
-      rectVals(3).toFloat
-    )
+      rectVals(3).toFloat)
   }
 
   private[this] def get2xRectangleForField(fields: AcroFields, key: String): Rectangle = {
@@ -44,8 +43,7 @@ object PDFStamping {
       rectVals(0).toFloat,
       (rectVals(1) - ((rectVals(3) - rectVals(1)) / 2)).toFloat,
       rectVals(2).toFloat,
-      (rectVals(3) + ((rectVals(3) - rectVals(1)) / 2)).toFloat
-    )
+      (rectVals(3) + ((rectVals(3) - rectVals(1)) / 2)).toFloat)
   }
 
   private[this] def placeImageInRectangle(image: Image, rectangle: Rectangle): Unit = {
@@ -64,8 +62,7 @@ object PDFStamping {
     value: Boolean,
     form: AcroFields,
     stamper: PdfStamper,
-    reader: PdfReader
-  ): Unit = {
+    reader: PdfReader): Unit = {
     if (value) {
       form.setField(key, ACRO_FORM_CHECKED)
 
@@ -81,8 +78,7 @@ object PDFStamping {
         linkLocation,
         PdfAnnotation.HIGHLIGHT_INVERT,
         reader.getNumberOfPages,
-        destination
-      )
+        destination)
       link.setBorder(new PdfBorderArray(0, 0, 0))
       stamper.addAnnotation(link, pageIdx)
     }
@@ -95,15 +91,16 @@ object PDFStamping {
     val pageIdx = getPageForField(form, key)
     val pdfContentByte = pdfStamper.getOverContent(pageIdx)
     val fontSize = ColumnText.fitText(
-      new Font(Font.FontFamily.COURIER),
+      FontFactory.getFont(FontFactory.COURIER),
       value,
       rectangle,
       MAX_FONT_SIZE,
-      PdfWriter.RUN_DIRECTION_DEFAULT
-    )
+      PdfWriter.RUN_DIRECTION_DEFAULT)
 
     // A litte bit smaller than the exact height of the box is easier to read
-    val font = new Font(Font.FontFamily.COURIER, fontSize * 0.90f)
+    val font = FontFactory.getFont(
+      FontFactory.COURIER,
+      fontSize * 0.90f)
     logger.info("Stamping " + value + " to rectangle " + rectangle + " with size " + fontSize)
     val text = new Chunk(value, font)
     text.setBackground(BaseColor.WHITE)
@@ -120,8 +117,7 @@ object PDFStamping {
     stamper: PdfStamper,
     acroFields: AcroFields,
     key: String,
-    base64Image: String
-  ): Unit = {
+    base64Image: String): Unit = {
 
     val imageBytes: Array[Byte] = Base64.getDecoder.decode(base64Image.split(",")(1))
     val image = Image.getInstance(imageBytes)
@@ -134,8 +130,7 @@ object PDFStamping {
     pdfTemplate: InputStream,
     responses: Map[String, JsValue],
     pdfFieldLocators: Seq[PDFFieldLocator],
-    outputStream: OutputStream
-  ): Unit = {
+    outputStream: OutputStream): Unit = {
     val reader = new PdfReader(pdfTemplate)
     val stamper = new PdfStamper(reader, outputStream)
 
@@ -175,8 +170,7 @@ object PDFStamping {
       }
 
       (1 to reader.getNumberOfPages).foreach(
-        i => form.removeFieldsFromPage(i)
-      )
+        i => form.removeFieldsFromPage(i))
       form.removeXfa()
       stamper.setFormFlattening(false)
     } finally {

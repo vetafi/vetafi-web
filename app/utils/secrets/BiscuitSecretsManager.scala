@@ -10,7 +10,7 @@ import com.amazonaws.services.kms.{ AWSKMS, AWSKMSClient }
 import com.amazonaws.util.EC2MetadataUtils
 import com.google.inject.Inject
 import com.wagmorelabs.biscuit.{ Biscuit, KeyManager, KmsKeyManager }
-import play.Configuration
+import play.api.Configuration
 import org.log4s._
 
 /**
@@ -35,13 +35,12 @@ class BiscuitSecretsManager @Inject() (configuration: Configuration) extends Sec
       .withKeyManager(kmsKeyManager)
       .build()
 
-    val yamlFileResource: String = configuration.getString("biscuit.yamlFile")
+    val yamlFileResource: String = configuration.get[String]("biscuit.yamlFile")
 
     logger.info(s"Reading secrets from $yamlFileResource")
 
     _biscuit.read(
-      new InputStreamReader(getClass.getClassLoader.getResource(yamlFileResource).openStream())
-    )
+      new InputStreamReader(getClass.getClassLoader.getResource(yamlFileResource).openStream()))
 
     _biscuit
   }
@@ -50,8 +49,7 @@ class BiscuitSecretsManager @Inject() (configuration: Configuration) extends Sec
     override def create(s: String): AWSKMS = {
       logger.info(s"Using the access key for biscuit ${credentialsProvider.getCredentials.getAWSAccessKeyId}")
       Region.getRegion(Regions.fromName(region)).createClient(
-        classOf[AWSKMSClient], credentialsProvider, null
-      )
+        classOf[AWSKMSClient], credentialsProvider, null)
     }
   }
 

@@ -16,31 +16,31 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 
+import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.ws.JsonBodyWritables._
+
 class SeamlessDocsServiceImpl @Inject() (
   wsClient: WSClient,
   configuration: Configuration,
   secretsManager: SecretsManager,
-  requestUtils: RequestUtils
-) extends SeamlessDocsService {
+  requestUtils: RequestUtils) extends SeamlessDocsService {
   private[this] val logger = getLogger
 
-  val url: String = configuration.getString("seamlessdocs.url").get
+  val url: String = configuration.get[String]("seamlessdocs.url")
   lazy val apiSecret: Array[Byte] = secretsManager.getSecret(
-    configuration.getString("seamlessdocs.secretKeySecretName").get
-  )
+    configuration.get[String]("seamlessdocs.secretKeySecretName"))
   lazy val apiKey: String = secretsManager.getSecretUtf8(
-    configuration.getString("seamlessdocs.apiKeySecretName").get
-  )
+    configuration.get[String]("seamlessdocs.apiKeySecretName"))
 
   lazy val delay: FiniteDuration = {
     val delay: Long = configuration.getMilliseconds("seamlessdocs.api.delay").getOrElse(15000)
     FiniteDuration(delay, TimeUnit.MILLISECONDS)
   }
 
-  lazy val retries: Int = configuration.getInt("seamlessdocs.api.retries").getOrElse(3)
+  lazy val retries: Int = configuration.getOptional[Int]("seamlessdocs.api.retries").getOrElse(3)
 
-  //lazy val apiSecret: Array[Byte] = configuration.getString("seamlessdocs.secret_key").get.getBytes
-  //lazy val apiKey: String = configuration.getString("seamlessdocs.api_key").get
+  //lazy val apiSecret: Array[Byte] = configuration.get[String]("seamlessdocs.secret_key").get.getBytes
+  //lazy val apiKey: String = configuration.get[String]("seamlessdocs.api_key").get
 
   private def signRequest(request: WSRequest): WSRequest = {
     requestUtils.sign(request, apiKey, apiSecret)
@@ -58,21 +58,17 @@ class SeamlessDocsServiceImpl @Inject() (
               errors => {
                 throw new RuntimeException(
                   s"Encountered JSON parsing errors: ${errors.toString} " +
-                    s"when parsing body: ${wsResponse.body}"
-                )
+                    s"when parsing body: ${wsResponse.body}")
               },
               success => {
                 Left(success)
-              }
-            )
+              })
           },
           success => {
             Right(success)
-          }
-        )
+          })
       case unexpectedStatus: Int => throw new RuntimeException(
-        s"Encountered unexpected status ($unexpectedStatus): " + wsResponse.body
-      )
+        s"Encountered unexpected status ($unexpectedStatus): " + wsResponse.body)
     }
   }
 
@@ -94,34 +90,27 @@ class SeamlessDocsServiceImpl @Inject() (
     name: String,
     email: String,
     signerId: String,
-    data: Map[String, JsValue]
-  ): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]] = {
+    data: Map[String, JsValue]): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]] = {
     val jsonPost = Json.obj(
       "signer_data" -> Json.obj(
         "fullname" -> "Vetafi",
-        "email" -> "admin@vetafi.org"
-      ),
+        "email" -> "admin@vetafi.org"),
       "recipients" -> Json.obj(
         signerId -> Json.obj(
           "fullname" -> name,
-          "email" -> email
-        )
-      )
-    )
+          "email" -> email)))
     val jsonPostWithAnswers: JsValue = jsonPost.deepMerge(JsObject(data))
 
     executeWithExponentialRetry[SeamlessApplicationCreateResponse](signRequest(
       wsClient
         .url(s"$url/api/form/$formId/prepare")
         .withBody(jsonPostWithAnswers)
-        .withMethod("POST")
-    ))
+        .withMethod("POST")))
   }
 
   override def formSubmit(
     formId: String,
-    data: Map[String, JsValue]
-  ): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]] = {
+    data: Map[String, JsValue]): Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]] = {
     val jsonPost = Json.obj()
     val jsonPostWithAnswers = jsonPost.deepMerge(JsObject(data))
 
@@ -129,16 +118,14 @@ class SeamlessDocsServiceImpl @Inject() (
       wsClient
         .url(s"$url/api/form/$formId/prepare")
         .withBody(jsonPostWithAnswers)
-        .withMethod("POST")
-    ))
+        .withMethod("POST")))
   }
 
   override def getInviteUrl(applicationId: String): Future[URL] = {
     executeWithExponentialRetry[Seq[String]](signRequest(
       wsClient
         .url(s"$url/api/application/$applicationId/get_invite_url")
-        .withMethod("GET")
-    )).map((result: Either[Seq[String], SeamlessErrorResponse]) => {
+        .withMethod("GET"))).map((result: Either[Seq[String], SeamlessErrorResponse]) => {
       result match {
         case Left(urlList) => new URL(urlList.head)
         case Right(error) => throw new RuntimeException(error.toString)
@@ -150,8 +137,7 @@ class SeamlessDocsServiceImpl @Inject() (
     executeWithExponentialRetry[SeamlessApplication](signRequest(
       wsClient
         .url(s"$url/api/application/$applicationId")
-        .withMethod("GET")
-    )).map((result: Either[SeamlessApplication, SeamlessErrorResponse]) => {
+        .withMethod("GET"))).map((result: Either[SeamlessApplication, SeamlessErrorResponse]) => {
       result match {
         case Left(application) => application
         case Right(errors) => throw new RuntimeException(errors.toString)
@@ -164,8 +150,7 @@ class SeamlessDocsServiceImpl @Inject() (
       wsClient
         .url(s"$url/api/application/$applicationId/update_pdf")
         .withBody(JsObject(Seq()))
-        .withMethod("POST")
-    )).map {
+        .withMethod("POST"))).map {
       case Left(urls) => Left(new URL(urls.head))
       case Right(error) => Right(error)
     }
@@ -175,8 +160,7 @@ class SeamlessDocsServiceImpl @Inject() (
     executeWithExponentialRetry[SeamlessApplicationStatus](signRequest(
       wsClient
         .url(s"$url/api/application/$applicationId/status")
-        .withMethod("GET")
-    )).map((result: Either[SeamlessApplicationStatus, SeamlessErrorResponse]) => {
+        .withMethod("GET"))).map((result: Either[SeamlessApplicationStatus, SeamlessErrorResponse]) => {
       result match {
         case Left(seamlessApplicationStatus) => seamlessApplicationStatus
         case Right(error) => throw new RuntimeException(error.toString)
@@ -188,8 +172,7 @@ class SeamlessDocsServiceImpl @Inject() (
     signRequest(
       wsClient
         .url(s"$url/api/account/forms")
-        .withMethod("GET")
-    )
+        .withMethod("GET"))
       .get()
       .map((wsResponse: WSResponse) => {
         wsResponse.status match {
@@ -203,8 +186,7 @@ class SeamlessDocsServiceImpl @Inject() (
     signRequest(
       wsClient
         .url(s"$url/api/form/$formId/elements")
-        .withMethod("GET")
-    )
+        .withMethod("GET"))
       .get()
       .map((wsResponse: WSResponse) => {
         wsResponse.status match {
@@ -218,8 +200,7 @@ class SeamlessDocsServiceImpl @Inject() (
     signRequest(
       wsClient
         .url(s"$url/api/form/$formId/properties")
-        .withMethod("GET")
-    )
+        .withMethod("GET"))
       .get()
       .map((wsResponse: WSResponse) => {
         wsResponse.status match {
@@ -233,8 +214,7 @@ class SeamlessDocsServiceImpl @Inject() (
     executeWithExponentialRetry[Seq[SeamlessSigner]](signRequest(
       wsClient
         .url(s"$url/api/form/$formId/signers")
-        .withMethod("GET")
-    ))
+        .withMethod("GET")))
       .map((result: Either[Seq[SeamlessSigner], SeamlessErrorResponse]) => {
         result match {
           case Left(signers) => signers

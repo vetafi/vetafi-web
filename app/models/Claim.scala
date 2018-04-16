@@ -7,8 +7,7 @@ import utils.EnumUtils
 
 case class Recipient(
   recipientType: Recipient.Type.Value,
-  value: String
-) {
+  value: String) {
 
 }
 
@@ -28,8 +27,7 @@ object Recipient {
 case class StartClaimRequest(
   key: String,
   description: String,
-  forms: Seq[String]
-) {
+  forms: Seq[String]) {
 
 }
 
@@ -47,8 +45,7 @@ case class Claim(
   state: Claim.State.Value,
   stateUpdatedAt: java.util.Date,
   recipients: Seq[Recipient],
-  submissions: Seq[ClaimSubmission] = Seq.empty[ClaimSubmission]
-) {
+  submissions: Seq[ClaimSubmission] = Seq.empty[ClaimSubmission]) {
 
 }
 
@@ -70,8 +67,7 @@ case class ClaimSubmission(
   from: String,
   method: String,
   dateSubmitted: java.util.Date,
-  success: Boolean
-) {
+  success: Boolean) {
 
 }
 

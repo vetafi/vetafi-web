@@ -13,12 +13,10 @@ class Filters @Inject() (
   securityHeadersFilter: SecurityHeadersFilter,
   guardFilter: GuardFilter,
   httpsRedirectFilter: HttpsRedirectFilter,
-  accessLogFilter: AccessLogFilter
-) extends DefaultHttpFilters(
+  accessLogFilter: AccessLogFilter) extends DefaultHttpFilters(
   csrfFilter,
   allowedHostsFilter,
   securityHeadersFilter,
   guardFilter,
   httpsRedirectFilter,
-  accessLogFilter
-)
+  accessLogFilter)

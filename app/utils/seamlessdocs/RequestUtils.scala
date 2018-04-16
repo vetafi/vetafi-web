@@ -25,8 +25,7 @@ class RequestUtils(clock: Clock) {
     request: WSRequest,
     apiKey: String,
     secretKey: Array[Byte],
-    nonceOption: Option[String] = None
-  ): WSRequest = {
+    nonceOption: Option[String] = None): WSRequest = {
     val epochTime: Long = clock.millis() / 1000
 
     val nonce: String = nonceOption match {
@@ -39,12 +38,10 @@ class RequestUtils(clock: Clock) {
       request.uri.getPath.stripPrefix("/api"),
       epochTime,
       nonce,
-      secretKey
-    )
+      secretKey)
 
     request.withHeaders(
       "Date" -> epochTime.toString,
-      "Authorization" -> s"HMAC-SHA256 api_key=$apiKey nonce=$nonce signature=$signature"
-    )
+      "Authorization" -> s"HMAC-SHA256 api_key=$apiKey nonce=$nonce signature=$signature")
   }
 }

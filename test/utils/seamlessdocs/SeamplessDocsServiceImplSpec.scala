@@ -4,7 +4,6 @@ import java.net.URL
 
 import com.google.inject.AbstractModule
 import com.typesafe.config.ConfigFactory
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.specs2.specification.Scope
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -35,9 +34,7 @@ trait SeamplessDocsServiceTestContext extends Scope {
             client,
             app.injector.instanceOf[Configuration],
             app.injector.instanceOf[SecretsManager],
-            app.injector.instanceOf[RequestUtils]
-          )
-        )
+            app.injector.instanceOf[RequestUtils]))
       }
     }
   }
@@ -61,7 +58,6 @@ trait SeamplessDocsServiceTestContext extends Scope {
 
   lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }
@@ -82,8 +78,7 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
                   |"result": true,
                   |"application_id": "AP15021000011409822",
                   |"description": "Submission successful"
-                  |}""".stripMargin
-              )
+                  |}""".stripMargin)
             } else {
               Results.Ok(
                 """
@@ -96,8 +91,7 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
                   |        }
                   |    ]
                   |}
-                """.stripMargin
-              )
+                """.stripMargin)
             }
           }
         })({ client: SeamlessDocsServiceImpl =>
@@ -127,8 +121,7 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
                 |        }
                 |    ]
                 |}
-              """.stripMargin
-            )
+              """.stripMargin)
           }
         })({ client: SeamlessDocsServiceImpl =>
 
@@ -152,8 +145,7 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
                 |"result": true,
                 |"application_id": "AP15021000011409822",
                 |"description": "Submission successful"
-                |}""".stripMargin
-            )
+                |}""".stripMargin)
           }
         })({ client: SeamlessDocsServiceImpl =>
 
@@ -172,16 +164,14 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
 
     "fail when endpoint returns unexpected json" in new SeamplessDocsServiceTestContext {
       new WithApplication(
-        application
-      ) {
+        application) {
         withTestClient(app)({
           case post if post.method == "POST" && post.uri ==
             "/api/form/test/prepare" => Action {
             Results.Ok(
               """{
                 |"unexpected": true
-                |}""".stripMargin
-            )
+                |}""".stripMargin)
           }
         })({ client: SeamlessDocsServiceImpl =>
 
@@ -244,8 +234,7 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
             Results.Ok(
               """{
                 |"unexpected": true
-                |}""".stripMargin
-            )
+                |}""".stripMargin)
           }
         })({ client: SeamlessDocsServiceImpl =>
 
@@ -301,8 +290,7 @@ class SeamplessDocsServiceImplSpec extends PlaySpecification {
                 |        "https://cdn.seamlessdocs.com/sig_files/xxx.pdf"
                 |    ],
                 |    "is_incomplete": "f"
-                |}""".stripMargin
-            )
+                |}""".stripMargin)
           }
         })({ client: SeamlessDocsServiceImpl =>
           val future: Future[SeamlessApplication] = client.getApplication("test")

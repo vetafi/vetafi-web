@@ -49,11 +49,9 @@ object PDFMapping {
 
     spec.filter(
       locator =>
-        checkboxResponses.contains(locator.elementId)
-    ).map(
+        checkboxResponses.contains(locator.elementId)).map(
         locator =>
-          (locator.pdfId.get, checkboxResponses(locator.elementId))
-      ).toMap
+          (locator.pdfId.get, checkboxResponses(locator.elementId))).toMap
   }
 
   /**
@@ -69,8 +67,7 @@ object PDFMapping {
 
     val checkboxLocators: Map[String, PDFFieldLocator] = spec.filter(_.idMap.nonEmpty).map(
       locator =>
-        (locator.elementId, locator)
-    ).toMap
+        (locator.elementId, locator)).toMap
 
     val filtered: Map[String, String] = stringInputs.filter {
       case (k, _) => checkboxLocators.contains(k)
@@ -94,8 +91,7 @@ object PDFMapping {
     }
 
     val stringLocators: Map[String, Seq[PDFFieldLocator]] = spec.filter(
-      locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob.getOrElse(false)
-    ).groupBy(_.elementId)
+      locator => locator.idMap.isEmpty && !locator.isBase64ImageBlob.getOrElse(false)).groupBy(_.elementId)
 
     val filtered: Map[String, String] = stringInputs.filter {
       case (k, _) => stringLocators.contains(k)
@@ -122,8 +118,7 @@ object PDFMapping {
       case (k, pdfFieldLocator) =>
         (k, concatenatedValues(k).substring(
           if (pdfFieldLocator.substringStart.get > concatenatedValues(k).length()) concatenatedValues(k).length() else pdfFieldLocator.substringStart.get,
-          if (pdfFieldLocator.substringEnd.get > concatenatedValues(k).length()) concatenatedValues(k).length() else pdfFieldLocator.substringEnd.get
-        ))
+          if (pdfFieldLocator.substringEnd.get > concatenatedValues(k).length()) concatenatedValues(k).length() else pdfFieldLocator.substringEnd.get))
     }
 
     concatenatedValues ++ substringAppliedValues

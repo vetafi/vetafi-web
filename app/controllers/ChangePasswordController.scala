@@ -32,8 +32,7 @@ class ChangePasswordController @Inject() (
   userService: UserService,
   credentialsProvider: CredentialsProvider,
   authInfoRepository: AuthInfoRepository,
-  passwordHasherRegistry: PasswordHasherRegistry
-)
+  passwordHasherRegistry: PasswordHasherRegistry)
   extends Controller with I18nSupport {
 
   /**
@@ -45,11 +44,8 @@ class ChangePasswordController @Inject() (
     Ok(
       views.html.authLayout(
         "change-password-view",
-        ""
-      )(
-          views.html.changePassword(ChangePasswordForm.form, request.identity)
-        )
-    )
+        "")(
+          views.html.changePassword(ChangePasswordForm.form, request.identity)))
   }
 
   /**
@@ -62,22 +58,16 @@ class ChangePasswordController @Inject() (
       errors => Future.successful(BadRequest(
         views.html.authLayout(
           "forgot-password-view",
-          "Error."
-        )(
-            views.html.changePassword(errors, request.identity)
-          )
-      )),
+          "Error.")(
+            views.html.changePassword(errors, request.identity)))),
       password => {
         val (currentPassword, newPassword, confirmPassword) = password
         if (newPassword != confirmPassword) {
           BadRequest(
             views.html.authLayout(
               "forgot-password-view",
-              "Passwords do not match."
-            )(
-                views.html.changePassword(ChangePasswordForm.form, request.identity)
-              )
-          )
+              "Passwords do not match.")(
+                views.html.changePassword(ChangePasswordForm.form, request.identity)))
         }
 
         val credentials = Credentials(request.identity.email.getOrElse(""), currentPassword)
@@ -89,7 +79,6 @@ class ChangePasswordController @Inject() (
         }.recover {
           case e: ProviderException => InternalServerError
         }
-      }
-    )
+      })
   }
 }

@@ -52,17 +52,14 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
 
       val idMap = Map(
         "Yes" -> "F[0].Page_1[0].Compensation[1]",
-        "No" -> "F[0].Page_1[0].Pension[1]"
-      )
+        "No" -> "F[0].Page_1[0].Pension[1]")
 
       PDFStamping.stampPdf(
         pdfTemplate,
         Map("veteran_previous_claim_with_va_y_n" -> JsString("Yes")),
         Seq(
-          PDFFieldLocator(None, "veteran_previous_claim_with_va_y_n", Some(0), Some(idMap), None, None, None)
-        ),
-        new FileOutputStream(tmpFile)
-      )
+          PDFFieldLocator(None, "veteran_previous_claim_with_va_y_n", Some(0), Some(idMap), None, None, None)),
+        new FileOutputStream(tmpFile))
 
       success
     }
@@ -76,10 +73,8 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
         pdfTemplate,
         Map("veteran_previous_claim_with_va_y_n" -> JsBoolean(true)),
         Seq(
-          PDFFieldLocator(Some("F[0].Page_1[0].Compensation[1]"), "veteran_previous_claim_with_va_y_n", None, None, None, None, None)
-        ),
-        new FileOutputStream(tmpFile)
-      )
+          PDFFieldLocator(Some("F[0].Page_1[0].Compensation[1]"), "veteran_previous_claim_with_va_y_n", None, None, None, None, None)),
+        new FileOutputStream(tmpFile))
 
       success
     }
@@ -98,25 +93,20 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
             elementId = "claimant_ssn",
             substringStart = Some(0),
             substringEnd = Some(3),
-            isBase64ImageBlob = None
-          ),
+            isBase64ImageBlob = None),
           PDFFieldLocator(
             pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_SecondTwoNumbers[0]"),
             elementId = "claimant_ssn",
             substringStart = Some(4),
             substringEnd = Some(6),
-            isBase64ImageBlob = None
-          ),
+            isBase64ImageBlob = None),
           PDFFieldLocator(
             pdfId = Some("F[0].Page_1[0].VeteransSocialSecurityNumber_LastFourNumbers[0]"),
             elementId = "claimant_ssn",
             substringStart = Some(7),
             substringEnd = Some(11),
-            isBase64ImageBlob = None
-          )
-        ),
-        new FileOutputStream(tmpFile)
-      )
+            isBase64ImageBlob = None)),
+        new FileOutputStream(tmpFile))
 
       success
     }
@@ -129,16 +119,12 @@ class PDFStampingTest extends PlaySpecification with TempDirectory {
         PDFStamping.stampPdf(
           pdfTemplate,
           Map(
-            "signature" -> JsString(SIGNATURE)
-          ),
+            "signature" -> JsString(SIGNATURE)),
           Seq(
             PDFFieldLocator(
               Some("F[0].Page_1[0].SignatureField1[0]"),
-              "signature", None, None, None, None, None
-            )
-          ),
-          new FileOutputStream(tmpFile)
-        )
+              "signature", None, None, None, None, None)),
+          new FileOutputStream(tmpFile))
 
         success
     }

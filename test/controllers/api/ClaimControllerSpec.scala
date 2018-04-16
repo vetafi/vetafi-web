@@ -4,7 +4,8 @@ import java.time.Instant
 import java.util.{ Date, UUID }
 
 import com.mohiva.play.silhouette.api.LoginInfo
-import controllers.{ CSRFTest, SilhouetteTestContext }
+import controllers.SilhouetteTestContext
+import play.api.test.CSRFTokenHelper._
 import com.mohiva.play.silhouette.test._
 import models._
 import org.mockito.{ Matchers, Mockito }
@@ -16,7 +17,7 @@ import utils.auth.DefaultEnv
 
 import scala.concurrent.Future
 
-class ClaimControllerSpec extends PlaySpecification with CSRFTest {
+class ClaimControllerSpec extends PlaySpecification {
 
   "The `subscribe` action" should {
     "return 200 and claim as json if found" in new ClaimControllerTestContext {
@@ -25,15 +26,16 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
         .thenReturn(Future.successful(Some(testIncompleteClaim)))
 
       new WithApplication(application) {
-        val getRequest: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(controllers.api.routes.ClaimController.getClaim(testIncompleteClaim.claimID))
-            .withAuthenticator(identity.loginInfo)
-        val csrfReq = addToken(getRequest)
-        val getResult = route(app, csrfReq).get
+        val controller: ClaimController = application.injector.instanceOf[ClaimController]
 
-        status(getResult) must be equalTo OK
+        val Some(result) = route(
+          app,
+          addCSRFToken(FakeRequest(routes.ClaimController.getClaim(testIncompleteClaim.claimID))
+            .withAuthenticator(identity.loginInfo)))
 
-        val userValuesValidation: JsResult[Claim] = contentAsJson(getResult).validate[Claim]
+        status(result) must be equalTo OK
+
+        val userValuesValidation: JsResult[Claim] = contentAsJson(result).validate[Claim]
 
         userValuesValidation.isSuccess must beTrue
       }
@@ -45,13 +47,14 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
         .thenReturn(Future.successful(None))
 
       new WithApplication(application) {
-        val getRequest: FakeRequest[AnyContentAsEmpty.type] =
-          FakeRequest(controllers.api.routes.ClaimController.getClaim(UUID.randomUUID()))
-            .withAuthenticator(identity.loginInfo)
-        val csrfReq = addToken(getRequest)
-        val getResult = route(app, csrfReq).get
+        val controller: ClaimController = application.injector.instanceOf[ClaimController]
 
-        status(getResult) must be equalTo NOT_FOUND
+        val Some(result) = route(
+          app,
+          addCSRFToken(FakeRequest(routes.ClaimController.getClaim(UUID.randomUUID()))
+            .withAuthenticator(identity.loginInfo)))
+
+        status(result) must be equalTo NOT_FOUND
       }
     }
   }
@@ -105,29 +108,24 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
               "form1",
               "description",
               VetafiInfo("title", "summary", required = true, "externalId1", "externalSignerId1"),
-              Seq()
-            ),
+              Seq()),
             "form2" -> FormConfig(
               "form2",
               "description",
               VetafiInfo("title", "summary", required = true, "externalId2", "externalSignerId2"),
-              Seq()
-            )
-          )
-        )
+              Seq())))
 
       new WithApplication(application) {
-        val req = FakeRequest(POST, controllers.api.routes.ClaimController.create().url)
+
+        val controller: ClaimController = application.injector.instanceOf[ClaimController]
+
+        val Some(result) = route(app, addCSRFToken(FakeRequest(routes.ClaimController.create())
+          .withMethod(POST)
           .withJsonBody(Json.toJson(StartClaimRequest(
             key = "claimKey",
             description = "description",
-            forms = Seq("form1", "form2")
-          )))
-          .withAuthenticator[DefaultEnv](identity.loginInfo)
-
-        val csrfReq = addToken(req)
-
-        val result: Future[Result] = route(app, csrfReq).get
+            forms = Seq("form1", "form2"))))
+          .withAuthenticator[DefaultEnv](identity.loginInfo)))
 
         status(result) must be equalTo CREATED
       }
@@ -139,17 +137,15 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
         .thenReturn(Future.successful(Some(testIncompleteClaim)))
 
       new WithApplication(application) {
-        val req = FakeRequest(POST, controllers.api.routes.ClaimController.create().url)
+        val controller: ClaimController = application.injector.instanceOf[ClaimController]
+
+        val Some(result) = route(app, addCSRFToken(FakeRequest(routes.ClaimController.create())
+          .withMethod(POST)
           .withJsonBody(Json.toJson(StartClaimRequest(
             key = "claimKey",
             description = "description",
-            forms = Seq("form1", "form2")
-          )))
-          .withAuthenticator[DefaultEnv](identity.loginInfo)
-
-        val csrfReq = addToken(req)
-
-        val result: Future[Result] = route(app, csrfReq).get
+            forms = Seq("form1", "form2"))))
+          .withAuthenticator[DefaultEnv](identity.loginInfo)))
 
         status(result) must be equalTo OK
       }
@@ -160,8 +156,7 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
     "return 200" in new ClaimControllerTestContext {
       val testRecipients = Seq(
         Recipient(Recipient.Type.FAX, "18005555555"),
-        Recipient(Recipient.Type.EMAIL, "test@x.com")
-      )
+        Recipient(Recipient.Type.EMAIL, "test@x.com"))
 
       Mockito.when(mockClaimDao.findClaim(identity.userID, testIncompleteClaim.claimID))
         .thenReturn(Future.successful(Some(testIncompleteClaim)))
@@ -172,8 +167,7 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
       Mockito.when(mockClaimDao.submit(
         Matchers.eq(identity.userID),
         Matchers.eq(testIncompleteClaim.claimID),
-        Matchers.any()
-      ))
+        Matchers.any()))
         .thenReturn(Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None)))
 
       Mockito.when(mockTwilioUserService.save(Matchers.any(), Matchers.any()))
@@ -184,11 +178,12 @@ class ClaimControllerSpec extends PlaySpecification with CSRFTest {
         .thenReturn(Future.successful(ClaimSubmission(UUID.randomUUID(), "", "", "", Date.from(Instant.EPOCH), true)))
 
       new WithApplication(application) {
-        val req = FakeRequest(POST, controllers.api.routes.ClaimController.submit(testIncompleteClaim.claimID).url)
+        val controller: ClaimController = application.injector.instanceOf[ClaimController]
+
+        val Some(result) = route(app, addCSRFToken(FakeRequest(
+          routes.ClaimController.submit(testIncompleteClaim.claimID))
           .withJsonBody(Json.toJson(testRecipients))
-          .withAuthenticator[DefaultEnv](identity.loginInfo)
-        val csrfReq = addToken(req)
-        val result: Future[Result] = route(app, csrfReq).get
+          .withAuthenticator[DefaultEnv](identity.loginInfo)))
 
         status(result) must be equalTo OK
       }

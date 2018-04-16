@@ -8,7 +8,6 @@ import com.typesafe.config.ConfigFactory
 import controllers.SilhouetteTestContext
 import models.daos.{ UserDAO, UserValuesDAO }
 import models._
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.mockito.Mockito
 import play.api.{ Application, Configuration }
@@ -36,7 +35,6 @@ trait UserValuesControllerTestContext extends SilhouetteTestContext {
 
   override lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

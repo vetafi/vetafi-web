@@ -21,12 +21,10 @@ class UserValuesServiceImplSpec extends PlaySpecification {
         email = Some("user@website.com"),
         avatarURL = None,
         activated = true,
-        contact = None
-      )
+        contact = None)
 
       val updatedValues = userValueService.updateUserValues(
-        fakeUser, UserValues(fakeUser.userID, Map())
-      )
+        fakeUser, UserValues(fakeUser.userID, Map()))
 
       updatedValues.values must be equalTo Map("contact_email" -> JsString("user@website.com"))
     }

@@ -28,8 +28,7 @@ class ForgotPasswordController @Inject() (
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   authTokenService: AuthTokenService,
-  mailerClient: MailerClient
-)
+  mailerClient: MailerClient)
   extends Controller with I18nSupport {
 
   /**
@@ -41,11 +40,8 @@ class ForgotPasswordController @Inject() (
     Future.successful(Ok(
       views.html.authLayout(
         "forgot-password-view",
-        ""
-      )(
-          views.html.forgotPassword(ForgotPasswordForm.form)
-        )
-    ))
+        "")(
+          views.html.forgotPassword(ForgotPasswordForm.form))))
   }
 
   /**
@@ -61,11 +57,8 @@ class ForgotPasswordController @Inject() (
       errors => Future.successful(BadRequest(
         views.html.authLayout(
           "forgot-password-view",
-          "Error."
-        )(
-            views.html.forgotPassword(errors)
-          )
-      )),
+          "Error.")(
+            views.html.forgotPassword(errors)))),
       email => {
         val loginInfo = LoginInfo(CredentialsProvider.ID, email)
         val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("reset.email.sent"))
@@ -79,13 +72,11 @@ class ForgotPasswordController @Inject() (
                 from = Messages("email.from"),
                 to = Seq(email),
                 bodyText = Some(views.txt.emails.resetPassword(user, url).body),
-                bodyHtml = Some(views.html.emails.resetPassword(user, url).body)
-              ))
+                bodyHtml = Some(views.html.emails.resetPassword(user, url).body)))
               result
             }
           case None => Future.successful(result)
         }
-      }
-    )
+      })
   }
 }

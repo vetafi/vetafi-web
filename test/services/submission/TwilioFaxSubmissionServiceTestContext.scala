@@ -11,7 +11,6 @@ import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import com.typesafe.config.ConfigFactory
 import models._
 import models.daos.{ ClaimDAO, TwilioFaxDAO }
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.mockito.Mockito
 import org.specs2.specification.Scope
@@ -48,8 +47,7 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
     email = None,
     avatarURL = None,
     activated = true,
-    contact = None
-  )
+    contact = None)
 
   var testClaim = Claim(
     userID = identity.userID,
@@ -59,9 +57,7 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
     stateUpdatedAt = java.util.Date.from(Instant.now()),
     recipients = Seq(
       Recipient(Recipient.Type.FAX, "18005555555"),
-      Recipient(Recipient.Type.EMAIL, "test@x.com")
-    )
-  )
+      Recipient(Recipient.Type.EMAIL, "test@x.com")))
 
   var testForm = ClaimForm("VBA-21-0966-ARE", Map.empty[String, JsValue], identity.userID, testClaim.claimID, 0, 0, 0, 0)
 
@@ -81,7 +77,6 @@ trait TwilioFaxSubmissionServiceTestContext extends Scope {
 
   val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }

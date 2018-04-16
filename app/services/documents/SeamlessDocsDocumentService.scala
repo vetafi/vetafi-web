@@ -22,8 +22,7 @@ class SeamlessDocsDocumentService @Inject() (
   formDAO: FormDAO,
   wSClient: WSClient,
   seamlessDocs: SeamlessDocsService,
-  formConfigManager: FormConfigManager
-) extends DocumentService {
+  formConfigManager: FormConfigManager) extends DocumentService {
 
   private[this] val logger = getLogger
 
@@ -42,8 +41,7 @@ class SeamlessDocsDocumentService @Inject() (
       user.name.getOrElse("Unknown User"),
       user.email.get,
       formConfigManager.getFormConfigs(form.key).vfi.externalSignerId,
-      formWithId.responses
-    ).map {
+      formWithId.responses).map {
         case Left(application) =>
           updateFormWithApplication(formWithId, application)
         case Right(error) =>
@@ -77,8 +75,7 @@ class SeamlessDocsDocumentService @Inject() (
     MDC.withCtx(
       "userID" -> form.userID.toString,
       "claimID" -> form.claimID.toString,
-      "form" -> form.key
-    ) {
+      "form" -> form.key) {
         logger.info("render called")
       }
     val formSubmissionFuture: Future[Either[SeamlessApplicationCreateResponse, SeamlessErrorResponse]] =
@@ -94,8 +91,7 @@ class SeamlessDocsDocumentService @Inject() (
       // If we get an error response, we already updated the pdf
       case Right(_) =>
         seamlessDocs.getApplication(form.externalApplicationId.get).map(
-          application => new URL(application.submission_pdf_url)
-        )
+          application => new URL(application.submission_pdf_url))
       case Left(pdfUrl) => Future.successful(pdfUrl)
     }
 
@@ -105,8 +101,7 @@ class SeamlessDocsDocumentService @Inject() (
           case ok if ok.ok => getPdf(pdfUrl)
           case _ => throw new RuntimeException
         }
-      }
-    )
+      })
   }
 
   /**
@@ -120,8 +115,7 @@ class SeamlessDocsDocumentService @Inject() (
     MDC.withCtx(
       "userID" -> form.userID.toString,
       "claimID" -> form.claimID.toString,
-      "form" -> form.key
-    ) {
+      "form" -> form.key) {
         logger.info("renderSigned called")
 
         (form.externalApplicationId match {
@@ -157,8 +151,7 @@ class SeamlessDocsDocumentService @Inject() (
     MDC.withCtx(
       "userID" -> form.userID.toString,
       "claimID" -> form.claimID.toString,
-      "form" -> form.key
-    ) {
+      "form" -> form.key) {
         logger.info("submitForSignature called")
       }
     maybeCreateApplication(form).flatMap(updatedForm => {
@@ -183,8 +176,7 @@ class SeamlessDocsDocumentService @Inject() (
     MDC.withCtx(
       "userID" -> form.userID.toString,
       "claimID" -> form.claimID.toString,
-      "form" -> form.key
-    ) {
+      "form" -> form.key) {
         logger.info("signatureLink called")
       }
     maybeCreateApplication(form).flatMap(updatedForm => {
@@ -205,8 +197,7 @@ class SeamlessDocsDocumentService @Inject() (
     MDC.withCtx(
       "userID" -> form.userID.toString,
       "claimID" -> form.claimID.toString,
-      "form" -> form.key
-    ) {
+      "form" -> form.key) {
         logger.info("isSigned called")
       }
     seamlessDocs.getApplicationStatus(form.externalApplicationId.get).map {

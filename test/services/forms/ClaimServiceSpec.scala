@@ -22,9 +22,7 @@ class ClaimServiceSpec extends PlaySpecification {
             Field.TemplateType.input,
             TemplateOptions("test", None, None, None, None),
             None,
-            Some("model.condition === \"x\"")
-          )
-        ) must beFalse
+            Some("model.condition === \"x\""))) must beFalse
 
         claimService.shouldBeAnswered(Map("condition" -> JsString("y")))(
           Field(
@@ -32,9 +30,7 @@ class ClaimServiceSpec extends PlaySpecification {
             Field.TemplateType.input,
             TemplateOptions("test", None, None, None, None),
             None,
-            Some("model.condition === \"x\"")
-          )
-        ) must beTrue
+            Some("model.condition === \"x\""))) must beTrue
       }
     }
   }
@@ -50,9 +46,7 @@ class ClaimServiceSpec extends PlaySpecification {
           "condition1" -> JsString("x"),
           "condition2" -> JsString("y"),
           "optionalField1" -> JsString("answer"),
-          "requiredField1" -> JsString("answer")
-        ), UUID.randomUUID(), UUID.randomUUID(), 0, 0, 0, 0)
-      )
+          "requiredField1" -> JsString("answer")), UUID.randomUUID(), UUID.randomUUID(), 0, 0, 0, 0))
 
       result.answeredOptional must be equalTo 1
       result.answeredRequired must be equalTo 1

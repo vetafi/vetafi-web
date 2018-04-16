@@ -17,8 +17,7 @@ class TwilioFaxDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extend
 
   override def save(twilioFaxId: String, twilioFax: TwilioFax): Future[WriteResult] = {
     collection.flatMap(
-      _.update(Json.obj("twilioFaxId" -> twilioFaxId), twilioFax)
-    )
+      _.update(Json.obj("twilioFaxId" -> twilioFaxId), twilioFax))
   }
 
   override def find(twilioFaxId: String): Future[Option[TwilioFax]] = {

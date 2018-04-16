@@ -2,6 +2,8 @@ package models
 
 import java.util.UUID
 import play.api.libs.json._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 import org.joda.time.DateTime
 
 /**
@@ -14,8 +16,7 @@ import org.joda.time.DateTime
 case class AuthToken(
   id: UUID,
   userID: UUID,
-  expiry: DateTime
-)
+  expiry: DateTime)
 
 object AuthToken {
   implicit val jsonFormat = Json.format[AuthToken]

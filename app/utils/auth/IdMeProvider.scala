@@ -3,7 +3,7 @@ package utils.auth
 import com.mohiva.play.silhouette.api.LoginInfo
 import com.mohiva.play.silhouette.api.util.HTTPLayer
 import com.mohiva.play.silhouette.impl.exceptions.ProfileRetrievalException
-import com.mohiva.play.silhouette.impl.providers.{ CommonSocialProfile, CommonSocialProfileBuilder, OAuth2Info, OAuth2Provider, OAuth2Settings, OAuth2StateProvider, SocialProfileParser, _ }
+import com.mohiva.play.silhouette.impl.providers.{ CommonSocialProfile, CommonSocialProfileBuilder, OAuth2Info, OAuth2Provider, OAuth2Settings, SocialProfileParser, _ }
 import play.api.Logger
 import play.api.libs.json.{ JsObject, JsValue }
 
@@ -26,7 +26,7 @@ trait BaseIdMeProvider extends OAuth2Provider {
   /**
    * The provider ID.
    */
-  override val id = IdMeProvider.ID
+  override val id: String = IdMeProvider.ID
 
   /**
    * Defines the URLs that are needed to retrieve the profile data.
@@ -78,8 +78,7 @@ class IdMeProfileParser extends SocialProfileParser[JsValue, CommonSocialProfile
       loginInfo = LoginInfo(IdMeProvider.ID, userID),
       firstName = firstName,
       lastName = lastName,
-      email = email
-    )
+      email = email)
   }
 }
 
@@ -87,14 +86,13 @@ class IdMeProfileParser extends SocialProfileParser[JsValue, CommonSocialProfile
  * The IdMe OAuth2 Provider.
  *
  * @param httpLayer     The HTTP layer implementation.
- * @param stateProvider The state provider implementation.
+ * @param stateHandler  The state handler implementation.
  * @param settings      The provider settings.
  */
 class IdMeProvider(
   protected val httpLayer: HTTPLayer,
-  protected val stateProvider: OAuth2StateProvider,
-  val settings: OAuth2Settings
-)
+  protected val stateHandler: SocialStateHandler,
+  val settings: OAuth2Settings)
   extends BaseIdMeProvider with CommonSocialProfileBuilder {
 
   /**
@@ -113,7 +111,7 @@ class IdMeProvider(
    * @param f A function which gets the settings passed and returns different settings.
    * @return An instance of the provider initialized with new settings.
    */
-  override def withSettings(f: (Settings) => Settings) = new IdMeProvider(httpLayer, stateProvider, f(settings))
+  override def withSettings(f: (Settings) => Settings) = new IdMeProvider(httpLayer, stateHandler, f(settings))
 }
 
 /**

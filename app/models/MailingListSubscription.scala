@@ -5,8 +5,7 @@ import utils.EnumUtils
 
 case class MailingListSubscription(
   email: String,
-  subscriptionType: MailingListSubscription.SubscriptionType.SubscriptionType = MailingListSubscription.SubscriptionType.INTERESTED_IN_UPDATES
-) {
+  subscriptionType: MailingListSubscription.SubscriptionType.SubscriptionType = MailingListSubscription.SubscriptionType.INTERESTED_IN_UPDATES) {
 
 }
 

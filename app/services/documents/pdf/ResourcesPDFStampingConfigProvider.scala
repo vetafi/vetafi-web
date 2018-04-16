@@ -9,15 +9,14 @@ import play.api.libs.json.Json
 class ResourcesPDFStampingConfigProvider @Inject() (configuration: Configuration) extends PDFStampingConfigProvider {
 
   private[this] val logger = getLogger
-  val pdfTemplateConfigsDir: String = configuration.getString("forms.pdfTemplateConfigsDir").get
+  val pdfTemplateConfigsDir: String = configuration.get[String]("forms.pdfTemplateConfigsDir")
 
   lazy val configs: Map[String, Seq[PDFFieldLocator]] = {
-    configuration.getStringSeq("forms.enabled").get.map(
+    configuration.get[Seq[String]]("forms.enabled").map(
       formKey => {
         logger.info(s"Parsing form config JSON from $pdfTemplateConfigsDir/$formKey.locators.json")
         Json.parse(
-          getClass.getClassLoader.getResourceAsStream(s"$pdfTemplateConfigsDir/$formKey.locators.json")
-        ).validate[Seq[PDFFieldLocator]]
+          getClass.getClassLoader.getResourceAsStream(s"$pdfTemplateConfigsDir/$formKey.locators.json")).validate[Seq[PDFFieldLocator]]
           .fold(
             errors => {
               val msg = s"Errors while parsing form config JSON from" +
@@ -27,10 +26,8 @@ class ResourcesPDFStampingConfigProvider @Inject() (configuration: Configuration
             },
             formConfig => {
               (formKey, formConfig)
-            }
-          )
-      }
-    ).toMap
+            })
+      }).toMap
   }
 
   override def getPDFFieldLocators(key: String): Seq[PDFFieldLocator] = configs(key)

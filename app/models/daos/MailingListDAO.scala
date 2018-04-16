@@ -8,6 +8,5 @@ import scala.concurrent.Future
 trait MailingListDAO {
   def save(
     email: String,
-    subscriptionType: MailingListSubscription.SubscriptionType.SubscriptionType = MailingListSubscription.SubscriptionType.INTERESTED_IN_UPDATES
-  ): Future[WriteResult]
+    subscriptionType: MailingListSubscription.SubscriptionType.SubscriptionType = MailingListSubscription.SubscriptionType.INTERESTED_IN_UPDATES): Future[WriteResult]
 }

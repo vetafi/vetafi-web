@@ -34,11 +34,10 @@ class TwilioFaxSubmissionService @Inject() (
   faxApi: FaxApi,
   clockService: ClockService,
   authInfoRepository: AuthInfoRepository,
-  passwordHasherRegistry: PasswordHasherRegistry
-) extends FaxSubmissionService {
+  passwordHasherRegistry: PasswordHasherRegistry) extends FaxSubmissionService {
 
-  val fromNumber: String = configuration.getString("twilio.number").get
-  val toNumber: String = configuration.getString("submission.va.fax").get
+  val fromNumber: String = configuration.get[String]("twilio.number")
+  val toNumber: String = configuration.get[String]("submission.va.fax")
 
   def createNewTwilioUser(claim: Claim): Future[TwilioUser] = {
     secureRandomIDGenerator.generate.flatMap {
@@ -49,8 +48,7 @@ class TwilioFaxSubmissionService @Inject() (
           passwordInfo =>
             twilioUserService.save(
               loginInfo,
-              TwilioUser(claim.claimID, password)
-            )
+              TwilioUser(claim.claimID, password))
         }
     }
   }
@@ -62,8 +60,7 @@ class TwilioFaxSubmissionService @Inject() (
   def saveTwilioFax(twilioFax: TwilioFax): Future[WriteResult] = {
     twilioFaxDAO.save(
       twilioFax.twilioFaxId,
-      twilioFax
-    )
+      twilioFax)
   }
 
   def saveResults(claimSubmission: ClaimSubmission, claim: Claim, fax: TwilioFax): Future[ClaimSubmission] = {
@@ -81,7 +78,7 @@ class TwilioFaxSubmissionService @Inject() (
   }
 
   def getResource(claim: Claim, twilioUser: TwilioUser): URL = {
-    val hostname: String = configuration.getString("hostname").get
+    val hostname: String = configuration.get[String]("hostname")
     new URL(s"https://${twilioUser.userID}:${twilioUser.apiPassword}@$hostname/api/twilioPdfEndpoint/${claim.userID}/${claim.claimID}")
   }
 
@@ -94,14 +91,12 @@ class TwilioFaxSubmissionService @Inject() (
           fromNumber,
           getClass.getSimpleName,
           Date.from(clockService.getCurrentTime),
-          success = true
-        )
+          success = true)
         val twilioFax = faxApi.sendFax(
           claim,
           claimSubmission,
           twilioUser,
-          getResource(claim, twilioUser)
-        )
+          getResource(claim, twilioUser))
         saveResults(claimSubmission, claim, twilioFax).map {
           claimSubmission => claimSubmission
         }

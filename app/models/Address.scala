@@ -9,8 +9,7 @@ case class Address(
   city: Option[String] = None,
   province: Option[String] = None,
   postal: Option[String] = None,
-  country: Option[String] = None
-) {
+  country: Option[String] = None) {
 }
 
 object Address {

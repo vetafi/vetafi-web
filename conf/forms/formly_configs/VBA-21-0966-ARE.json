@@ -17,12 +17,12 @@
         "label": "Are you filing for yourself, or for someone else?",
         "options": [
           {
-            "name": "For myself",
-            "value": true
+            "value": "For myself",
+            "key": true
           },
           {
-            "name": "For someone else",
-            "value": false
+            "value": "For someone else",
+            "key": false
           }
         ],
         "optional": false
@@ -71,7 +71,10 @@
         "placeholder": "C",
         "autocomplete": "additional-name",
         "optional": false
-      }
+      },
+      "optionsTypes": [
+        "middleInitial"
+      ]
     },
     {
       "key": "claimant_last_name",
@@ -116,7 +119,10 @@
         "autocomplete": "additional-name",
         "optional": false
       },
-      "hideExpression": "model.filing_for_self"
+      "hideExpression": "model.filing_for_self",
+      "optionsTypes": [
+        "middleInitial"
+      ]
     },
     {
       "key": "veteran_last_name",
@@ -163,12 +169,12 @@
         "label": "Veteran's Gender",
         "options": [
           {
-            "name": "Male",
-            "value": "Male"
+            "value": "Male",
+            "key": "Male"
           },
           {
-            "name": "Female",
-            "value": "Female"
+            "value": "Female",
+            "key": "Female"
           }
         ],
         "optional": false
@@ -190,12 +196,12 @@
         "label": "Have you, or the veteran you represent, ever previously filed a claim with the VA?",
         "options": [
           {
-            "name": "Yes",
-            "value": "Yes"
+            "value": "Yes",
+            "key": "Yes"
           },
           {
-            "name": "No",
-            "value": "No"
+            "value": "No",
+            "key": "No"
           }
         ],
         "optional": false

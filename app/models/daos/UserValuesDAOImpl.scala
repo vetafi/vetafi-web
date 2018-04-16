@@ -16,8 +16,7 @@ import scala.concurrent.Future
 
 class UserValuesDAOImpl @Inject() (
   val reactiveMongoApi: ReactiveMongoApi,
-  val userDAO: UserDAO
-) extends UserValuesDAO {
+  val userDAO: UserDAO) extends UserValuesDAO {
 
   def collection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection("user_values"))
 
@@ -54,8 +53,7 @@ class UserValuesDAOImpl @Inject() (
         userValuesCollection.update(
           Json.obj("userID" -> userID),
           // The values on the RHS of `++` will overwrite the values of the LHS
-          Json.obj("$set" -> Json.obj("values" -> Json.toJson(existingValues ++ values)))
-        )
+          Json.obj("$set" -> Json.obj("values" -> Json.toJson(existingValues ++ values))))
       })
     })
   }
@@ -66,8 +64,7 @@ class UserValuesDAOImpl @Inject() (
         case Some(_) =>
           Future.successful(UpdateWriteResult(
             ok = true,
-            1, 1, Seq(), Seq(), None, None, None
-          ))
+            1, 1, Seq(), Seq(), None, None, None))
         case None =>
           userValuesCollection.insert(UserValues(userID, Map()))
       }

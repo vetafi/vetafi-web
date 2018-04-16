@@ -1,31 +1,57 @@
 package services.documents
 
-import java.awt.Image
 import java.awt.image.RenderedImage
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, InputStream }
+import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, File, InputStream }
 import javax.imageio.ImageIO
 import javax.inject.Inject
 
 import models.ClaimForm
+import org.apache.commons.io.{ FileUtils, IOUtils }
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.PDFRenderer
+import org.log4s.getLogger
+import play.api.Configuration
 import services.documents.pdf.{ PDFFieldLocator, PDFStamping, PDFStampingConfigProvider, PDFTemplateProvider }
 
-import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-import org.apache.pdfbox.contentstream.PDFGraphicsStreamEngine
-import org.apache.pdfbox.pdmodel.PDDocument
-import org.apache.pdfbox.pdmodel.font.PDFont
-import org.apache.pdfbox.pdmodel.graphics.color.PDColor
-import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation
-import org.apache.pdfbox.rendering.PDFRenderer
-import org.apache.pdfbox.rendering.PageDrawer
-import org.apache.pdfbox.rendering.PageDrawerParameters
-import org.apache.pdfbox.util.Matrix
-import org.apache.pdfbox.util.Vector
-import javax.imageio.ImageIO
+class ITextDocumentService @Inject() (
+  pDFStampingConfigProvider: PDFStampingConfigProvider,
+  pDFTemplateProvider: PDFTemplateProvider,
+  configuration: Configuration) extends DocumentService {
 
-class ITextDocumentService @Inject() (pDFStampingConfigProvider: PDFStampingConfigProvider, pDFTemplateProvider: PDFTemplateProvider) extends DocumentService {
+  private[this] val logger = getLogger
+
+  val FONT_FILES_TO_INSTALL = Seq(
+    "Courier New Bold Italic.ttf",
+    "Courier New Bold.ttf",
+    "Courier New Italic.ttf",
+    "Courier New.ttf")
+
+  def installFonts(): Unit = {
+    val base = System.getProperty("user.home") + "/.fonts"
+    val dir = new File(base)
+    dir.mkdirs()
+
+    FONT_FILES_TO_INSTALL.foreach {
+      fontFile =>
+        val stream = getClass.getClassLoader.getResourceAsStream(s"fonts/$fontFile")
+        val newFile = new File(base + "/" + fontFile)
+
+        if (!newFile.exists()) {
+          logger.info(s"Installing $fontFile")
+          FileUtils.writeByteArrayToFile(
+            newFile,
+            IOUtils.toByteArray(stream),
+            false)
+        }
+    }
+  }
+
+  if (configuration.get[Boolean]("fonts.install")) {
+    installFonts()
+  }
 
   /**
    * Get PDF for document from document service.

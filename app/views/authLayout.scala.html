@@ -1,12 +1,17 @@
-@(viewId: String, errorMessage: String)(inputs: Html)
-
+@(viewId: String, errorMessage: String)(inputs: Html)(implicit flash: Flash)
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <title>Vetafi</title>
-        <link rel="stylesheet" href="/css/main.css">
-        <script type="text/javascript" src="/libs/libs.js"></script>
-        <script type="text/javascript" src="/js/signin.js"></script>
+        <base href="/">
+        <script type="text/javascript" src="/assets/scripts/jquery.js"></script>
+        <script type="text/javascript" src="/assets/scripts/bootstrap.js"></script>
+        <script type="text/javascript" src="/assets/scripts/signin.js"></script>
+        <link rel="stylesheet" href="/assets/stylesheets/bootstrap.css">
+        <link rel="stylesheet" href="/assets/stylesheets/ngDialog.css">
+        <link rel="stylesheet" href="/assets/stylesheets/ngDialog-theme-default.css">
+        <link rel="stylesheet" href="/signin.css"></link>
     </head>
     <body id="@viewId">
         <div class="bg-overlay"></div>
@@ -14,10 +19,11 @@
             <div class="pic-section"></div>
             <div class="interact-section">
                 <a href="/">
-                    <img class="logo" src="/icons/vetafi-logo-black.svg">
+                    <img class="logo" src="/assets/icons/vetafi-logo-black.svg">
                 </a>
                 <p class="error-msg">
-                @errorMessage
+                    @errorMessage
+                    @flash.get("error").getOrElse("")
                 </p>
                 <div class="carousel">
                     @inputs

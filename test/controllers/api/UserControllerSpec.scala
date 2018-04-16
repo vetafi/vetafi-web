@@ -7,10 +7,10 @@ import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.api.{ Environment, LoginInfo }
 import com.mohiva.play.silhouette.test._
 import com.typesafe.config.ConfigFactory
-import controllers.{ CSRFTest, SilhouetteTestContext }
+import controllers.SilhouetteTestContext
+import play.api.test.CSRFTokenHelper._
 import models._
 import models.daos.{ ClaimDAO, FormDAO, UserDAO, UserValuesDAO }
-import modules.JobModule
 import net.codingwell.scalaguice.ScalaModule
 import org.mockito.Mockito
 import org.specs2.mock.Mockito
@@ -41,12 +41,11 @@ trait UserControllerTestContext extends SilhouetteTestContext {
 
   override lazy val application: Application = GuiceApplicationBuilder()
     .configure(Configuration(ConfigFactory.load("application.test.conf")))
-    .disable(classOf[JobModule])
     .overrides(new FakeModule)
     .build()
 }
 
-class UserControllerSpec extends PlaySpecification with CSRFTest {
+class UserControllerSpec extends PlaySpecification {
 
   "The `getUser` action" should {
 

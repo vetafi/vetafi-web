@@ -13,33 +13,29 @@ import org.log4s._
 
 class TwilioFaxApi @Inject() (
   configuration: Configuration,
-  secretsManager: SecretsManager
-) extends FaxApi {
+  secretsManager: SecretsManager) extends FaxApi {
 
   private[this] val logger = getLogger
 
   lazy val accountSid: String = secretsManager.getSecretUtf8(
-    configuration.getString("twilio.accountSidSecretName").get
-  )
+    configuration.get[String]("twilio.accountSidSecretName"))
 
   lazy val authToken: String = secretsManager.getSecretUtf8(
-    configuration.getString("twilio.authTokenSecretName").get
-  )
+    configuration.get[String]("twilio.authTokenSecretName"))
 
   def sendFax(
     claim: Claim,
     claimSubmission: ClaimSubmission,
     twilioUser: TwilioUser,
-    faxResource: URL
-  ): TwilioFax = {
+    faxResource: URL): TwilioFax = {
     Twilio.init(accountSid, authToken)
     MDC.withCtx("userID" -> claim.userID.toString, "claimID" -> claim.claimID.toString) {
       logger.info(s"Sending ${faxResource.toURI} to ${claimSubmission.to}")
     }
     val faxCreator: FaxCreator = Fax.creator(claimSubmission.to, faxResource.toURI)
       .setFrom(claimSubmission.from)
-      .setStatusCallback(configuration.getString("scheme").get +
-        configuration.getString("hostname").get +
+      .setStatusCallback(configuration.get[String]("scheme") +
+        configuration.get[String]("hostname") +
         routes.TwilioController.faxCallback())
     val fax = faxCreator.create()
 
@@ -52,7 +48,6 @@ class TwilioFaxApi @Inject() (
       to = fax.getTo,
       from = fax.getFrom,
       twilioFaxId = fax.getSid,
-      status = fax.getStatus.toString
-    )
+      status = fax.getStatus.toString)
   }
 }

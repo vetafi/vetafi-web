@@ -11,15 +11,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MailingListDAOImpl @Inject() (
-  val reactiveMongoApi: ReactiveMongoApi
-) extends MailingListDAO {
+  val reactiveMongoApi: ReactiveMongoApi) extends MailingListDAO {
 
   def collection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection("mailing_list"))
 
   override def save(
     email: String,
-    subscriptionType: SubscriptionType = MailingListSubscription.SubscriptionType.INTERESTED_IN_UPDATES
-  ): Future[WriteResult] = {
+    subscriptionType: SubscriptionType = MailingListSubscription.SubscriptionType.INTERESTED_IN_UPDATES): Future[WriteResult] = {
     collection.flatMap(_.insert(MailingListSubscription(email, subscriptionType)))
   }
 }
