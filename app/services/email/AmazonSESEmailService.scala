@@ -6,12 +6,12 @@ import java.util
 import java.util.Properties
 import javax.activation.DataHandler
 import javax.inject.Inject
-import javax.mail.internet.{InternetAddress, MimeBodyPart, MimeMessage, MimeMultipart}
+import javax.mail.internet.{ InternetAddress, MimeBodyPart, MimeMessage, MimeMultipart }
 import javax.mail.util.ByteArrayDataSource
 
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.simpleemail.model._
-import com.amazonaws.services.simpleemail.{AmazonSimpleEmailServiceAsync, AmazonSimpleEmailServiceAsyncClientBuilder}
+import com.amazonaws.services.simpleemail.{ AmazonSimpleEmailServiceAsync, AmazonSimpleEmailServiceAsyncClientBuilder }
 import org.log4s.getLogger
 import play.api.Configuration
 import play.api.http.MimeTypes
@@ -20,7 +20,7 @@ import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmazonSESEmailService @Inject()(configuration: Configuration) extends EmailService {
+class AmazonSESEmailService @Inject() (configuration: Configuration) extends EmailService {
 
   private[this] val logger = getLogger
   lazy val fromEmail: String = configuration.getString("email.fromAddress").get
@@ -32,9 +32,10 @@ class AmazonSESEmailService @Inject()(configuration: Configuration) extends Emai
       .build()
   }
 
-  override def sendEmail(recipient: String,
-                         subject: String,
-                         message: String): Future[Boolean] = {
+  override def sendEmail(
+    recipient: String,
+    subject: String,
+    message: String): Future[Boolean] = {
     val client: AmazonSimpleEmailServiceAsync = getClient
     val request = new SendEmailRequest()
       .withDestination(
@@ -57,11 +58,12 @@ class AmazonSESEmailService @Inject()(configuration: Configuration) extends Emai
     }
   }
 
-  def sendMailWithPdfAttachment(recipient: String,
-                                subject: String,
-                                message: String,
-                                filename: String,
-                                attachment: Array[Byte]): Future[Boolean] = {
+  def sendMailWithPdfAttachment(
+    recipient: String,
+    subject: String,
+    message: String,
+    filename: String,
+    attachment: Array[Byte]): Future[Boolean] = {
     val session = javax.mail.Session.getInstance(new Properties(), null)
     val mimeMessage = new MimeMessage(session)
 

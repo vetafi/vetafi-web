@@ -90,7 +90,7 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.claims = this.activatedRoute.snapshot.data.claims;
+        this.claims = this.activatedRoute.snapshot.data.claims || [];
         this.incompleteClaim = this.claims.find(
             (claim) =>
                 claim.state === ClaimService.state.INCOMPLETE
