@@ -6,10 +6,10 @@ import com.google.inject.AbstractModule
 import com.mohiva.play.silhouette.impl.util.SecureRandomIDGenerator
 import models.daos._
 import net.codingwell.scalaguice.ScalaModule
-import play.modules.reactivemongo.ReactiveMongoApi
 import services._
 import services.documents.pdf._
 import services.documents.{ DocumentService, ITextDocumentService }
+import services.email.{ AmazonSESEmailService, EmailService }
 import services.forms._
 import services.submission._
 import services.time.{ ClockService, SystemClockService }
@@ -55,5 +55,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[ClockService].to[SystemClockService]
     bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator(32))
     bind[TwilioRequestValidator].to[TwilioRequestValidatorImpl]
+    bind[EmailService].to[AmazonSESEmailService]
   }
 }
