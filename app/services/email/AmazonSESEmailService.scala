@@ -23,7 +23,7 @@ import scala.concurrent.Future
 class AmazonSESEmailService @Inject() (configuration: Configuration) extends EmailService {
 
   private[this] val logger = getLogger
-  lazy val fromEmail: String = configuration.getString("email.fromAddress").get
+  lazy val fromEmail: String = configuration.get[String]("email.fromAddress")
 
   def getClient: AmazonSimpleEmailServiceAsync = {
     AmazonSimpleEmailServiceAsyncClientBuilder
