@@ -50,6 +50,7 @@ libraryDependencies ++= Seq(
   "org.apache.pdfbox" % "pdfbox" % "2.0.7",
   "com.twilio.sdk" % "twilio" % "7.14.5",
   "com.amazonaws" % "aws-java-sdk-ses" % "1.11.244",
+  "com.amazonaws" % "aws-java-sdk" % "1.11.316",
   "com.typesafe.play" %% "play-json-joda" % "2.6.8",
   specs2 % Test,
   filters,
