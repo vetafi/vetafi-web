@@ -11,24 +11,19 @@
         <link rel="stylesheet" href="/assets/stylesheets/bootstrap.css">
         <link rel="stylesheet" href="/assets/stylesheets/ngDialog.css">
         <link rel="stylesheet" href="/assets/stylesheets/ngDialog-theme-default.css">
-        <link rel="stylesheet" href="/signin.css"></link>
+        <link rel="stylesheet" href="/signin.css">
     </head>
     <body id="@viewId">
         <div class="bg-overlay"></div>
-        <div class="viewer">
-            <div class="pic-section"></div>
-            <div class="interact-section">
-                <a href="/">
-                    <img class="logo" src="/assets/icons/vetafi-logo-black.svg">
-                </a>
-                <p class="error-msg">
-                    @errorMessage
-                    @flash.get("error").getOrElse("")
-                </p>
-                <div class="carousel">
-                    @inputs
-                </div>
-            </div>
+        <div class="auth-view">
+            <a href="/">
+                <img class="logo" src="/assets/icons/vetafi-logo-black.svg">
+            </a>
+            <p class="error-msg">
+                @errorMessage
+                @flash.get("error").getOrElse("")
+            </p>
+            @inputs
         </div>
     </body>
 </html>
