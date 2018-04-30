@@ -59,6 +59,10 @@ class ForgotPasswordController @Inject() (
             Redirect(routes.SignInController.view())
               .flashing("info" -> messages("error"))
           }
+      }.recover {
+        case e =>
+          Redirect(routes.SignInController.view())
+            .flashing("info" -> messages("error"))
       }
     }
   }
