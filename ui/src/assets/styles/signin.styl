@@ -20,14 +20,24 @@ div.auth-view
   & img.logo
     display: block
     width: 120px
-    margin: smallSpacing auto auto largeSpacing
+    margin-left: auto
+    margin-right: auto
+    margin-top: smallSpacing
+    margin-bottom: largeSpacing
 
     @media screen and (max-width: changeLayoutWidth)
       content: url('/assets/icons/vetafi-logo.svg')
 
+  & div.error-msg-container
+    margin: 0 auto
+    width: 50%
+
   & .error-msg
     color: colorRed
-    text-align: left
+    text-align: center
+
+  & p.email-text-container
+    font-weight: bold
 
   & div.btn-container
     margin: 0 auto
@@ -39,7 +49,10 @@ div.auth-view
     overflow-x: visible
 
   & div.form-container
-    margin: 0 auto
+    margin-left: auto
+    margin-right: auto
+    margin-bottom: smallSpacing
+
     width: 50%
 
     & input

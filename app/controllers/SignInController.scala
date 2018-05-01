@@ -66,7 +66,9 @@ class SignInController @Inject() (
    */
   def submit: Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     SignInForm.form.bindFromRequest.fold(
-      errors => Future.successful(BadRequest(errors.errorsAsJson)),
+      errors => Future.successful(
+        Redirect(routes.SignInController.view())
+          .flashing("error" -> errors.errorsAsJson.toString())),
       data => {
         val credentials = Credentials(data.email, data.password)
         credentialsProvider.authenticate(credentials).flatMap { loginInfo =>

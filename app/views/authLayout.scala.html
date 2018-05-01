@@ -19,11 +19,18 @@
             <a href="/">
                 <img class="logo" src="/assets/icons/vetafi-logo-black.svg">
             </a>
-            <p class="error-msg">
-                @errorMessage
-                @flash.get("error").getOrElse("")
-            </p>
+
+            @if(flash.get("error").isDefined || !errorMessage.isEmpty) {
+                <div class="error-msg-container">
+                    <div class="alert alert-danger" role="alert">
+                        @flash.get("error").getOrElse("")
+                        @errorMessage
+                    </div>
+                </div>
+            }
+
             @inputs
+
         </div>
     </body>
 </html>
