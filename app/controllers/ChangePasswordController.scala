@@ -2,16 +2,16 @@ package controllers
 
 import javax.inject.Inject
 
+import _root_.services.UserService
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.api.exceptions.ProviderException
 import com.mohiva.play.silhouette.api.repositories.AuthInfoRepository
 import com.mohiva.play.silhouette.api.util.{ Credentials, PasswordHasherRegistry, PasswordInfo }
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
-import forms.{ ChangePasswordForm, ForgotPasswordForm }
-import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
+import forms.ChangePasswordForm
+import play.api.i18n.I18nSupport
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{ Action, AnyContent, Controller }
-import _root_.services.UserService
+import play.api.mvc._
 import utils.auth.{ DefaultEnv, WithProvider }
 
 import scala.concurrent.Future
@@ -19,7 +19,6 @@ import scala.concurrent.Future
 /**
  * The `Change Password` controller.
  *
- * @param messagesApi            The Play messages API.
  * @param silhouette             The Silhouette stack.
  * @param userService            The user service implementation.
  * @param credentialsProvider    The credentials provider.
@@ -27,13 +26,13 @@ import scala.concurrent.Future
  * @param passwordHasherRegistry The password hasher registry.
  */
 class ChangePasswordController @Inject() (
-  val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   credentialsProvider: CredentialsProvider,
   authInfoRepository: AuthInfoRepository,
+  components: ControllerComponents,
   passwordHasherRegistry: PasswordHasherRegistry)
-  extends Controller with I18nSupport {
+  extends AbstractController(components) with I18nSupport {
 
   /**
    * Views the `Change Password` page.

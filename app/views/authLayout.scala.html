@@ -30,6 +30,14 @@
                 </div>
             }
 
+            @if(flash.get("info").isDefined) {
+                <div class="error-msg-container">
+                    <div class="alert alert-primary" role="alert">
+                        @flash.get("info").getOrElse("")
+                    </div>
+                </div>
+            }
+
             @inputs
 
         </div>
