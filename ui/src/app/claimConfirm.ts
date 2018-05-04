@@ -75,6 +75,10 @@ const template = `
   </div>
 </div>
 <app-footer></app-footer>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 
@@ -85,6 +89,7 @@ const template = `
 })
 export class ClaimConfirmComponent implements OnInit {
 
+    public loading: boolean = false;
     claimId;
     user;
     userEmail;
@@ -121,17 +126,21 @@ export class ClaimConfirmComponent implements OnInit {
     }
 
     onClickConfirm() {
+        this.loading = true;
         this.ajaxService.submitClaim(this.claimId, [])
             .subscribe((resp) => {
                 if (resp) {
                     this.claimService.submitCurrentClaim();
+                    this.loading = false;
                     this.router.navigateByUrl(
                         "claim/" + this.claimId + "/submit");
                 } else {
+                    this.loading = false;
                     this.router.navigateByUrl(
                         "claim/" + this.claimId + "/submit");
                 }
             }, (data) => {
+                this.loading = false;
                 this.router.navigateByUrl(
                     "claim/" + this.claimId + "/submit");
             });

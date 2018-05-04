@@ -38,6 +38,10 @@ const template = `
   <ngb-progressbar [animated]="false" [value]="getProgress()"></ngb-progressbar>
     
 </div>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 @Component({
@@ -47,10 +51,10 @@ const template = `
 })
 export class FormComponent implements OnInit, DoCheck {
 
+    public loading: boolean = false;
     fieldsByKey;
     model;
     form = new FormGroup({});
-    busy: boolean;
     fields;
     fieldsCopy;
     answered: number;
@@ -97,9 +101,10 @@ export class FormComponent implements OnInit, DoCheck {
     }
 
     onSubmit() {
-        this.busy = true;
+        this.loading = true;
         this.saveForm(true).subscribe(
             (res) => {
+                this.loading = false;
                 this.router.navigateByUrl(
                     'claim/' + this.activatedRoute.snapshot.params.claimId + '/select-forms');
             }
@@ -107,10 +112,10 @@ export class FormComponent implements OnInit, DoCheck {
     }
 
     onSave() {
-        this.busy = true;
+        this.loading = true;
         this.saveForm(true).subscribe(
             (res) =>
-                this.busy = false
+                this.loading = false
         );
     }
 

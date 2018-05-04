@@ -42,6 +42,10 @@ const template = `
   </div>
 </div>
 <app-footer></app-footer>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 
@@ -52,6 +56,7 @@ const template = `
 })
 export class ClaimStartComponent implements OnInit {
 
+    public loading: boolean = false;
     isSignedIn: boolean;
     claimConfig;
     formConfig;
@@ -86,9 +91,11 @@ export class ClaimStartComponent implements OnInit {
     }
 
     private goStartClaim(claim) {
+        this.loading = true;
         this.ajaxService.startClaim(claim).subscribe(
             (res) => {
                 this.claimService.createNewClaim();
+                this.loading = false;
                 this.router.navigateByUrl(
                     'claim/' + res.claimID + '/select-forms');
             }
