@@ -1,32 +1,36 @@
 @(idMeUrl: String)(implicit request: RequestHeader)
 
-<div class="screen options">
-    <a href="@idMeUrl">
-        <button class="idme-btn">
-            <div class="icon-container">
-                <div class="idme-icon"></div>
-            </div>
-            <div class="txt-container">Login with Id.Me</div>
-        </button>
-    </a>
-    <p class="divider">- OR -</p>
-    <button id="reveal-email-login-button" class="email-btn">
+<div class="btn-container">
+    <a class="btn idme-btn" href="@idMeUrl">
         <div class="icon-container">
-            <div class="email-icon"></div>
+            <div class="idme-icon"></div>
         </div>
-        <div class="txt-container">Login with your email</div>
-    </button>
-    <a href="/signup">Need an account?</a>
+        <div class="txt-container">Login with Id.Me</div>
+    </a>
 </div>
-<div class="screen inputs">
+
+<div class="divider-container">
+    <p class="divider">OR</p>
+</div>
+
+<div class="form-container">
+    <p class="email-text-container">
+        Login with your email:
+    </p>
     @helper.form(action = routes.SignInController.submit()) {
         @helper.CSRF.formField
-        <input class="email" placeholder="Email Address" type="text" name="email">
-        <input class="pwd" placeholder="Password" type="password" name="password">
-        <input class="submit" value="LOG IN" type="submit">
-        <a href="/password/forgot ">Forgot password?</a>
+        <div class="form-group">
+            <input class="email" placeholder="Email Address" type="text" name="email">
+        </div>
+        <div class="form-group">
+            <input class="pwd" placeholder="Password" type="password" name="password">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
     }
-    <button id="hide-email-login-button" class="back-btn">
-        Back
-    </button>
+    <div>
+        <a href="/password/forgot ">Forgot password?</a>
+    </div>
+    <div>
+        <a href="/signup">Need an account?</a>
+    </div>
 </div>

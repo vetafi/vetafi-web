@@ -55,6 +55,10 @@ class AmazonSESEmailService @Inject() (configuration: Configuration) extends Ema
       val result = resultFuture.get()
       logger.info("Got result from API: " + result.toString)
       result.getSdkHttpMetadata.getHttpStatusCode == play.api.http.Status.OK
+    }.recover {
+      case e =>
+        logger.error(e)("Failed to call SES API")
+        false
     }
   }
 

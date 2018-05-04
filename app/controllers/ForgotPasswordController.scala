@@ -43,7 +43,10 @@ class ForgotPasswordController @Inject() (
 
   def trySendEmailAndGenerateResponse(user: User)(implicit messages: Messages): Future[Result] = {
     authTokenService.create(user.userID).flatMap { authToken =>
-      val url = routes.ResetPasswordController.view(authToken.id).url
+
+      val url = configuration.getOptional[String]("scheme").getOrElse("http://") +
+        configuration.getOptional[String]("hostname").getOrElse("localhost") +
+        routes.ResetPasswordController.view(authToken.id).url
 
       val emailFuture: Future[Boolean] = emailService.sendEmail(
         recipient = user.email.get,
@@ -56,8 +59,9 @@ class ForgotPasswordController @Inject() (
             Redirect(routes.SignInController.view())
               .flashing("info" -> messages("reset.email.sent"))
           } else {
+
             Redirect(routes.SignInController.view())
-              .flashing("info" -> messages("error"))
+              .flashing("error" -> messages("error"))
           }
       }.recover {
         case e =>

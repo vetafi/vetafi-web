@@ -2,30 +2,26 @@ package controllers
 
 import javax.inject.Inject
 
-import com.mohiva.play.silhouette.api.actions.SecuredErrorHandler
 import com.mohiva.play.silhouette.api.{ LogoutEvent, Silhouette }
 import com.mohiva.play.silhouette.impl.providers.SocialProviderRegistry
 import play.api.Configuration
-import play.api.i18n.{ I18nSupport, MessagesApi }
-import play.api.mvc.{ Action, AnyContent, Controller }
+import play.api.i18n.I18nSupport
+import play.api.mvc._
 import utils.auth.{ DefaultEnv, RedirectSecuredErrorHandler }
-
-import scala.concurrent.Future
 
 /**
  * The basic application controller.
  *
- * @param messagesApi The Play messages API.
- * @param silhouette The Silhouette stack.
+ * @param silhouette             The Silhouette stack.
  * @param socialProviderRegistry The social provider registry.
  */
 class ApplicationController @Inject() (
-  val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
   socialProviderRegistry: SocialProviderRegistry,
   redirectSecuredErrorHandler: RedirectSecuredErrorHandler,
+  components: ControllerComponents,
   configuration: Configuration)
-  extends Controller with I18nSupport {
+  extends AbstractController(components) with I18nSupport {
 
   /**
    * Handles the Sign Out action.

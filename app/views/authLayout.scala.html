@@ -5,30 +5,41 @@
         <meta charset="utf-8">
         <title>Vetafi</title>
         <base href="/">
+        <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
         <script type="text/javascript" src="/assets/scripts/jquery.js"></script>
         <script type="text/javascript" src="/assets/scripts/bootstrap.js"></script>
         <script type="text/javascript" src="/assets/scripts/signin.js"></script>
         <link rel="stylesheet" href="/assets/stylesheets/bootstrap.css">
         <link rel="stylesheet" href="/assets/stylesheets/ngDialog.css">
         <link rel="stylesheet" href="/assets/stylesheets/ngDialog-theme-default.css">
-        <link rel="stylesheet" href="/signin.css"></link>
+        <link rel="stylesheet" href="/signin.css">
     </head>
     <body id="@viewId">
         <div class="bg-overlay"></div>
-        <div class="viewer">
-            <div class="pic-section"></div>
-            <div class="interact-section">
-                <a href="/">
-                    <img class="logo" src="/assets/icons/vetafi-logo-black.svg">
-                </a>
-                <p class="error-msg">
-                    @errorMessage
-                    @flash.get("error").getOrElse("")
-                </p>
-                <div class="carousel">
-                    @inputs
+        <div class="auth-view">
+            <a href="/">
+                <img class="logo" src="/assets/icons/vetafi-logo-black.svg">
+            </a>
+
+            @if(flash.get("error").isDefined || !errorMessage.isEmpty) {
+                <div class="error-msg-container">
+                    <div class="alert alert-danger" role="alert">
+                        @flash.get("error").getOrElse("")
+                        @errorMessage
+                    </div>
                 </div>
-            </div>
+            }
+
+            @if(flash.get("info").isDefined) {
+                <div class="error-msg-container">
+                    <div class="alert alert-primary" role="alert">
+                        @flash.get("info").getOrElse("")
+                    </div>
+                </div>
+            }
+
+            @inputs
+
         </div>
     </body>
 </html>
