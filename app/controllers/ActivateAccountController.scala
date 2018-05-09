@@ -8,6 +8,7 @@ import _root_.services.email.EmailService
 import _root_.services.{ AuthTokenService, UserService }
 import com.mohiva.play.silhouette.api._
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
+import org.log4s.getLogger
 import play.api.i18n.{ I18nSupport, Messages }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.mvc._
@@ -27,6 +28,8 @@ class ActivateAccountController @Inject() (
   components: ControllerComponents)
   extends AbstractController(components) with I18nSupport {
 
+  private[this] val logger = getLogger
+
   /**
    * Sends an account activation email to the user with the given email.
    *
@@ -36,7 +39,8 @@ class ActivateAccountController @Inject() (
   def send(email: String): Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
     val decodedEmail = URLDecoder.decode(email, "UTF-8")
     val loginInfo = LoginInfo(CredentialsProvider.ID, decodedEmail)
-    val result = Redirect(routes.SignInController.view()).flashing("info" -> Messages("activation.email.sent", decodedEmail))
+    val result = Redirect(routes.SignInController.view())
+      .flashing("info" -> Messages("activation.email.sent", decodedEmail))
 
     userService.retrieve(loginInfo).flatMap {
       case Some(user) if !user.activated =>
@@ -53,7 +57,7 @@ class ActivateAccountController @Inject() (
                       result
                     } else {
                       Redirect(routes.SignInController.view())
-                        .flashing("success" -> request.messages.messages("error"))
+                        .flashing("info" -> request.messages.messages("error"))
                     }
                 }
             case None =>
@@ -70,19 +74,21 @@ class ActivateAccountController @Inject() (
    * @param token The token to identify a user.
    * @return The result to display.
    */
-  def activate(token: UUID): Action[AnyContent] = silhouette.UnsecuredAction.async { implicit request =>
-    authTokenService.validate(token).flatMap {
-      case Some(authToken) => userService.retrieve(authToken.userID).flatMap {
-        case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
-          userService.save(user.copy(activated = true)).map { _ =>
-            Redirect(routes.SignInController.view())
-              .flashing("success" -> request.messages.messages("account.activated"))
-          }
-        case _ => Future.successful(Redirect(routes.SignInController.view())
+  def activate(token: UUID): Action[AnyContent] = silhouette.UnsecuredAction.async {
+    implicit request =>
+      authTokenService.validate(token).flatMap {
+        case Some(authToken) => userService.retrieve(authToken.userID).flatMap {
+          case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
+            logger.info(user.toString)
+            userService.save(user.copy(activated = true)).map { _ =>
+              Redirect(routes.SignInController.view())
+                .flashing("info" -> request.messages.messages("account.activated"))
+            }
+          case _ => Future.successful(Redirect(routes.SignInController.view())
+            .flashing("error" -> request.messages.messages("invalid.activation.link")))
+        }
+        case None => Future.successful(Redirect(routes.SignInController.view())
           .flashing("error" -> request.messages.messages("invalid.activation.link")))
       }
-      case None => Future.successful(Redirect(routes.SignInController.view())
-        .flashing("error" -> request.messages.messages("invalid.activation.link")))
-    }
   }
 }
