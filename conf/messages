@@ -89,6 +89,8 @@ email.already.signed.up.subject = Welcome
 email.already.signed.up.hello = Hello {0},
 email.already.signed.up.html.text = You already have an account registered. Please follow <a href="{0}">this link</a> to sign in into your account.
 email.already.signed.up.txt.text = You already have an account registered. Please follow the link to sign in into your account: {0}
+email.already.signed.up.error = This email has already been registered for an account.
+
 
 # Reset Password
 email.reset.password.subject = Reset password
@@ -101,3 +103,5 @@ email.activate.account.subject = Activate account
 email.activate.account.hello = Hello {0},
 email.activate.account.html.text = Please follow <a href="{0}">this link</a> to confirm and activate your new account.
 email.activate.account.txt.text = Please follow the link to confirm and activate your new account: {0}
+email.activate.send.error = We were unable to reach you at the provided email address. Please double-check you entered it correctly.
+email.activate.send.success = Please check your email and follow the link we have sent you to activate your account. This is necessary for security purposes to make sure you control this email account.
