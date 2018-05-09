@@ -52,4 +52,12 @@ trait UserDAO {
    * @return WriteResult
    */
   def setInactive(user: User): Future[WriteResult]
+
+  /**
+   * Update a users Terms of Service status
+   *
+   * @param user The user account to modify.
+   * @param status True if user has agreed to TOS, false otherwise.
+   */
+  def setTOSStatus(user: User, status: Boolean): Future[WriteResult]
 }

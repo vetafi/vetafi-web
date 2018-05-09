@@ -1,4 +1,4 @@
-import {Component, DoCheck, HostListener, KeyValueDiffer, KeyValueDiffers, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, DoCheck, HostListener, KeyValueDiffer, KeyValueDiffers, OnInit} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import keyBy from 'lodash/keyBy';
 import clone from 'lodash/clone';
@@ -38,6 +38,10 @@ const template = `
   <ngb-progressbar [animated]="false" [value]="getProgress()"></ngb-progressbar>
     
 </div>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 @Component({
@@ -47,14 +51,14 @@ const template = `
 })
 export class FormComponent implements OnInit, DoCheck {
 
+    public loading: boolean = false;
     fieldsByKey;
     model;
     form = new FormGroup({});
-    busy: boolean;
     fields;
     fieldsCopy;
-    answered: number;
-    answerable: number;
+    public answered: number;
+    public answerable: number;
     claimId;
     formId;
     title;
@@ -67,7 +71,8 @@ export class FormComponent implements OnInit, DoCheck {
                 public ajaxService: AjaxService,
                 public router: Router,
                 public activatedRoute: ActivatedRoute,
-                private differs: KeyValueDiffers) {
+                private differs: KeyValueDiffers,
+                private changeDetectorRef: ChangeDetectorRef) {
 
     }
 
@@ -82,6 +87,7 @@ export class FormComponent implements OnInit, DoCheck {
         this.fieldsByKey = keyBy(this.fieldsCopy, (f) => f.key);
         this.modelDiffer = this.differs.find(this.model).create();
         this.updateProgress();
+        this.changeDetectorRef.detectChanges();
     }
 
 
@@ -93,13 +99,17 @@ export class FormComponent implements OnInit, DoCheck {
     }
 
     onDownload() {
-        let popUp = this.windowRef.nativeWindow.open('/loading', '_blank');
+        this.saveForm(true).subscribe(
+            (res) =>
+                this.windowRef.nativeWindow.location = '/pdf/' + this.claimId + '/' + this.formId
+        )
     }
 
     onSubmit() {
-        this.busy = true;
+        this.loading = true;
         this.saveForm(true).subscribe(
             (res) => {
+                this.loading = false;
                 this.router.navigateByUrl(
                     'claim/' + this.activatedRoute.snapshot.params.claimId + '/select-forms');
             }
@@ -107,10 +117,10 @@ export class FormComponent implements OnInit, DoCheck {
     }
 
     onSave() {
-        this.busy = true;
+        this.loading = true;
         this.saveForm(true).subscribe(
             (res) =>
-                this.busy = false
+                this.loading = false
         );
     }
 

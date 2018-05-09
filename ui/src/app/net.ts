@@ -52,39 +52,43 @@ export class AjaxService {
         return this.httpClient.post('/api/claims/create', data)
     }
 
-    submitClaim(claimId, data) {
+    submitClaim(claimId, data): Observable<any>  {
         return this.httpClient.post('/api/claim/submit/' + claimId, data)
     }
 
-    discardClaim(claimId) {
+    discardClaim(claimId): Observable<any>  {
         return this.httpClient.delete('/api/claim/' + claimId)
     }
 
-    getClaim(claimId) {
+    getClaim(claimId): Observable<any>  {
         return this.httpClient.get('/api/claim/' + claimId)
     }
 
-    getFormsForClaim(claimId) {
+    getFormsForClaim(claimId): Observable<any>  {
         return this.httpClient.get('/api/forms/' + claimId)
     }
 
-    saveForm(claimId, formId, data) {
+    saveForm(claimId, formId, data): Observable<any>  {
         return this.httpClient.post('/api/save/' + claimId + '/' + formId, data);
     }
 
-    downloadForm(claimId, formId) {
+    downloadForm(claimId, formId): Observable<any>  {
         return this.httpClient.get('/api/claim/' + claimId + '/form/' + formId + '/pdf');
     }
 
-    getFormSignatureStatus(claimId, formId) {
+    getFormSignatureStatus(claimId, formId): Observable<any>  {
         return this.httpClient.get('/api/form/' + claimId + '/' + formId + '/issigned');
     }
 
-    signClaim(claimId) {
+    signClaim(claimId): Observable<any>  {
         return this.httpClient.get('/api/claim/sign/' + claimId)
     }
 
-    subscribe(data) {
+    subscribe(data): Observable<any>  {
         return this.httpClient.post('/api/subscribe', data)
+    }
+
+    agreeToTOS(): Observable<any>  {
+        return this.httpClient.get('/api/user/agreeToTOS')
     }
 }

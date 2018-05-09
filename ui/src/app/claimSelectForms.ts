@@ -52,6 +52,10 @@ const template = `
   </div>
 </div>
 <app-footer></app-footer>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 @Component({
@@ -61,7 +65,7 @@ const template = `
 })
 export class ClaimSelectFormsComponent implements OnInit {
 
-    busySpinner;
+    public loading: boolean = false;
     claimForms;
     claimId;
     myForms: any;
@@ -105,7 +109,6 @@ export class ClaimSelectFormsComponent implements OnInit {
 
     onDownload(formId: String) {
         this.windowRef.nativeWindow.open('/pdf/' + this.claimId + '/' + formId, '_blank');
-        this.busySpinner.showBusyUntilDownload();
     }
 
     onClickCancel() {

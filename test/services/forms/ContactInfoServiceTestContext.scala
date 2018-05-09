@@ -49,6 +49,10 @@ trait ContactInfoServiceTestContext extends SilhouetteTestContext {
     override def setInactive(user: User): Future[WriteResult] = {
       Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None))
     }
+
+    override def setTOSStatus(user: User, status: Boolean): Future[WriteResult] = {
+      Future.successful(UpdateWriteResult(ok = true, 1, 1, Seq(), Seq(), None, None, None))
+    }
   }
 
   class FakeModule extends AbstractModule with ScalaModule {

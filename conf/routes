@@ -28,6 +28,8 @@ GET         /account/activate/:token         controllers.ActivateAccountControll
 GET         /api/user                        controllers.api.UserController.getUser
 POST        /api/user                        controllers.api.UserController.updateUser
 DELETE      /api/user                        controllers.api.UserController.deleteAccount
+GET         /api/user/agreeToTOS             controllers.api.UserController.agreeToTos
+
 
 GET         /api/user/values                 controllers.api.UserValuesController.getUserValues
 POST        /api/save/:claimID/:formKey      controllers.api.FormController.saveForm(claimID: java.util.UUID, formKey: String)

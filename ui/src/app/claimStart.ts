@@ -42,6 +42,10 @@ const template = `
   </div>
 </div>
 <app-footer></app-footer>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 
@@ -52,6 +56,7 @@ const template = `
 })
 export class ClaimStartComponent implements OnInit {
 
+    public loading: boolean = false;
     isSignedIn: boolean;
     claimConfig;
     formConfig;
@@ -86,9 +91,11 @@ export class ClaimStartComponent implements OnInit {
     }
 
     private goStartClaim(claim) {
+        this.loading = true;
         this.ajaxService.startClaim(claim).subscribe(
             (res) => {
                 this.claimService.createNewClaim();
+                this.loading = false;
                 this.router.navigateByUrl(
                     'claim/' + res.claimID + '/select-forms');
             }
@@ -96,12 +103,24 @@ export class ClaimStartComponent implements OnInit {
     }
 
     startClaim(claim) {
-        if (!this.claimService.acceptedTos()) {
-            const modalRef: NgbModalRef = this.ngbModal.open(TosModalComponent);
+        if (!this.user.agreedToTOS) {
+            const modalRef: NgbModalRef = this.ngbModal.open(
+                TosModalComponent,
+                {size: 'lg'}
+            );
             modalRef.result.then(
                 (res) => {
-                    this.claimService.acceptTos(true);
-                    this.goStartClaim(claim);
+                    this.ajaxService.agreeToTOS().subscribe(
+                        (res) => {
+                            this.goStartClaim(claim);
+                        },
+                        (error) => {
+                            this.goStartClaim(claim);
+                        }
+                    );
+                },
+                (err) => {
+                    this.router.navigateByUrl('/');
                 }
             );
         } else {
