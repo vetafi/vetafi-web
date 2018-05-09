@@ -36,6 +36,10 @@ const template = `
     </div>
   </div>
 </div>
+
+<div id="busy-overlay" *ngIf="loading">
+   <img class="busy-spinner" src="/assets/icons/spinner.svg">
+</div>
 `;
 
 @Component({
@@ -50,6 +54,7 @@ export class SignDocumentPreviewComponent implements OnInit {
     claimId: String;
     formId: String;
     signature: String;
+    public loading: Boolean = false;
     @ViewChild(SignaturePad) signaturePad: SignaturePad;
     @ViewChildren('signatureContainer') public signatureContainerQuery: QueryList<ElementRef>;
     public signatureContainer: ElementRef;
@@ -78,7 +83,7 @@ export class SignDocumentPreviewComponent implements OnInit {
     }
 
     onSubmit(): void {
-        console.log(this);
+        this.loading = true;
         this.userValues.values.date_signed =
             this.datePipe.transform(new Date(), 'MM/dd/yyyy');
         this.userValues.values.signature = this.signaturePad.toDataURL();
@@ -89,6 +94,7 @@ export class SignDocumentPreviewComponent implements OnInit {
             this.userValues.values
         ).subscribe( (res) => {
             this.router.navigateByUrl('sign/' + this.claimId);
+            this.loading = false;
         })
     }
 

@@ -59,4 +59,17 @@ class UserController @Inject() (
         }
       }
   }
+
+  def agreeToTos(): Action[AnyContent] = silhouette.SecuredAction.async {
+    request =>
+      {
+        userDao.setTOSStatus(request.identity, status = true).flatMap {
+          case ok if ok.ok => Future.successful(
+            Ok(Json.obj(
+              "status" -> "ok",
+              "message" -> ("User '" + request.identity.userID + "' inactivated."))))
+          case error => Future.successful(InternalServerError(Json.obj("status" -> "error")))
+        }
+      }
+  }
 }

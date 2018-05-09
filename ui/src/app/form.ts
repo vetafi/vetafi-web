@@ -1,4 +1,4 @@
-import {Component, DoCheck, HostListener, KeyValueDiffer, KeyValueDiffers, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, DoCheck, HostListener, KeyValueDiffer, KeyValueDiffers, OnInit} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import keyBy from 'lodash/keyBy';
 import clone from 'lodash/clone';
@@ -57,8 +57,8 @@ export class FormComponent implements OnInit, DoCheck {
     form = new FormGroup({});
     fields;
     fieldsCopy;
-    answered: number;
-    answerable: number;
+    public answered: number;
+    public answerable: number;
     claimId;
     formId;
     title;
@@ -71,7 +71,8 @@ export class FormComponent implements OnInit, DoCheck {
                 public ajaxService: AjaxService,
                 public router: Router,
                 public activatedRoute: ActivatedRoute,
-                private differs: KeyValueDiffers) {
+                private differs: KeyValueDiffers,
+                private changeDetectorRef: ChangeDetectorRef) {
 
     }
 
@@ -86,6 +87,7 @@ export class FormComponent implements OnInit, DoCheck {
         this.fieldsByKey = keyBy(this.fieldsCopy, (f) => f.key);
         this.modelDiffer = this.differs.find(this.model).create();
         this.updateProgress();
+        this.changeDetectorRef.detectChanges();
     }
 
 
@@ -97,7 +99,10 @@ export class FormComponent implements OnInit, DoCheck {
     }
 
     onDownload() {
-        let popUp = this.windowRef.nativeWindow.open('/loading', '_blank');
+        this.saveForm(true).subscribe(
+            (res) =>
+                this.windowRef.nativeWindow.location = '/pdf/' + this.claimId + '/' + this.formId
+        )
     }
 
     onSubmit() {

@@ -76,5 +76,18 @@ class UserDAOImpl @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Use
     collection.flatMap(
       _.update(Json.obj("userID" -> user.userID.toString), Json.obj("$set" -> Json.obj("activated" -> false))))
   }
+
+  /**
+   * Set a user tos status
+   *
+   * @param user The user account to modify.
+   * @return WriteResult
+   */
+  override def setTOSStatus(user: User, status: Boolean): Future[WriteResult] = {
+    collection.flatMap(
+      _.update(
+        Json.obj("userID" -> user.userID.toString),
+        Json.obj("$set" -> Json.obj("agreedToTOS" -> status))))
+  }
 }
 

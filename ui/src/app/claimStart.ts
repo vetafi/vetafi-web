@@ -103,12 +103,24 @@ export class ClaimStartComponent implements OnInit {
     }
 
     startClaim(claim) {
-        if (!this.claimService.acceptedTos()) {
-            const modalRef: NgbModalRef = this.ngbModal.open(TosModalComponent);
+        if (!this.user.agreedToTOS) {
+            const modalRef: NgbModalRef = this.ngbModal.open(
+                TosModalComponent,
+                {size: 'lg'}
+            );
             modalRef.result.then(
                 (res) => {
-                    this.claimService.acceptTos(true);
-                    this.goStartClaim(claim);
+                    this.ajaxService.agreeToTOS().subscribe(
+                        (res) => {
+                            this.goStartClaim(claim);
+                        },
+                        (error) => {
+                            this.goStartClaim(claim);
+                        }
+                    );
+                },
+                (err) => {
+                    this.router.navigateByUrl('/');
                 }
             );
         } else {
