@@ -64,8 +64,12 @@ class BiscuitPasswordMongoApi @Inject() (
 
   override def database: Future[DefaultDB] = {
     val db = environment.mode match {
-      case Mode.Prod => configuration.getOptional[String]("mongodb.db").getOrElse("test")
-      case _ => getNotProdUri.db.get
+      case Mode.Prod =>
+        logger.info("Using prod mongo URI.")
+        configuration.getOptional[String]("mongodb.db").getOrElse("test")
+      case _ =>
+        logger.info("Using non prod mongo URI.")
+        getNotProdUri.db.get
     }
 
     connection.database(db)

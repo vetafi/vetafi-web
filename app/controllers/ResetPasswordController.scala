@@ -10,7 +10,7 @@ import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import forms.ResetPasswordForm
 import play.api.i18n.{ I18nSupport, Messages, MessagesApi }
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.mvc.{ Action, AnyContent, Controller }
+import play.api.mvc._
 import _root_.services.{ AuthTokenService, UserService }
 import utils.auth.DefaultEnv
 
@@ -27,13 +27,13 @@ import scala.concurrent.Future
  * @param authTokenService       The auth token service implementation.
  */
 class ResetPasswordController @Inject() (
-  val messagesApi: MessagesApi,
   silhouette: Silhouette[DefaultEnv],
   userService: UserService,
   authInfoRepository: AuthInfoRepository,
   passwordHasherRegistry: PasswordHasherRegistry,
-  authTokenService: AuthTokenService)
-  extends Controller with I18nSupport {
+  authTokenService: AuthTokenService,
+  components: ControllerComponents)
+  extends AbstractController(components) with I18nSupport {
 
   /**
    * Views the `Reset Password` page.
@@ -66,11 +66,16 @@ class ResetPasswordController @Inject() (
             case Some(user) if user.loginInfo.providerID == CredentialsProvider.ID =>
               val passwordInfo = passwordHasherRegistry.current.hash(password)
               authInfoRepository.update[PasswordInfo](user.loginInfo, passwordInfo).map { _ =>
-                Redirect(routes.SignInController.view()).flashing("success" -> Messages("password.reset"))
+                Redirect(routes.SignInController.view()).flashing(
+                  "success" -> Messages("password.reset"))
               }
-            case _ => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link")))
+            case _ => Future.successful(
+              Redirect(routes.SignInController.view()).flashing(
+                "error" -> Messages("invalid.reset.link")))
           })
-      case None => Future.successful(Redirect(routes.SignInController.view()).flashing("error" -> Messages("invalid.reset.link")))
+      case None => Future.successful(
+        Redirect(routes.SignInController.view()).flashing(
+          "error" -> Messages("invalid.reset.link")))
     }
   }
 }

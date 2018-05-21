@@ -60,7 +60,7 @@ class UserValuesDAOImpl @Inject() (
 
   override def initialize(userID: UUID): Future[WriteResult] = collection.flatMap {
     (userValuesCollection: JSONCollection) =>
-      userValuesCollection.find(Json.obj("userID" -> userID)).one[User].flatMap {
+      userValuesCollection.find(Json.obj("userID" -> userID)).one[UserValues].flatMap {
         case Some(_) =>
           Future.successful(UpdateWriteResult(
             ok = true,

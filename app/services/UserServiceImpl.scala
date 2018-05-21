@@ -39,7 +39,10 @@ class UserServiceImpl @Inject() (
    * @param loginInfo The login info to retrieve a user.
    * @return The retrieved user or None if no user could be retrieved for the given login info.
    */
-  def retrieve(loginInfo: LoginInfo): Future[Option[User]] = userDAO.find(loginInfo)
+  def retrieve(loginInfo: LoginInfo): Future[Option[User]] = {
+    logger.info("About to find user for: " + loginInfo.toString)
+    userDAO.find(loginInfo)
+  }
 
   /**
    * Saves a user, also updates their user values based on their user information.
