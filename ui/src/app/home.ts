@@ -24,7 +24,8 @@ let template = `
           <h5 class="subheader">Get the benefits that you deserve now.</h5>
         </div>
         <div class="col-sm-3">
-            <a routerLink="/claim/start" class="btn">Begin</a>
+            <a *ngIf="isSignedIn" routerLink="/claim/start" class="btn">Begin</a>
+            <a *ngIf="!isSignedIn" href="/signup" class="btn">Begin</a>
         </div>
       </div>
     </div>
@@ -34,11 +35,14 @@ let template = `
       <div class="content col-sm-6">
         <h4>Submit an Intent to File.</h4>
         <p>Secure an effective date for your claim today in 5 minutes. Get the largest possible retroactive payment if you are awarded benefits. Avoid eBenefits, avoid dealing with any paperwork.</p>
-          <a routerLink="/claim/start" *ngIf="!incompleteClaim" class="btn">
+          <a routerLink="/claim/start" *ngIf="!incompleteClaim && isSignedIn" class="btn">
             Begin
           </a>
-          <a routerLink="/claim/{{incompleteClaim.claimID}}/select-forms" *ngIf="incompleteClaim" class="btn">
+          <a routerLink="/claim/{{incompleteClaim.claimID}}/select-forms" *ngIf="incompleteClaim && isSignedIn" class="btn">
             Continue
+          </a>
+          <a href="/signup" *ngIf="!isSignedIn" class="btn">
+            Begin
           </a>
       </div>
       <div class="icons-wrapper col-sm-6">
