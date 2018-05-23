@@ -11,8 +11,9 @@ import {FaqComponent} from './faq';
 import {SignDocumentComponent} from './signDocument';
 import {SignDocumentPreviewComponent} from './signDocumentPreview';
 import {Routes} from '@angular/router';
-import {ClaimsResolve, FormsResolve, MaybeUserResolve, UserResolve, UserValuesResolve} from './resolvers';
+import {ClaimsResolve, FormsResolve, MaybeUserResolve, RatingsConfigResolve, UserResolve, UserValuesResolve} from './resolvers';
 import {TosComponent} from './tos';
+import {RatingsCategories, RatingsHome, RatingsSelect} from './ratings';
 
 
 let profileRoutes: Routes = [
@@ -133,6 +134,27 @@ let childRoutes: Routes = [
         resolve: {
             userValues: UserValuesResolve,
             user: UserResolve
+        }
+    },
+    {
+        path: '/ratings',
+        component: RatingsHome,
+        resolve: {
+            ratingsConfig: RatingsConfigResolve
+        }
+    },
+    {
+        path: '/ratings/category/:categoryPath',
+        component: RatingsCategories,
+        resolve: {
+            ratingsConfig: RatingsConfigResolve
+        }
+    },
+    {
+        path: '/ratings/category/:categoryPath/rating/:ratingPath',
+        component: RatingsSelect,
+        resolve: {
+            ratingsConfig: RatingsConfigResolve
         }
     }
 ];

@@ -30,7 +30,6 @@ POST        /api/user                        controllers.api.UserController.upda
 DELETE      /api/user                        controllers.api.UserController.deleteAccount
 GET         /api/user/agreeToTOS             controllers.api.UserController.agreeToTos
 
-
 GET         /api/user/values                 controllers.api.UserValuesController.getUserValues
 POST        /api/save/:claimID/:formKey      controllers.api.FormController.saveForm(claimID: java.util.UUID, formKey: String)
 
@@ -55,5 +54,10 @@ POST        /api/subscribe                        controllers.api.MailingListCon
 GET         /api/twilioPdfEndpoint/:userID/:claimID            controllers.api.TwilioController.getPdf(userID: java.util.UUID, claimID: java.util.UUID)
 POST        /api/twilioCallback                                controllers.api.TwilioController.faxCallback()
 
+<<<<<<< HEAD
+=======
+GET         /api/ratings                          controllers.RatingsController.get()
+
+>>>>>>> 6bec202... squash
 # Map static resources from the /public folder to the file resource path
 GET        /*file               controllers.Assets.at(path="/public", file)
