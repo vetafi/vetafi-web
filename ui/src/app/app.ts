@@ -35,10 +35,15 @@ import {APP_ROUTES} from './app.routes';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {WindowRef} from './window';
 import {RouterModule} from '@angular/router';
-import {ClaimResolve, ClaimsResolve, FormsResolve, MaybeUserResolve, UserResolve, UserValuesResolve} from './resolvers';
+import {
+    ClaimResolve, ClaimsResolve, FormsResolve, MaybeUserResolve, RatingsConfigResolve, UserResolve,
+    UserValuesResolve
+} from './resolvers';
 import {RootComponent} from './root';
 import {TosComponent, TosModalComponent} from './tos';
 import {EditProfileComponent} from './modalEditProfile';
+import {RatingCategoryBreadcrumbs, RatingsCategories, RatingsHome, RatingsSelect} from './ratings';
+import {RatingsService} from './ratingsService';
 
 
 @NgModule({
@@ -73,7 +78,9 @@ import {EditProfileComponent} from './modalEditProfile';
         ClaimResolve,
         ClaimsResolve,
         UserValuesResolve,
-        FormsResolve
+        FormsResolve,
+        RatingsConfigResolve,
+        RatingsService
     ],
     bootstrap: [
         RootComponent
@@ -104,7 +111,11 @@ import {EditProfileComponent} from './modalEditProfile';
         ProfileComponent,
         ProfileGeneralComponent,
         ProfileSettingsComponent,
-        AutoCorrectField
+        AutoCorrectField,
+        RatingsHome,
+        RatingsCategories,
+        RatingsSelect,
+        RatingCategoryBreadcrumbs
     ],
     entryComponents: [
         TosModalComponent,

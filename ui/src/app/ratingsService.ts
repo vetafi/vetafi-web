@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {AjaxService} from './net';
 import {Observable} from 'rxjs/Observable';
+import {of} from 'rxjs/observable/of';
 
 @Injectable()
 export class RatingsService {
@@ -14,7 +15,8 @@ export class RatingsService {
     }
 
     static getScore(ratingSelections: any[]): number {
-        let scores =  ratingSelections
+        console.log(ratingSelections);
+        let scores = ratingSelections
             .map((selection) => selection.rating)
             .sort((selection) => selection.rating)
             .reverse();
@@ -31,6 +33,8 @@ export class RatingsService {
     }
 
     addSelection(selection: any): void {
+        console.log("addSelection");
+        console.log(this.userSelection);
         this.userSelection.push(selection);
         this.totalScore = RatingsService.getScore(this.userSelection)
     }
@@ -41,12 +45,14 @@ export class RatingsService {
     }
 
     getSelections(): any[] {
+        console.log("getSelections");
+        console.log(this.userSelection);
         return this.userSelection;
     }
 
     getConfiguration(): Observable<any> {
         if (this.configuration) {
-            return Observable.of(this.configuration)
+            return of(this.configuration);
         } else {
             return this.ajaxService
                 .getRatingsConfig()

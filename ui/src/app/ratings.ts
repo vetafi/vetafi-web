@@ -23,11 +23,11 @@ const ratingsHome = `
     </div>
   </div>
   <div class="container nopadding">
-    <div class="row rating-selection-header" [hidden]="userRating.ratingSelections.length > 0">
+    <div class="row rating-selection-header" [hidden]="userSelections.length > 0">
       <div class="col-sm-4">Condition</div>
       <div class="col-sm-2">Rating</div>
     </div>
-    <div class="row rating-selection-row" *ngFor="let item of userRating.ratingSelections">
+    <div class="row rating-selection-row" *ngFor="let item of userSelections">
       <div class="col-sm-4">
         <p></p>{{item.diagnosis.code}}: {{item.diagnosis.description}}
       </div>
@@ -40,7 +40,7 @@ const ratingsHome = `
     </div>
     <div class="row">
       <div class="col-sm-6">
-        <button (click)="addCondition(item)">Add Condition</button>
+        <a class="btn" routerLink="/ratings/category">Add Condition</a>
       </div>
     </div>
     <div class="row">
@@ -59,8 +59,9 @@ const ratingsHome = `
 )
 export class RatingsHome implements OnInit {
 
-    public ratingsConfig: any;
+    public ratingsConfig: any[];
     public userRating: number;
+    public userSelections: any[];
 
     constructor(public ratingsService: RatingsService,
                 public router: Router,
@@ -71,6 +72,8 @@ export class RatingsHome implements OnInit {
     ngOnInit(): void {
         this.ratingsConfig = this.activatedRoute.snapshot.data.ratingsConfig;
         this.userRating = this.ratingsService.getUserRating();
+        this.userSelections = this.ratingsService.getSelections();
+        console.log(this.userSelections);
     }
 
     removeSelection(item: any) {
@@ -85,7 +88,7 @@ export class RatingsHome implements OnInit {
 
 
 const ratingsSelect = `
-<rating-category-breadcrumbs breadcrumbs="breadcrumbs"></rating-category-breadcrumbs>
+<ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings">
   <div class="container nopadding" [hidden]="ratings.length == 0">
     <div class="row">
@@ -129,31 +132,68 @@ const ratingsSelect = `
 export class RatingsSelect {
 
     public ratingsConfig: any;
+    public ratings: any[];
+    public notes: any[];
+    public see_other_notes: any[];
+    public breadcrumbs: string[];
+    public category: any;
+
 
     constructor(public ratingsService: RatingsService,
                 public activatedRoute: ActivatedRoute) {
 
     }
 
+    unpackPath(rootCategory: any, path: string[]) {
+        this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
+        this.category = resolveCategoryFromPath(rootCategory, path);
+        this.notes = this.category.notes;
+        this.ratings = this.category.ratings;
+    }
+
     ngOnInit(): void {
         this.ratingsConfig = this.activatedRoute.snapshot.data.ratingsConfig;
+        let rootCategory = {
+            description: "All Categories",
+            subcategories: this.ratingsConfig,
+            notes: [],
+            ratings: []
+        };
+
+        let categoryPath =
+            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : [];
+        let ratingPath =
+            this.activatedRoute.snapshot.params.categoryPath ? this.ratingPath() : [];
+
+        this.unpackPath(rootCategory, categoryPath);
+
     }
 }
 
 
 const ratingsCategories = `
-<rating-category-breadcrumbs [breadcrumbs]="breadcrumbs"></rating-category-breadcrumbs>
+<ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings-categories">
   <h4>Select Condition</h4>
-  <h5 [hidden]="subcategories.length == 0">Subcategories</h5>
-  <div class="rating-category-select-button"
-    *ngFor="let subcategory of subcategories; index as i"
-    (click)="gotoSubcategory(i)">{{subcategory}}</div>
-  <h5 [hidden]="ratings.length == 0">Conditions</h5>
-  <div class="condition-select-button"
-       *ngFor="let rating of ratings; index as i"
-       (click)="gotoRating(i)">{{rating.code.description}} ({{rating.code.code}})</div>
-  <table [hidden]="notes.length == 0">
+  <div *ngIf="ratings.length > 0" class="container">
+    <h5>Conditions</h5>
+    
+    <div class="row">
+        <div class="col-xl-3">Condition Name</div>
+        <div class="col-xl-3">VA Condition Code</div>
+    </div>
+    <div class="row" *ngFor="let rating of ratings; index as i">
+        <div class="col-xl-3">{{rating.code.description}}</div>
+        <div class="col-xl-3">{{rating.code.code}}</div>
+        <div class="col-xl-3">
+            <a class="btn" routerLink="/ratings/category/{{currentUrlPath}}/rating/{{i}}">
+                Select Condition
+            </a>
+        </div>
+    </div>
+  </div>
+  
+  <table *ngIf="notes.length > 0">
     <thead>
       <tr>
         <th>Notes</th>
@@ -165,7 +205,43 @@ const ratingsCategories = `
       </tr>
     </tbody>
   </table>
+  
+  <div *ngIf="subcategories.length > 0">
+      <h5>Subcategories</h5>
+      <div class="rating-category-select-button"
+           *ngFor="let subcategory of subcategories; index as i">
+        <a routerLink="/ratings/category/{{getPathToSubcategory(i)}}">{{subcategory}}</a>
+      </div>
+  </div>
 </div>`;
+
+
+function resolveCategoryFromPath(rootCategory: any, path: string[]) {
+    let currentCategory = rootCategory;
+    let tempBreadcrumbs = [];
+    tempBreadcrumbs.push(currentCategory.description);
+
+    path.forEach(
+        (i) => {
+            currentCategory = currentCategory.subcategories[i];
+            tempBreadcrumbs.push(currentCategory.description);
+        }
+    );
+
+    return tempBreadcrumbs;
+}
+
+function getBreadCrumbsFromPath(rootCategory: any, path: string[]) {
+    let currentCategory = rootCategory;
+
+    path.forEach(
+        (i) => {
+            currentCategory = currentCategory.subcategories[i];
+        }
+    );
+
+    return currentCategory;
+}
 
 @Component(
     {
@@ -175,48 +251,61 @@ const ratingsCategories = `
 )
 export class RatingsCategories {
 
-    public breadcrumbs: string[];
-    public notes: string[];
-    public subcategories: string[];
-    public category: any;
-    public ratings: any[];
+    public breadcrumbs: string[] = [];
+    public notes: string[] = [];
+    public subcategories: string[] = [];
+    public ratings: any[] = [];
     public ratingsConfig: any;
+    public category: any;
+    public currentUrlPath: string;
 
     constructor(public ratingsService: RatingsService,
-                public activatedRoute: ActivatedRoute) {
+                public activatedRoute: ActivatedRoute,
+                public router: Router) {
 
     }
 
     categoryPath() {
-        return this.activatedRoute.snapshot.params.categoryPath.split(",").map(parseInt);
+        return this.activatedRoute.snapshot.params.categoryPath.split(',').map(parseInt);
     }
 
+    unpackPath(rootCategory: any, path: string[]) {
+        this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
+        this.category = resolveCategoryFromPath(rootCategory, path);
+        this.notes = this.category.notes;
+        this.subcategories = this.category.subcategories.map(
+            (c) => {
+                return c.description;
+            });
+        this.ratings = this.category.ratings;
+    }
 
     ngOnInit(): void {
         this.ratingsConfig = this.activatedRoute.snapshot.data.ratingsConfig;
+        let rootCategory = {
+            description: "All Categories",
+            subcategories: this.ratingsConfig,
+            notes: [],
+            ratings: []
+        };
 
         let path =
             this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : [];
+        this.currentUrlPath =
+            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : "";
 
-        let currentCategory = this.ratingsConfig;
-        let tempBreadcrumbs = [];
-        tempBreadcrumbs.push(currentCategory.description);
+        this.unpackPath(rootCategory, path);
+    }
 
-        path.forEach(
-            (i) => {
-                currentCategory = currentCategory.subcategories[i];
-                tempBreadcrumbs.push(currentCategory.description);
-            }
-        );
+    getPathToSubcategory(index: number) {
+        let currentUrlPath =
+            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : "";
 
-        this.breadcrumbs = tempBreadcrumbs;
-        this.notes = currentCategory.notes;
-        this.category = currentCategory;
-
-        this.subcategories = this.category.subcategories.map(
-            (c) => { return c.description });
-        this.category = this.category.description;
-        this.ratings = this.category.ratings;
+        if (!currentUrlPath) {
+            return String(index);
+        } else {
+            return currentUrlPath + "," + index;
+        }
     }
 
     gotoSubcategory(i): void {
@@ -225,6 +314,11 @@ export class RatingsCategories {
 
     gotoRating(i): void {
 
+    }
+
+    selectCondition(selection: any): void {
+        this.ratingsService.addSelection(selection);
+        this.router.navigateByUrl("ratings")
     }
 }
 

@@ -3,9 +3,9 @@ package services.ratings
 import com.google.inject.Inject
 import org.log4s.getLogger
 import play.api.Configuration
-import play.api.libs.json.{JsArray, JsObject, Json}
+import play.api.libs.json.{ JsArray, JsObject, Json }
 
-class JsonResourceRatingsConfigManager @Inject()(configuration: Configuration) extends RatingsConfigManager {
+class JsonResourceRatingsConfigManager @Inject() (configuration: Configuration) extends RatingsConfigManager {
 
   private[this] val logger = getLogger
   val ratingsResources = Seq(
@@ -28,14 +28,13 @@ class JsonResourceRatingsConfigManager @Inject()(configuration: Configuration) e
     "schedule_of_ratings_neurological_conditions_and_convulsive_disorders.json",
     "schedule_of_ratings_other_sense_organs.json",
     "schedule_of_ratings_respiratory_system.json",
-    "schedule_of_ratings_skin.json"
-  )
+    "schedule_of_ratings_skin.json")
 
   lazy val jsonObjects: Seq[JsObject] = {
     ratingsResources.map {
       fileName =>
         val inputStream = getClass.getClassLoader.getResource(
-          s"conf/ratings/$fileName").openStream()
+          s"ratings/$fileName").openStream()
         Json.parse(inputStream).as[JsObject]
     }
   }

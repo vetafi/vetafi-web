@@ -137,21 +137,28 @@ let childRoutes: Routes = [
         }
     },
     {
-        path: '/ratings',
+        path: 'ratings',
         component: RatingsHome,
         resolve: {
             ratingsConfig: RatingsConfigResolve
         }
     },
     {
-        path: '/ratings/category/:categoryPath',
+        path: 'ratings/category/:categoryPath',
         component: RatingsCategories,
         resolve: {
             ratingsConfig: RatingsConfigResolve
         }
     },
     {
-        path: '/ratings/category/:categoryPath/rating/:ratingPath',
+        path: 'ratings/category',
+        component: RatingsCategories,
+        resolve: {
+            ratingsConfig: RatingsConfigResolve
+        }
+    },
+    {
+        path: 'ratings/category/:categoryPath/rating/:ratingPath',
         component: RatingsSelect,
         resolve: {
             ratingsConfig: RatingsConfigResolve
