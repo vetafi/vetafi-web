@@ -144,7 +144,7 @@ export class RatingsSelect {
 
     }
 
-    unpackPath(rootCategory: any, path: string[]) {
+    unpackPath(rootCategory: any, path: number[]) {
         this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
         this.category = resolveCategoryFromPath(rootCategory, path);
         this.notes = this.category.notes;
@@ -167,6 +167,14 @@ export class RatingsSelect {
 
         this.unpackPath(rootCategory, categoryPath);
 
+    }
+
+    categoryPath(): number[] {
+        return this.activatedRoute.snapshot.params.categoryPath.split(',').map(parseInt);
+    }
+
+    ratingPath(): number[] {
+        return this.activatedRoute.snapshot.params.ratingPath.split(',').map(parseInt);
     }
 }
 
@@ -216,7 +224,7 @@ const ratingsCategories = `
 </div>`;
 
 
-function resolveCategoryFromPath(rootCategory: any, path: string[]) {
+function getBreadCrumbsFromPath(rootCategory: any, path: number[]) {
     let currentCategory = rootCategory;
     let tempBreadcrumbs = [];
     tempBreadcrumbs.push(currentCategory.description);
@@ -231,7 +239,7 @@ function resolveCategoryFromPath(rootCategory: any, path: string[]) {
     return tempBreadcrumbs;
 }
 
-function getBreadCrumbsFromPath(rootCategory: any, path: string[]) {
+function resolveCategoryFromPath(rootCategory: any, path: number[]) {
     let currentCategory = rootCategory;
 
     path.forEach(
@@ -265,11 +273,11 @@ export class RatingsCategories {
 
     }
 
-    categoryPath() {
+    categoryPath(): number[] {
         return this.activatedRoute.snapshot.params.categoryPath.split(',').map(parseInt);
     }
 
-    unpackPath(rootCategory: any, path: string[]) {
+    unpackPath(rootCategory: any, path: number[]) {
         this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
         this.category = resolveCategoryFromPath(rootCategory, path);
         this.notes = this.category.notes;
@@ -278,6 +286,7 @@ export class RatingsCategories {
                 return c.description;
             });
         this.ratings = this.category.ratings;
+        console.log(this.category);
     }
 
     ngOnInit(): void {
@@ -292,7 +301,8 @@ export class RatingsCategories {
         let path =
             this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : [];
         this.currentUrlPath =
-            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : "";
+            this.activatedRoute.snapshot.params.categoryPath ?
+                this.activatedRoute.snapshot.params.categoryPath : "";
 
         this.unpackPath(rootCategory, path);
     }
@@ -306,14 +316,6 @@ export class RatingsCategories {
         } else {
             return currentUrlPath + "," + index;
         }
-    }
-
-    gotoSubcategory(i): void {
-
-    }
-
-    gotoRating(i): void {
-
     }
 
     selectCondition(selection: any): void {
