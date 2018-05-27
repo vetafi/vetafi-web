@@ -90,7 +90,7 @@ export class RatingsHome implements OnInit {
 const ratingsSelect = `
 <ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings">
-  <div class="container nopadding" [hidden]="ratings.length == 0">
+  <div class="container nopadding" *ngIf="ratings.length > 0">
     <div class="row">
       <div class="col-sm-6"><b>Description</b></div>
       <div class="col-sm-2"><b>Rating</b></div>
@@ -103,7 +103,7 @@ const ratingsSelect = `
       </div>
     </div>
   </div>
-  <div class="container nopadding" [hidden]="notes.length == 0">
+  <div class="container nopadding" *ngIf="notes.length > 0">
     <div class="row">
       <div class="col-sm-6"><b>Notes</b></div>
     </div>
@@ -113,9 +113,9 @@ const ratingsSelect = `
       </div>
     </div>
   </div>
-  <div class="container nopadding" [hidden]="see_other_notes.length == 0">
+  <div class="container nopadding" *ngIf="see_other_notes.length > 0">
     <div class="row">
-      <div class="col-sm-6">See Other Notes</div>
+      <div class="col-sm-6">See Other</div>
     </div>
     <div class="row" *ngFor="let note of see_other_notes">
       <div class="col-sm-6">{{note.see_other_note}}</div>
@@ -132,11 +132,11 @@ const ratingsSelect = `
 export class RatingsSelect {
 
     public ratingsConfig: any;
-    public ratings: any[];
+    public ratings: any;
     public notes: any[];
+    public category: any;
     public see_other_notes: any[];
     public breadcrumbs: string[];
-    public category: any;
 
 
     constructor(public ratingsService: RatingsService,
@@ -147,8 +147,10 @@ export class RatingsSelect {
     unpackPath(rootCategory: any, path: number[]) {
         this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
         this.category = resolveCategoryFromPath(rootCategory, path);
-        this.notes = this.category.notes;
-        this.ratings = this.category.ratings;
+        this.ratings = this.category.ratings[this.ratingPath()].ratings;
+        this.notes = this.category.ratings[this.ratingPath()].notes;
+        this.see_other_notes = this.category.ratings[this.ratingPath()].see_other_notes;
+        console.log(this.ratings);
     }
 
     ngOnInit(): void {
@@ -173,8 +175,8 @@ export class RatingsSelect {
         return this.activatedRoute.snapshot.params.categoryPath.split(',').map(parseInt);
     }
 
-    ratingPath(): number[] {
-        return this.activatedRoute.snapshot.params.ratingPath.split(',').map(parseInt);
+    ratingPath(): number {
+        return parseInt(this.activatedRoute.snapshot.params.ratingPath);
     }
 }
 

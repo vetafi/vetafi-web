@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {AjaxService} from './net';
 import {Observable} from 'rxjs/Observable';
 import {of} from 'rxjs/observable/of';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class RatingsService {
@@ -56,10 +57,13 @@ export class RatingsService {
         } else {
             return this.ajaxService
                 .getRatingsConfig()
-                .pipe((config) => {
-                    this.configuration = config;
-                    return config;
-                })
+                .pipe(
+                    map((config) => {
+                        this.configuration = config;
+                        return config;
+                    }, this)
+                )
         }
     }
 }
+
