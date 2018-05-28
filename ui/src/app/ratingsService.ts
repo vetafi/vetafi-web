@@ -4,6 +4,17 @@ import {Observable} from 'rxjs/Observable';
 import {of} from 'rxjs/observable/of';
 import {map} from 'rxjs/operators';
 
+
+export class UserSelection {
+
+    constructor(public rating: number,
+                public diagnosis: string,
+                public subdiagnosis: string,
+                public diagnosisCode: number) {
+
+    }
+}
+
 @Injectable()
 export class RatingsService {
 
@@ -15,11 +26,11 @@ export class RatingsService {
 
     }
 
-    static getScore(ratingSelections: any[]): number {
+    static getScore(ratingSelections: UserSelection[]): number {
         console.log(ratingSelections);
         let scores = ratingSelections
             .map((selection) => selection.rating)
-            .sort((selection) => selection.rating)
+            .sort()
             .reverse();
 
         scores.unshift(0);
@@ -33,19 +44,19 @@ export class RatingsService {
         return RatingsService.getScore(this.userSelection);
     }
 
-    addSelection(selection: any): void {
+    addSelection(selection: UserSelection): void {
         console.log("addSelection");
         console.log(this.userSelection);
         this.userSelection.push(selection);
         this.totalScore = RatingsService.getScore(this.userSelection)
     }
 
-    removeSelection(item: any): void {
+    removeSelection(item: UserSelection): void {
         this.userSelection = this.userSelection.filter((iteree) => item != iteree);
         this.totalScore = RatingsService.getScore(this.userSelection)
     }
 
-    getSelections(): any[] {
+    getSelections(): UserSelection[] {
         console.log("getSelections");
         console.log(this.userSelection);
         return this.userSelection;

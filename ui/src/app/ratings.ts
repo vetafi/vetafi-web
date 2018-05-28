@@ -1,14 +1,14 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {RatingsService} from './ratingsService';
+import {RatingsService, UserSelection} from './ratingsService';
 import {ActivatedRoute, Router} from '@angular/router';
 
 
 const ratingsHome = `
 <div id="vfi-ratings-home">
-  <div class="container nopadding">
+  <div class="container">
     <div class="row">
       <div class="col-sm-6">
-        <h3>ProRate - Disability Rating and Pension Calculator</h3>
+        <h3>Disability Rating and Pension Calculator</h3>
         <p>To begin click “Add Condition”.</p>
         <p>
           You may add multiple conditions and we will calculate
@@ -22,39 +22,54 @@ const ratingsHome = `
       </div>
     </div>
   </div>
-  <div class="container nopadding">
-    <div class="row rating-selection-header" [hidden]="userSelections.length > 0">
-      <div class="col-sm-4">Condition</div>
-      <div class="col-sm-2">Rating</div>
-    </div>
-    <div class="row rating-selection-row" *ngFor="let item of userSelections">
-      <div class="col-sm-4">
-        <p></p>{{item.diagnosis.code}}: {{item.diagnosis.description}}
+  
+  <div class="container">
+      <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">VA Diagnosis Code</th>
+                <th scope="col">Condition</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Rating</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <p *ngIf="userSelections.length == 0">
+                No conditions selected. Please click "Add Condition" below to browse the tree of conditions.
+            </p>
+            <tr *ngFor="let item of userSelections">
+              <td>{{item.diagnosisCode}}</td>
+              <td>{{item.diagnosis}}</td>
+              <td>{{item.subdiagnosis}}</td>
+              <td>{{item.rating}}</td>
+              <td>
+                <button class="remove-rating-selection" (click)="removeSelection(item)">X</button>
+              </td>
+            </tr>
+        </tbody>
+      </table>
+      
+      
+  </div>
+  
+  <div class="container">
+      <div class="row">
+        <div class="col-xl-6">
+          <h3>Total Rating:</h3> <h2>{{userRating}}</h2>
+        </div>
+        <div class="col-xl-6">
+          <a class="btn" routerLink="/ratings/category">Add Condition</a>
+        </div>
       </div>
-      <div class="col-sm-2">
-        <p></p>{{item.rating}}
-      </div>
-      <div class="col-sm-1">
-        <div class="remove-rating-selection" (click)="removeSelection(item)"></div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-6">
-        <a class="btn" routerLink="/ratings/category">Add Condition</a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-sm-6">
-        <p></p>Total Rating: {{userRating.totalScore}}
-      </div>
-    </div>
   </div>
 </div>`;
 
 @Component(
     {
         selector: 'ratings-home',
-        template: ratingsHome
+        template: ratingsHome,
+        styleUrls: ['../assets/styles/ratingHome.styl']
     }
 )
 export class RatingsHome implements OnInit {
@@ -76,11 +91,12 @@ export class RatingsHome implements OnInit {
         console.log(this.userSelections);
     }
 
-    removeSelection(item: any) {
+    removeSelection(item: UserSelection) {
         this.ratingsService.removeSelection(item);
+        this.userSelections = this.ratingsService.getSelections();
     }
 
-    addCondition(item: any) {
+    addCondition(item: UserSelection) {
         this.ratingsService.addSelection(item);
         this.router.navigateByUrl('');
     }
@@ -137,10 +153,12 @@ export class RatingsSelect {
     public category: any;
     public see_other_notes: any[];
     public breadcrumbs: string[];
+    public code: any;
 
 
     constructor(public ratingsService: RatingsService,
-                public activatedRoute: ActivatedRoute) {
+                public activatedRoute: ActivatedRoute,
+                public router: Router) {
 
     }
 
@@ -150,7 +168,9 @@ export class RatingsSelect {
         this.ratings = this.category.ratings[this.ratingPath()].ratings;
         this.notes = this.category.ratings[this.ratingPath()].notes;
         this.see_other_notes = this.category.ratings[this.ratingPath()].see_other_notes;
-        console.log(this.ratings);
+        this.code = this.category.ratings[this.ratingPath()].code;
+        console.log(this.category.ratings[this.ratingPath()]);
+        console.log(this.code);
     }
 
     ngOnInit(): void {
@@ -177,6 +197,16 @@ export class RatingsSelect {
 
     ratingPath(): number {
         return parseInt(this.activatedRoute.snapshot.params.ratingPath);
+    }
+
+    addRating(selection: any): void {
+        this.ratingsService.addSelection(
+            new UserSelection(
+                selection.rating,
+                this.code.description,
+                selection.description,
+                this.code.code));
+        this.router.navigateByUrl("ratings");
     }
 }
 
