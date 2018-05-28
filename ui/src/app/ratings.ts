@@ -56,7 +56,7 @@ const ratingsHome = `
   <div class="container">
       <div class="row">
         <div class="col-xl-6">
-          <h3>Total Rating:</h3> <h2>{{userRating}}</h2>
+          <h3>Total Rating:</h3> <h2>{{userRating}} %</h2>
         </div>
         <div class="col-xl-6">
           <a class="btn" routerLink="/ratings/category">Add Condition</a>

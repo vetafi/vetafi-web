@@ -35,9 +35,11 @@ export class RatingsService {
 
         scores.unshift(0);
 
-        return Math.round(scores.reduce((left, right) => {
+        let unrounded = Math.round(scores.reduce((left, right) => {
             return (((100 - left) / 100) * right) + left
-        }))
+        }));
+
+        return Math.round(unrounded / 10) * 10;
     }
 
     getUserRating(): number {
