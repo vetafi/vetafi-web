@@ -10,7 +10,7 @@ const ratingsHome = `
   <div class="container">
     <div class="row">
       <div class="col-sm-10">
-        <h2>Disability Rating and Pension Calculator</h2>
+        <h2>Disability Rating Calculator</h2>
         
       </div>
       <div class="col-sm-2 float-right">
@@ -311,8 +311,9 @@ export class RatingsHome implements OnInit {
 const ratingsSelect = `
 <ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings">
-    <div class="container nopadding" *ngIf="ratings.length > 0">
+    <div class="container">
 
+<div *ngIf="ratings.length > 0">
         <h3 class="section-header">Rated Conditions</h3>
         <div class="row">
           <div class="col-xl-12">
@@ -337,10 +338,11 @@ const ratingsSelect = `
             </tr>
             </tbody>
         </table>
+        </div>
 
         <div *ngIf="notes.length > 0">
         
-            <h3>Notes</h3>
+            <h3 class="section-header">Notes</h3>
             <div class="row">
                 <div class="col-xl-12">
                     <hr />
@@ -354,7 +356,7 @@ const ratingsSelect = `
         </div>
 
         <div *ngIf="see_other_notes.length > 0">
-            <h3>See Other Conditions</h3>
+            <h3 class="section-header">See Other Conditions</h3>
             <div class="row">
                 <div class="col-xl-12">
                     <hr />
@@ -395,12 +397,13 @@ export class RatingsSelect {
     unpackPath(rootCategory: any, path: number[]) {
         this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
         this.category = resolveCategoryFromPath(rootCategory, path);
+        this.breadcrumbs.push(this.category.ratings[this.ratingPath()].code.description);
         this.ratings = this.category.ratings[this.ratingPath()].ratings;
         this.notes = this.category.ratings[this.ratingPath()].notes;
         this.see_other_notes = this.category.ratings[this.ratingPath()].see_other_notes;
         this.code = this.category.ratings[this.ratingPath()].code;
         console.log(this.category.ratings[this.ratingPath()]);
-        console.log(this.code);
+        console.log(this.see_other_notes);
     }
 
     ngOnInit(): void {
@@ -561,10 +564,17 @@ export class RatingsCategories {
     }
 
     categoryPath(): number[] {
-        return this.activatedRoute.snapshot.params.categoryPath.split(',').map(parseInt);
+        return this.activatedRoute.snapshot.params.categoryPath.split(',').map(
+                (x) => parseInt(x)
+            );
     }
 
-    unpackPath(rootCategory: any, path: number[]) {
+    unpackPath(rootCategory: any, params: any) {
+        let path =
+            params.categoryPath ? this.categoryPath() : [];
+        this.currentUrlPath =
+            params.categoryPath ? params.categoryPath : '';
+
         this.breadcrumbs = getBreadCrumbsFromPath(rootCategory, path);
         this.category = resolveCategoryFromPath(rootCategory, path);
         this.notes = this.category.notes;
@@ -585,13 +595,13 @@ export class RatingsCategories {
             ratings: []
         };
 
-        let path =
-            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : [];
-        this.currentUrlPath =
-            this.activatedRoute.snapshot.params.categoryPath ?
-                this.activatedRoute.snapshot.params.categoryPath : '';
+        this.activatedRoute.params.subscribe(
+            params => {
+                this.unpackPath(rootCategory, params)
+            }
+        );
 
-        this.unpackPath(rootCategory, path);
+        this.unpackPath(rootCategory, this.activatedRoute.snapshot.params);
     }
 
     getPathToSubcategory(index: number) {

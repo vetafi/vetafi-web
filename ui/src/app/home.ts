@@ -58,6 +58,25 @@ let template = `
   <div class="action-wrapper container">
     <div class="action row">
       <div class="content col-sm-6">
+        <h4>See what the VA will pay you for your service linked disability.</h4>
+        <p>The VA rules for disability compensation are complicated and change frequently. Use our simple tool to get the most up to date information on what you could be paid by the VA.</p>
+          <a routerLink="/ratings" class="btn">
+            Disability Ratings Calculator
+          </a>
+      </div>
+      <div class="icons-wrapper col-sm-6">
+        <div class="main-wrapper health right-align">
+          <div class="main-icon health"></div>
+          <div class="inner-wrapper question right-align">
+            <div class="inner-icon question"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="action-wrapper container">
+    <div class="action row">
+      <div class="content col-sm-6">
         <h4>How does Vetafi work?</h4>
         <p>Have any questions about Vetafi and what services we provide? Want more information about the VA claims process? Visit our FAQ page to get your questions answered.</p>
           <a routerLink="/faq" class="btn">Frequently Asked Questions</a>
