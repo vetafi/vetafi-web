@@ -1,0 +1,44 @@
+<ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
+<div id="vfi-ratings">
+    <div class="container nopadding" *ngIf="ratings.length > 0">
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Description</th>
+                <th>Rating</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rating of ratings">
+                <td>{{rating.description}}</td>
+                <td>{{rating.rating}}</td>
+                <td>
+                    <button (click)="addRating(rating)">Add</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="notes.length > 0">
+            <div class="row">
+                <div class="col-sm-12"><b>Notes</b></div>
+            </div>
+            <div class="row" *ngFor="let note of notes">
+                <div class="col-sm-12">
+                    <p>{{note.note}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="see_other_notes.length > 0">
+            <div class="row">
+                <div class="col-sm-12">See Other</div>
+            </div>
+            <div class="row" *ngFor="let note of see_other_notes">
+                <div class="col-sm-12">{{note.see_other_note}}</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,24 +9,38 @@ const ratingsHome = `
 <div id="vfi-ratings-home">
   <div class="container">
     <div class="row">
-      <div class="col-sm-6">
-        <h3>Disability Rating and Pension Calculator</h3>
-        <p>To begin click “Add Condition”.</p>
-        <p>
-          You may add multiple conditions and we will calculate
-          your combined rating using the VA formula.
-        </p>
+      <div class="col-sm-10">
+        <h2>Disability Rating and Pension Calculator</h2>
+        
       </div>
-      <div class="col-sm-2">
-        <div><span><b class="last-updated-statement">Rating info last updated:</b>May 2017</span>
+      <div class="col-sm-2 float-right">
+          <p><b class="last-updated-statement">Rating info last updated:</b>May 2017</p>
           <p class="rating-info-disclaimer">All information on this page comes directly from CFR 38.</p>
-        </div>
       </div>
     </div>
-  </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <hr/>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-8">
+            <h3>Step 1: Select your service connected disabilities</h3>
+            <p>To begin click “Add Condition”. You will be able to browse from the list of VA covered conditions.</p>
+            <p>
+              You may add multiple conditions and we will calculate
+              your combined rating using the VA formula.
+            </p>
+        </div>
+        <div class="col-xl-4">
+          <a class="btn" routerLink="/ratings/category">Add Condition</a>
+        </div>
+    </div>
   
-  <div class="container">
-      <table class="table">
+    
+    
+      <table class="table rating-table">
         <thead>
             <tr>
                 <th scope="col">VA Diagnosis Code</th>
@@ -37,8 +51,8 @@ const ratingsHome = `
             </tr>
         </thead>
         <tbody>
-            <p *ngIf="userSelections.length == 0">
-                No conditions selected. Please click "Add Condition" below to browse the tree of conditions.
+            <p *ngIf="userSelections.length == 0" class="table-placeholder">
+                No conditions selected. Please click "Add Condition" to browse the tree of conditions.
             </p>
             <tr *ngFor="let item of userSelections">
               <td>{{item.diagnosisCode}}</td>
@@ -46,24 +60,37 @@ const ratingsHome = `
               <td>{{item.subdiagnosis}}</td>
               <td>{{item.rating}}</td>
               <td>
-                <button class="remove-rating-selection" (click)="removeSelection(item)">X</button>
+                <div class="remove-condition" (click)="removeSelection(item)"></div>
               </td>
             </tr>
         </tbody>
       </table>
       
-      
-  </div>
-  
-  <div class="container">
       <div class="row">
         <div class="col-xl-6">
           <h3>Total Rating:</h3> <h2>{{userRating}} %</h2>
         </div>
-        <div class="col-xl-6">
-          <a class="btn" routerLink="/ratings/category">Add Condition</a>
-        </div>
+        
       </div>
+      
+      
+      <div class="row">
+        <div class="col-sm-12">
+            <hr/>
+        </div>
+    </div>
+      
+      <div class="row">
+        <div class="col-sm-8">
+            <h3>Step 2: Fill out your dependent information.</h3>
+            <p>VA compensation is also based on the number of dependents you have.</p>
+            <p>Answer the following questions so that we can calculate your monthly disability payments:</p>
+        </div>
+    </div>
+   
+      
+       
+      
       <form name="form" (ngSubmit)="submit()">
           <formly-form [form]="form" [model]="model" [fields]="fields">
           </formly-form>
@@ -284,43 +311,68 @@ export class RatingsHome implements OnInit {
 const ratingsSelect = `
 <ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings">
-  <div class="container nopadding" *ngIf="ratings.length > 0">
-    <div class="row">
-      <div class="col-sm-6"><b>Description</b></div>
-      <div class="col-sm-2"><b>Rating</b></div>
+    <div class="container nopadding" *ngIf="ratings.length > 0">
+
+        <h3 class="section-header">Rated Conditions</h3>
+        <div class="row">
+          <div class="col-xl-12">
+            <hr />
+          </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Description</th>
+                <th>Rating</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rating of ratings">
+                <td>{{rating.description}}</td>
+                <td>{{rating.rating}}</td>
+                <td>
+                    <button (click)="addRating(rating)">Add</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf="notes.length > 0">
+        
+            <h3>Notes</h3>
+            <div class="row">
+                <div class="col-xl-12">
+                    <hr />
+                </div>
+            </div>
+            <div class="row" *ngFor="let note of notes">
+                <div class="col-sm-12">
+                    <p>{{note.note}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="see_other_notes.length > 0">
+            <h3>See Other Conditions</h3>
+            <div class="row">
+                <div class="col-xl-12">
+                    <hr />
+                </div>
+            </div>
+            <div class="row" *ngFor="let note of see_other_notes">
+                <div class="col-sm-12">{{note.see_other_note}}</div>
+            </div>
+        </div>
     </div>
-    <div class="row rating-selection-row" *ngFor="let rating of ratings">
-      <div class="col-sm-6">{{rating.description}}</div>
-      <div class="col-sm-1">{{rating.rating}}</div>
-      <div class="col-sm-1">
-        <button (click)="addRating(rating)">Add</button>
-      </div>
-    </div>
-  </div>
-  <div class="container nopadding" *ngIf="notes.length > 0">
-    <div class="row">
-      <div class="col-sm-6"><b>Notes</b></div>
-    </div>
-    <div class="row" *ngFor="let note of notes">
-      <div class="col-sm-6">
-        <p>{{note.note}}</p>
-      </div>
-    </div>
-  </div>
-  <div class="container nopadding" *ngIf="see_other_notes.length > 0">
-    <div class="row">
-      <div class="col-sm-6">See Other</div>
-    </div>
-    <div class="row" *ngFor="let note of see_other_notes">
-      <div class="col-sm-6">{{note.see_other_note}}</div>
-    </div>
-  </div>
-</div>`;
+</div>
+`;
 
 @Component(
     {
         selector: 'ratings-select',
-        template: ratingsSelect
+        template: ratingsSelect,
+        styleUrls: ['../assets/styles/ratingSelect.styl']
     }
 )
 export class RatingsSelect {
@@ -392,43 +444,67 @@ export class RatingsSelect {
 const ratingsCategories = `
 <ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings-categories">
-  <h4>Select Condition</h4>
-  <div *ngIf="ratings.length > 0" class="container">
-    <h5>Conditions</h5>
-    
-    <div class="row">
-        <div class="col-xl-3">Condition Name</div>
-        <div class="col-xl-3">VA Condition Code</div>
-    </div>
-    <div class="row" *ngFor="let rating of ratings; index as i">
-        <div class="col-xl-3">{{rating.code.description}}</div>
-        <div class="col-xl-3">{{rating.code.code}}</div>
-        <div class="col-xl-3">
-            <a class="btn" routerLink="/ratings/category/{{currentUrlPath}}/rating/{{i}}">
-                Select Condition
-            </a>
+    <div class="container">
+      <h3 class="section-header">VA Covered Conditions Browser</h3>
+      <div class="row">
+         <div class="col-xl-12">
+            <hr />
+         </div>
+      </div>
+      <div *ngIf="ratings.length > 0" class="container">
+        <h4 class="section-header">Conditions</h4>
+        <div class="row">
+          <div class="col-xl-12">
+            <hr />
+          </div>
         </div>
-    </div>
-  </div>
-  
-  <table *ngIf="notes.length > 0">
-    <thead>
-      <tr>
-        <th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let note of notes">
-        <td>{{note.note}}</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  <div *ngIf="subcategories.length > 0">
-      <h5>Subcategories</h5>
-      <div class="rating-category-select-button"
-           *ngFor="let subcategory of subcategories; index as i">
-        <a routerLink="/ratings/category/{{getPathToSubcategory(i)}}">{{subcategory}}</a>
+        
+        <table class="table table-striped">
+            <thead>
+                    <tr>
+                        <th>Condition Name</th>
+                        <th>VA Condition Code</th>
+                        <th></th>
+                    </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let rating of ratings; index as i">
+                    <td>{{rating.code.description}}</td>
+                    <td>{{rating.code.code}}</td>
+                    <td> 
+                        <a class="btn" routerLink="/ratings/category/{{currentUrlPath}}/rating/{{i}}">
+                            Select Condition
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+      </div>
+      
+      <table *ngIf="notes.length > 0">
+        <h4 class="section-header">Notes</h4>
+        <div class="row">
+          <div class="col-xl-12">
+            <hr />
+          </div>
+        </div>
+        <div *ngFor="let note of notes" class="row">
+          {{note.note}}
+        </div>
+      </table>
+      
+      <div *ngIf="subcategories.length > 0">
+          <h4 class="section-header">Categories</h4>
+          <div class="row">
+            <div class="col-xl-12">
+              <hr />
+            </div>
+          </div>
+          <div class="rating-category-select-button row"
+               *ngFor="let subcategory of subcategories; index as i">
+            <a routerLink="/ratings/category/{{getPathToSubcategory(i)}}"
+               class="subcategory">{{subcategory}}</a>
+          </div>
       </div>
   </div>
 </div>`;
@@ -464,7 +540,8 @@ function resolveCategoryFromPath(rootCategory: any, path: number[]) {
 @Component(
     {
         selector: 'ratings-categories',
-        template: ratingsCategories
+        template: ratingsCategories,
+        styleUrls: ['../assets/styles/ratingCategories.styl']
     }
 )
 export class RatingsCategories {
@@ -539,8 +616,7 @@ const breadcrumbTemplate = `
 <div id="vfi-breadcrumbs">
   <div class="breadcrumbs-wrapper">
     <div class="link-wrapper" *ngFor="let link of links; index as i">
-        <span [ngClass]="{'lighten': link.lighten}"
-              *ngIf="i > 0"></span>
+        <span [ngClass]="{'lighten': link.lighten}" *ngIf="i > 0">&gt;</span>
         <span [ngClass]="{'lighten': link.lighten, 'current': link.current}">{{link.title}}</span>
     </div>
   </div>
@@ -550,7 +626,8 @@ const breadcrumbTemplate = `
 @Component(
     {
         selector: 'ratings-category-breadcrumbs',
-        template: breadcrumbTemplate
+        template: breadcrumbTemplate,
+        styleUrls: ['../assets/styles/ratingBreadcrumbs.styl']
     }
 )
 export class RatingCategoryBreadcrumbs implements OnInit {
