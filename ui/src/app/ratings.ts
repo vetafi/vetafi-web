@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {RatingsService, UserSelection} from './ratingsService';
 import {ActivatedRoute, Router} from '@angular/router';
+import {FormGroup} from '@angular/forms';
+import {FormlyFieldConfig} from '@ngx-formly/core';
 
 
 const ratingsHome = `
@@ -62,8 +64,168 @@ const ratingsHome = `
           <a class="btn" routerLink="/ratings/category">Add Condition</a>
         </div>
       </div>
+      <form name="form" (ngSubmit)="submit()">
+          <formly-form [form]="form" [model]="model" [fields]="fields">
+          </formly-form>
+      </form>
+      <div class="row">
+          <div class="col-xl-6">
+              <h3>Monthly Compensation:</h3> <h2>{{calculateMoney() | currency:'USD'}}</h2>
+          </div>
+      </div>
   </div>
+  
+  
 </div>`;
+
+const fields: FormlyFieldConfig[] = [
+    {
+        fieldGroupClassName: 'row',
+        fieldGroup: [
+            {
+                className: 'col-3',
+                'key': 'has_children_y_n',
+                'type': 'radio',
+                'templateOptions': {
+                    'label': 'Do you have children?',
+                    'options': [
+                        {
+                            'key': 'Yes',
+                            'label': 'Yes',
+                            'value': 'Yes'
+                        },
+                        {
+                            'key': 'No',
+                            'label': 'No',
+                            'value': 'No'
+                        }
+                    ]
+                },
+                'defaultValue': 'No'
+            },
+            {
+                className: 'col-3',
+                'key': 'num_under_18_children',
+                'type': 'input',
+                'templateOptions': {
+                    'type': 'number',
+                    'min': 0,
+                    'label': 'How many children under 18 do you have?'
+                },
+                'defaultValue': 0,
+                'hideExpression': 'model.has_children_y_n != \'Yes\''
+            },
+            {
+                className: 'col-3',
+                'key': 'num_over_18_children',
+                'type': 'input',
+                'templateOptions': {
+                    'type': 'number',
+                    'min': 0,
+                    'label': 'How many children over 18 who are attending school/college?'
+                },
+                'defaultValue': 0,
+                'hideExpression': 'model.has_children_y_n != \'Yes\''
+            }
+        ]
+    },
+    {
+        fieldGroupClassName: 'row',
+        fieldGroup: [
+            {
+                className: 'col-6',
+                'key': 'has_parents_y_n',
+                'type': 'radio',
+                'templateOptions': {
+                    'label': 'Do you have parents that are your dependents?',
+                    'options': [
+                        {
+                            'key': 'Yes',
+                            'label': 'Yes',
+                            'value': 'Yes'
+                        },
+                        {
+                            'key': 'No',
+                            'label': 'No',
+                            'value': 'No'
+                        }
+                    ]
+                },
+                'defaultValue': 'No'
+            },
+            {
+                className: 'col-6',
+                'key': 'num_parents',
+                'type': 'radio',
+                'templateOptions': {
+                    'label': 'Do you have one or two parents as dependents?',
+                    'options': [
+                        {
+                            'key': 'One',
+                            'label': 'One',
+                            'value': 'One'
+                        },
+                        {
+                            'key': 'Two',
+                            'label': 'Two',
+                            'value': 'Two'
+                        }
+                    ]
+                },
+                'defaultValue': 0,
+                'hideExpression': 'model.has_parents_y_n != \'Yes\''
+            }
+        ]
+    },
+    {
+        fieldGroupClassName: 'row',
+        fieldGroup: [
+            {
+                className: 'col-6',
+                'key': 'has_spouse_y_n',
+                'type': 'radio',
+                'templateOptions': {
+                    'label': 'Do you have a spouse?',
+                    'options': [
+                        {
+                            'key': 'Yes',
+                            'label': 'Yes',
+                            'value': 'Yes'
+                        },
+                        {
+                            'key': 'No',
+                            'label': 'No',
+                            'value': 'No'
+                        }
+                    ]
+                },
+                'defaultValue': 'No'
+            },
+            {
+                className: 'col-6',
+                'key': 'aid_and_attendance_spouse_y_n',
+                'type': 'radio',
+                'templateOptions': {
+                    'label': 'Does your spouse require aid and attendance (blind, bedridden, or requiring help bathing, dressing, etc.)?',
+                    'options': [
+                        {
+                            'key': 'Yes',
+                            'label': 'Yes',
+                            'value': 'Yes'
+                        },
+                        {
+                            'key': 'No',
+                            'label': 'No',
+                            'value': 'No'
+                        }
+                    ]
+                },
+                'defaultValue': 'No',
+                'hideExpression': 'model.has_spouse_y_n != \'Yes\''
+            }
+        ]
+    }
+];
 
 @Component(
     {
@@ -77,6 +239,9 @@ export class RatingsHome implements OnInit {
     public ratingsConfig: any[];
     public userRating: number;
     public userSelections: any[];
+    public fields = fields;
+    public model = {};
+    public form = new FormGroup({});
 
     constructor(public ratingsService: RatingsService,
                 public router: Router,
@@ -88,7 +253,6 @@ export class RatingsHome implements OnInit {
         this.ratingsConfig = this.activatedRoute.snapshot.data.ratingsConfig;
         this.userRating = this.ratingsService.getUserRating();
         this.userSelections = this.ratingsService.getSelections();
-        console.log(this.userSelections);
     }
 
     removeSelection(item: UserSelection) {
@@ -99,6 +263,20 @@ export class RatingsHome implements OnInit {
     addCondition(item: UserSelection) {
         this.ratingsService.addSelection(item);
         this.router.navigateByUrl('');
+    }
+
+    submit() {
+        console.log(this.form);
+        console.log(this.fields);
+        if (this.form.valid) {
+            alert(JSON.stringify(this.model));
+        }
+    }
+
+    calculateMoney() {
+        return RatingsService.getCompensation(
+            this.userRating,
+            this.model);
     }
 }
 
@@ -176,7 +354,7 @@ export class RatingsSelect {
     ngOnInit(): void {
         this.ratingsConfig = this.activatedRoute.snapshot.data.ratingsConfig;
         let rootCategory = {
-            description: "All Categories",
+            description: 'All Categories',
             subcategories: this.ratingsConfig,
             notes: [],
             ratings: []
@@ -206,7 +384,7 @@ export class RatingsSelect {
                 this.code.description,
                 selection.description,
                 this.code.code));
-        this.router.navigateByUrl("ratings");
+        this.router.navigateByUrl('ratings');
     }
 }
 
@@ -324,7 +502,7 @@ export class RatingsCategories {
     ngOnInit(): void {
         this.ratingsConfig = this.activatedRoute.snapshot.data.ratingsConfig;
         let rootCategory = {
-            description: "All Categories",
+            description: 'All Categories',
             subcategories: this.ratingsConfig,
             notes: [],
             ratings: []
@@ -334,25 +512,25 @@ export class RatingsCategories {
             this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : [];
         this.currentUrlPath =
             this.activatedRoute.snapshot.params.categoryPath ?
-                this.activatedRoute.snapshot.params.categoryPath : "";
+                this.activatedRoute.snapshot.params.categoryPath : '';
 
         this.unpackPath(rootCategory, path);
     }
 
     getPathToSubcategory(index: number) {
         let currentUrlPath =
-            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : "";
+            this.activatedRoute.snapshot.params.categoryPath ? this.categoryPath() : '';
 
         if (!currentUrlPath) {
             return String(index);
         } else {
-            return currentUrlPath + "," + index;
+            return currentUrlPath + ',' + index;
         }
     }
 
     selectCondition(selection: any): void {
         this.ratingsService.addSelection(selection);
-        this.router.navigateByUrl("ratings")
+        this.router.navigateByUrl('ratings');
     }
 }
 
