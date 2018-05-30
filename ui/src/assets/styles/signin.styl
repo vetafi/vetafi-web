@@ -1,229 +1,93 @@
 @import "standards.styl"
 @import "main.styl"
 
-backgroundUrl = '/assets/icons/veteran-dog-bg.jpg'
 removePicWidth = maxLayoutWidthPx
 changeLayoutWidth = minWindowWidthPx
 textContainerWidthPx = 165px
 
-#signup-view
-#login-view
-#change-password-view
-#forgot-password-view
-  background: url(backgroundUrl)
-  background-attachment: fixed
-  background-position: center center
-  background-size: cover
-  background-repeat: no-repeat
+div.auth-view
+  position: fixed
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  width: 33vw
+  min-width: minWindowWidthPx
+  background-color: colorWhite
+  box-shadow: 0px 0px 16px 4px
+  border-radius: 6px
+  overflow: hidden
 
-  & .bg-overlay
-    position: fixed
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    background: rgba(255, 255, 255, 0.4)
-
-  & .viewer
-    position: fixed
-    top: 50%
-    left: 50%
-    transform: translate(-50%, -50%)
-    width: maxLayoutWidthPx
-    height: 520px
-    background-color: colorWhite
-    box-shadow: 0px 0px 16px 4px
-    border-radius: 6px
-    overflow: hidden
-
-    @media screen and (max-width: removePicWidth)
-      width: 400px
+  & img.logo
+    display: block
+    width: 120px
+    margin-left: auto
+    margin-right: auto
+    margin-top: smallSpacing
+    margin-bottom: largeSpacing
 
     @media screen and (max-width: changeLayoutWidth)
-      width: 100%
-      height: 100%
-      top: 0
-      left: 0
-      transform: none
-      border-radius: 0px
-      background: rgba(0, 0, 0, 0.6)
+      content: url('/assets/icons/vetafi-logo.svg')
 
-  & .pic-section
-    display: inline-block
-    float: left
+  & div.error-msg-container
+    margin: 0 auto
     width: 50%
-    height: 100%
-    background: url('/assets/icons/veteran-dog-bg.jpg')
-    background-position: -50px 0px
-    background-size: cover
-    background-repeat: no-repeat
 
-    @media screen and (max-width: removePicWidth)
-      display: none
+  & .error-msg
+    color: colorRed
+    text-align: center
 
-  & .interact-section
-    display: inline-block
-    vertical-align: top
+  & p.email-text-container
+    font-weight: bold
+
+  & div.btn-container
+    margin: 0 auto
     width: 50%
-    height: 100%
-    padding: largeSpacing
 
-    @media screen and (max-width: removePicWidth)
-      display: block
-      width: 100%
-      padding: largeSpacing megaSpacing
+  & div.divider-container
+    margin: 0 auto
+    width: 2em
+    overflow-x: visible
 
-    & img.logo
-      display: block
-      width: 120px
-      margin: 0 auto largeSpacing
+  & div.form-container
+    margin-left: auto
+    margin-right: auto
+    margin-bottom: smallSpacing
 
-      @media screen and (max-width: changeLayoutWidth)
-        content: url('/assets/icons/vetafi-logo.svg')
-
-    & .error-msg
-      color: colorRed
-      text-align: left
-
-  & .carousel
-    position: relative
-    width: 100%
-    height: calc(100% - 1em)
-    //overflow: hidden
-
-    & .screen
-      position: absolute
-      top: 0
-      width: 100%
-      transition: 0.2s linear all
-
-      &.options
-        left: 0
-        opacity: 1.0
-        visibility: visible
-
-        &.vfi-hide
-          left: -50%
-          opacity: 0.0
-          visibility: hidden
-
-      &.inputs
-        left: 50%
-        opacity: 0.0
-        visibility: hidden
-
-        &.vfi-show
-          left: 0
-          opacity: 1.0
-          visibility: visible
-
-
-  & .screen.options
-    & .divider
-      margin-bottom: mediumSpacing
-      text-align: center
-      color: colorDarkGray
-
-      @media screen and (max-width: changeLayoutWidth)
-        color: colorWhite
-
-    & a
-      display: block
-      margin-bottom: smallSpacing
-      text-align: left
-      color: colorPrimaryBlue
-
-      &:hover
-        cursor: pointer
-
-      @media screen and (max-width: removePicWidth)
-        text-align: center
-      @media screen and (max-width: changeLayoutWidth)
-        color: colorWhite
-
-    & button
-      width: 100%
-      margin-bottom: mediumSpacing
-      text-align: left
-
-      & .icon-container
-        display: inline-block
-        width: "calc(100% - %s)" % textContainerWidthPx
-        vertical-align: middle
-
-      & .txt-container
-        display: inline-block
-        float: right
-        width: textContainerWidthPx
-
-      & .fb-icon
-        height: 24px
-        width: 24px
-        margin-left: -10px
-        margin-top: -3px
-        background: url('/assets/icons/fb-icon.svg')
-        background-size: cover
-        background-repeat: no-repeat
-
-      & .idme-icon
-        height: 16px
-        width: 44px
-        margin-top: 4px
-        margin-bottom: 4px
-        background: url('/assets/icons/idme-logo-white.png')
-        background-size: cover
-        background-repeat: no-repeat
-
-      & .email-icon
-        width: 40px
-        height: 24px
-        background: url('/assets/icons/email-white.svg')
-        background-size: cover
-        background-repeat: no-repeat
-        background-position: -7px -7px
-
-      &.fb-btn
-        background-color: colorFacebook
-      &.idme-btn
-        background-color: colorIdMeNavy
-      &.email-btn
-        background-color: colorPrimaryBlue
-
-
-  & .screen.inputs
-    & a
-      display: block
+    width: 50%
 
     & input
-      display: block
       width: 100%
-      margin-bottom: smallSpacing
-      padding: miniSpacing smallSpacing
-      border-radius: 4px
-      outline: none
-      border: 2px solid colorLightGray
-      box-shadow: none
 
-      &:active
-      &:focus
-        border: 2px solid colorLightBlue
+    & .email-icon
+      width: 40px
+      height: 24px
+      background: url('/assets/icons/email-white.svg')
+      background-size: cover
+      background-repeat: no-repeat
+      background-position: -7px -7px
 
-    & .submit
-      display: block
-      width: 100%
-      margin-bottom: smallSpacing
-      background-color: colorPrimaryDarkBlue
-      border: 2px solid colorPrimaryDarkBlue
-      color: colorWhite
+  & .idme-btn
+    background-color: colorIdMeNavy
+    text-align: left
 
-      @media screen and (max-width: removePicWidth)
-        text-align: center
+    & .idme-icon
+      height: 16px
+      width: 44px
+      margin-top: 4px
+      margin-bottom: 4px
+      background: url('/assets/icons/idme-logo-white.png')
+      background-size: cover
+      background-repeat: no-repeat
 
-    & .back-btn
-      display: block
-      width: 100%
-      background-color: transparent
-      color: colorDarkGray
+  & .btn
+    margin-bottom: mediumSpacing
+    width: 100%
 
-      @media screen and (max-width: changeLayoutWidth)
-        color: colorWhite
+    & .icon-container
+      display: inline-block
+      vertical-align: middle
+
+    & .txt-container
+      display: inline-block
+      float: right
+      margin-left: megaSpacing
