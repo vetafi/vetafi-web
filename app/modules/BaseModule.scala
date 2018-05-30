@@ -11,6 +11,7 @@ import services.documents.pdf._
 import services.documents.{ DocumentService, ITextDocumentService }
 import services.email.{ AmazonSESEmailService, EmailService }
 import services.forms._
+import services.ratings.{ JsonResourceRatingsConfigManager, RatingsConfigManager }
 import services.submission._
 import services.time.{ ClockService, SystemClockService }
 import utils.auth.{ TwilioRequestValidator, TwilioRequestValidatorImpl }
@@ -56,5 +57,6 @@ class BaseModule extends AbstractModule with ScalaModule {
     bind[SecureRandomIDGenerator].toInstance(new SecureRandomIDGenerator(32))
     bind[TwilioRequestValidator].to[TwilioRequestValidatorImpl]
     bind[EmailService].to[AmazonSESEmailService]
+    bind[RatingsConfigManager].to[JsonResourceRatingsConfigManager]
   }
 }

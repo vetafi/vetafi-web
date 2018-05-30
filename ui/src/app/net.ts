@@ -88,7 +88,11 @@ export class AjaxService {
         return this.httpClient.post('/api/subscribe', data)
     }
 
-    agreeToTOS(): Observable<any>  {
+    agreeToTOS(): Observable<any> {
         return this.httpClient.get('/api/user/agreeToTOS')
+    }
+
+    getRatingsConfig(): Observable<any> {
+        return this.httpClient.get('/api/ratings')
     }
 }

@@ -1,0 +1,283 @@
+{
+ "description": "Schedule of ratings\u2014ear.",
+ "subcategories": [],
+ "ratings": [
+  {
+   "code": {
+    "code": 6200,
+    "description": "Chronic suppurative otitis media, mastoiditis, or cholesteatoma (or any combination):"
+   },
+   "ratings": [
+    {
+     "rating": 10,
+     "description": "During suppuration, or with aural polyps"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  \n\n                    Note: Evaluate hearing impairment, and complications such as labyrinthitis, tinnitus, facial nerve paralysis, or bone loss of skull, separately.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6201,
+    "description": "Chronic nonsuppurative otitis media with effusion (serous otitis media):"
+   },
+   "ratings": [
+    {
+     "rating": 30,
+     "description": "Dizziness and occasional staggering"
+    },
+    {
+     "rating": 10,
+     "description": "Occasional dizziness"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  Rate hearing impairment\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  Rate hearing impairment\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  \n\n                    Note: Objective findings supporting the diagnosis of vestibular disequilibrium are required before a compensable evaluation can be assigned under this code. Hearing impairment or suppuration shall be separately rated and combined.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6202,
+    "description": "Otosclerosis:"
+   },
+   "ratings": [
+    {
+     "rating": 30,
+     "description": "Dizziness and occasional staggering"
+    },
+    {
+     "rating": 10,
+     "description": "Occasional dizziness"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  Rate hearing impairment\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  Rate hearing impairment\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  \n\n                    Note: Objective findings supporting the diagnosis of vestibular disequilibrium are required before a compensable evaluation can be assigned under this code. Hearing impairment or suppuration shall be separately rated and combined.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6204,
+    "description": "Peripheral vestibular disorders:"
+   },
+   "ratings": [
+    {
+     "rating": 30,
+     "description": "Dizziness and occasional staggering"
+    },
+    {
+     "rating": 10,
+     "description": "Occasional dizziness"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  Rate hearing impairment\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  Rate hearing impairment\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  \n\n                    Note: Objective findings supporting the diagnosis of vestibular disequilibrium are required before a compensable evaluation can be assigned under this code. Hearing impairment or suppuration shall be separately rated and combined.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6205,
+    "description": "Meniere's syndrome (endolymphatic hydrops):"
+   },
+   "ratings": [
+    {
+     "rating": 100,
+     "description": "Hearing impairment with attacks of vertigo and cerebellar gait occurring more than once weekly, with or without tinnitus"
+    },
+    {
+     "rating": 60,
+     "description": "Hearing impairment with attacks of vertigo and cerebellar gait occurring from one to four times a month, with or without tinnitus"
+    },
+    {
+     "rating": 30,
+     "description": "Hearing impairment with vertigo less than once a month, with or without tinnitus"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  \n\n                    Note: Evaluate Meniere's syndrome either under these criteria or by separately evaluating vertigo (as a peripheral vestibular disorder), hearing impairment, and tinnitus, whichever method results in a higher overall evaluation. But do not combine an evaluation for hearing impairment, tinnitus, or vertigo with an evaluation under diagnostic code 6205.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6207,
+    "description": "Loss of auricle:"
+   },
+   "ratings": [
+    {
+     "rating": 50,
+     "description": "Complete loss of both"
+    },
+    {
+     "rating": 30,
+     "description": "Complete loss of one"
+    },
+    {
+     "rating": 10,
+     "description": "Deformity of one, with loss of one-third or more of the substance"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": []
+  },
+  {
+   "code": {
+    "code": 6208,
+    "description": "Malignant neoplasm of the ear (other than skin only)\n\n                  100"
+   },
+   "ratings": [
+    {
+     "rating": 100,
+     "description": "6208\u2003Malignant neoplasm of the ear (other than skin only)"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  \n\n                    Note: A rating of 100 percent shall continue beyond the cessation of any surgical, radiation treatment, antineoplastic chemotherapy or other therapeutic procedure. Six months after discontinuance of such treatment, the appropriate disability rating shall be determined by mandatory VA examination. Any change in evaluation based on that or any subsequent examination shall be subject to the provisions of \u00a7\u20093.105(e) of this chapter. If there has been no local recurrence or metastasis, rate on residuals.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6209,
+    "description": "Benign neoplasms of the ear (other than skin only):"
+   },
+   "ratings": [
+    {
+     "rating": 10,
+     "description": "Swelling, dry and scaly or serous discharge, and itching requiring frequent and prolonged treatment"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  Rate on impairment of function.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6210,
+    "description": "Chronic otitis externa:"
+   },
+   "ratings": [
+    {
+     "rating": 10,
+     "description": "Swelling, dry and scaly or serous discharge, and itching requiring frequent and prolonged treatment"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  Rate on impairment of function.\n\n                \n\n                "
+    }
+   ]
+  },
+  {
+   "code": {
+    "code": 6211,
+    "description": "Tympanic membrane, perforation of\n\n                  0"
+   },
+   "ratings": [
+    {
+     "rating": 0,
+     "description": "6211\u2003Tympanic membrane, perforation of"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": []
+  },
+  {
+   "code": {
+    "code": 6260,
+    "description": "Tinnitus, recurrent\n\n                  10"
+   },
+   "ratings": [
+    {
+     "rating": 10,
+     "description": "6260\u2003Tinnitus, recurrent"
+    }
+   ],
+   "header": [
+    "Rating"
+   ],
+   "see_other_notes": [],
+   "notes": [
+    {
+     "note": "\n\n                  \n\n                    Note (1): A separate evaluation for tinnitus may be combined with an evaluation under diagnostic codes 6100, 6200, 6204, or other diagnostic code, except when tinnitus supports an evaluation under one of those diagnostic codes.\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  \n\n                    Note (2): Assign only a single evaluation for recurrent tinnitus, whether the sound is perceived in one ear, both ears, or in the head.\n\n                \n\n                "
+    },
+    {
+     "note": "\n\n                  \n\n                    Note (3): Do not evaluate objective tinnitus (in which the sound is audible to other people and has a definable cause that may or may not be pathologic) under this diagnostic code, but evaluate it as part of any underlying condition causing it.\n\n                \n\n              "
+    }
+   ]
+  }
+ ],
+ "notes": [],
+ "see_other_notes": []
+}

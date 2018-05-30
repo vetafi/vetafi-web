@@ -4,6 +4,7 @@ import {AjaxService} from './net';
 import {ClaimService} from './claimService';
 import isEmpty from 'lodash/isEmpty'
 import find from 'lodash/find'
+import {RatingsService} from './ratingsService';
 
 @Injectable()
 export class ClaimsResolve implements Resolve<any> {
@@ -93,3 +94,12 @@ export class UserValuesResolve implements Resolve<any> {
     }
 }
 
+@Injectable()
+export class RatingsConfigResolve implements Resolve<any> {
+    constructor(private ratingsService: RatingsService) {}
+
+    resolve(route: ActivatedRouteSnapshot,
+            state: RouterStateSnapshot) {
+        return this.ratingsService.getConfiguration();
+    }
+}
