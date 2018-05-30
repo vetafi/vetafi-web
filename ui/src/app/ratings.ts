@@ -11,7 +11,6 @@ const ratingsHome = `
     <div class="row">
       <div class="col-sm-10">
         <h2>Disability Rating Calculator</h2>
-        
       </div>
       <div class="col-sm-2 float-right">
           <p><b class="last-updated-statement">Rating info last updated:</b>May 2017</p>
@@ -24,7 +23,7 @@ const ratingsHome = `
         </div>
     </div>
     
-    <div class="row">
+    <div class="row button-row">
         <div class="col-sm-8">
             <h3>Step 1: Select your service connected disabilities</h3>
             <p>To begin click “Add Condition”. You will be able to browse from the list of VA covered conditions.</p>
@@ -37,9 +36,6 @@ const ratingsHome = `
           <a class="btn" routerLink="/ratings/category">Add Condition</a>
         </div>
     </div>
-  
-    
-    
       <table class="table rating-table">
         <thead>
             <tr>
@@ -70,15 +66,13 @@ const ratingsHome = `
         <div class="col-xl-6">
           <h3>Total Rating:</h3> <h2>{{userRating}} %</h2>
         </div>
-        
       </div>
       
-      
       <div class="row">
-        <div class="col-sm-12">
-            <hr/>
-        </div>
-    </div>
+          <div class="col-sm-12">
+              <hr/>
+          </div>
+      </div>
       
       <div class="row">
         <div class="col-sm-8">
@@ -87,10 +81,6 @@ const ratingsHome = `
             <p>Answer the following questions so that we can calculate your monthly disability payments:</p>
         </div>
     </div>
-   
-      
-       
-      
       <form name="form" (ngSubmit)="submit()">
           <formly-form [form]="form" [model]="model" [fields]="fields">
           </formly-form>
@@ -101,8 +91,6 @@ const ratingsHome = `
           </div>
       </div>
   </div>
-  
-  
 </div>`;
 
 const fields: FormlyFieldConfig[] = [
@@ -312,14 +300,15 @@ const ratingsSelect = `
 <ratings-category-breadcrumbs [breadcrumbs]="breadcrumbs"></ratings-category-breadcrumbs>
 <div id="vfi-ratings">
     <div class="container">
-
-<div *ngIf="ratings.length > 0">
+      <div *ngIf="ratings.length > 0">
         <h3 class="section-header">Rated Conditions</h3>
         <div class="row">
           <div class="col-xl-12">
             <hr />
           </div>
         </div>
+        <div class="row">
+          <div class="col-xl-12">
         <table class="table table-striped">
             <thead>
             <tr>
@@ -338,6 +327,8 @@ const ratingsSelect = `
             </tr>
             </tbody>
         </table>
+        </div>
+        </div>
         </div>
 
         <div *ngIf="notes.length > 0">
@@ -462,6 +453,8 @@ const ratingsCategories = `
           </div>
         </div>
         
+        <div class="row">
+        <div class="col-xl-12">
         <table class="table table-striped">
             <thead>
                     <tr>
@@ -476,12 +469,14 @@ const ratingsCategories = `
                     <td>{{rating.code.code}}</td>
                     <td> 
                         <a class="btn" routerLink="/ratings/category/{{currentUrlPath}}/rating/{{i}}">
-                            Select Condition
+                            Select
                         </a>
                     </td>
                 </tr>
             </tbody>
         </table>
+        </div>
+        </div>
       </div>
       
       <table *ngIf="notes.length > 0">
@@ -492,7 +487,9 @@ const ratingsCategories = `
           </div>
         </div>
         <div *ngFor="let note of notes" class="row">
-          {{note.note}}
+            <div class="col-xl-12">
+                {{note.note}}
+            </div>
         </div>
       </table>
       
@@ -505,8 +502,10 @@ const ratingsCategories = `
           </div>
           <div class="rating-category-select-button row"
                *ngFor="let subcategory of subcategories; index as i">
-            <a routerLink="/ratings/category/{{getPathToSubcategory(i)}}"
-               class="subcategory">{{subcategory}}</a>
+               <div class="col-xl-12">
+                    <a routerLink="/ratings/category/{{getPathToSubcategory(i)}}"
+                       class="subcategory">{{subcategory}}</a>
+               </div>
           </div>
       </div>
   </div>
