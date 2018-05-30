@@ -13,6 +13,12 @@ BOXFUSE_SECRET="$(biscuit get --filename=conf/biscuit/secrets.yaml boxfuse-secre
 
 NEWRELIC_LICENSE_KEY="$(biscuit get --filename=conf/biscuit/secrets.yaml newrelic-license-key)"
 
+cd ui
+
+npm run-script build-prod
+
+cd ..
+
 sbt clean dist
 
 boxfuse run -env=prod \
