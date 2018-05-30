@@ -62,6 +62,9 @@ lazy val root = (project in file("."))
       watchSources ++= (baseDirectory.value / "public/ui" ** "*").get
     )
 
+PB.targets in Compile := Seq(
+  scalapb.gen() -> file("./protos")
+)
 
 routesGenerator := InjectedRoutesGenerator
 
