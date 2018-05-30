@@ -58,7 +58,7 @@ let template = `
   <div class="action-wrapper container">
     <div class="action row">
       <div class="content col-sm-6">
-        <h4>See what the VA will pay you for your service linked disability.</h4>
+        <h4>See what the VA will pay you for your service connected disability.</h4>
         <p>The VA rules for disability compensation are complicated and change frequently. Use our simple tool to get the most up to date information on what you could be paid by the VA.</p>
           <a routerLink="/ratings" class="btn">
             Disability Ratings Calculator
