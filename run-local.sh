@@ -10,4 +10,4 @@ npm run-script build-prod
 
 cd ..
 
-sbt run -Dconfig.resource=application.local.conf -Dlogger.resource=logback.xml
+sbt clean run -Dconfig.resource=application.local.conf -Dlogger.resource=logback.xml
