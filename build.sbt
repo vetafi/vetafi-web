@@ -63,8 +63,10 @@ lazy val root = (project in file("."))
     )
 
 PB.targets in Compile := Seq(
-  scalapb.gen() -> baseDirectory.value / "protos/*"
+  scalapb.gen() -> (sourceManaged in Compile).value
 )
+
+PB.protoSources in Compile := (baseDirectory.value / "protos" ** "*").get
 
 routesGenerator := InjectedRoutesGenerator
 
