@@ -14,7 +14,5 @@ class AccessLogFilter @Inject() (implicit val mat: Materializer) extends Filter 
   def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
     logger.debug(requestHeader.toString())
     nextFilter(requestHeader)
-
-    TestThing
   }
 }
