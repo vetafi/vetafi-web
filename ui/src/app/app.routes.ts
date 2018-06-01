@@ -14,6 +14,7 @@ import {Routes} from '@angular/router';
 import {ClaimsResolve, FormsResolve, MaybeUserResolve, RatingsConfigResolve, UserResolve, UserValuesResolve} from './resolvers';
 import {TosComponent} from './tos';
 import {RatingsCategories, RatingsHome, RatingsSelect} from './ratings';
+import {TestComponent} from './test';
 
 
 let profileRoutes: Routes = [
@@ -48,6 +49,10 @@ let childRoutes: Routes = [
         path: '',
         redirectTo: 'home',
         pathMatch: 'full'
+    },
+    {
+      path: 'test',
+      component: TestComponent
     },
     {
         path: 'home',

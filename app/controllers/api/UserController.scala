@@ -3,8 +3,9 @@ package controllers.api
 import javax.inject.Inject
 
 import com.mohiva.play.silhouette.api.Silhouette
-import models.User
+import models.{ Contact, User }
 import models.daos.UserDAO
+import models.test.{ Nested, TestEnum, TestMessage }
 import play.api.libs.json.{ JsError, JsValue, Json }
 import play.api.mvc._
 import play.modules.reactivemongo.ReactiveMongoApi
@@ -21,6 +22,17 @@ class UserController @Inject() (
   val userDao: UserDAO,
   components: ControllerComponents,
   silhouette: Silhouette[DefaultEnv]) extends AbstractController(components) {
+
+  def test: Action[AnyContent] = silhouette.UnsecuredAction.async {
+    request =>
+      {
+        import models.serializers._
+        Future.successful(Ok(Json.toJson(TestMessage(
+          enumField = TestEnum.A,
+          stringField = "dstring",
+          nestedField = Some(Nested(stringField = "hello"))))))
+      }
+  }
 
   def getUser: Action[AnyContent] = silhouette.SecuredAction.async {
     request =>

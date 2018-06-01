@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from 'rxjs/Observable';
+import {TestMessage} from './models/test_pb';
 
 @Injectable()
 export class AjaxService {
@@ -94,5 +95,9 @@ export class AjaxService {
 
     getRatingsConfig(): Observable<any> {
         return this.httpClient.get('/api/ratings')
+    }
+
+    test(): Observable<TestMessage.AsObject> {
+        return this.httpClient.get<TestMessage.AsObject>('/api/test')
     }
 }

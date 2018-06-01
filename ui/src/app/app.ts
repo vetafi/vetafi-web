@@ -44,6 +44,7 @@ import {TosComponent, TosModalComponent} from './tos';
 import {EditProfileComponent} from './modalEditProfile';
 import {RatingCategoryBreadcrumbs, RatingsCategories, RatingsHome, RatingsSelect} from './ratings';
 import {RatingsService} from './ratingsService';
+import {TestComponent} from './test';
 
 
 @NgModule({
@@ -115,7 +116,8 @@ import {RatingsService} from './ratingsService';
         RatingsHome,
         RatingsCategories,
         RatingsSelect,
-        RatingCategoryBreadcrumbs
+        RatingCategoryBreadcrumbs,
+        TestComponent
     ],
     entryComponents: [
         TosModalComponent,

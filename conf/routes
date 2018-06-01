@@ -29,6 +29,7 @@ GET         /api/user                        controllers.api.UserController.getU
 POST        /api/user                        controllers.api.UserController.updateUser
 DELETE      /api/user                        controllers.api.UserController.deleteAccount
 GET         /api/user/agreeToTOS             controllers.api.UserController.agreeToTos
+GET         /api/test                        controllers.api.UserController.test
 
 GET         /api/user/values                 controllers.api.UserValuesController.getUserValues
 POST        /api/save/:claimID/:formKey      controllers.api.FormController.saveForm(claimID: java.util.UUID, formKey: String)
